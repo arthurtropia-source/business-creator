@@ -10,6 +10,8 @@ Você recebe do Arthur a sua pasta (`meu-os`), que já sabe onde buscar o plugin
 2. Abrir a pasta na aba **Code** e confirmar que confia nela.
 3. Escrever **oi**.
 
+**Modelo sugerido:** o Opus 5.5, no esforço padrão (médio). Escolha no seletor de modelo, embaixo da caixa de texto do app. É só uma sugestão: você pode mudar quando quiser.
+
 Sem a pasta, no app: clique no **+** ao lado da caixa de texto, **Plugins**, **Add marketplace** com `arthurtropia-source/business-creator`, depois **Add plugin** e escolha `business-creator`. Num terminal: `claude plugin install business-creator --marketplace arthurtropia-source/business-creator`.
 
 ## O que vem nele
