@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Bash(date:*)",
+      "Bash(ls:*)",
+      "mcp__business-creator__teste_do_base_camp"
+    ]
+  },
+  "extraKnownMarketplaces": {
+    "sem-ia": {
+      "source": {
+        "source": "github",
+        "repo": "arthurtropia-source/business-creator"
+      },
+      "autoUpdate": true
+    }
+  },
+  "enabledPlugins": {
+    "business-creator@sem-ia": true
+  },
+  "language": "Portuguese",
+  "spinnerVerbs": {
+    "mode": "replace",
+    "verbs": [
+      "Lendo o mapa",
+      "Arrumando a mochila",
+      "Firmando o passo",
+      "Marcando a trilha",
+      "Acendendo a lanterna",
+      "Conferindo a rota",
+      "Montando o acampamento",
+      "Abrindo caminho"
+    ]
+  },
+  "spinnerTipsEnabled": false,
+  "companyAnnouncements": [
+    "Business Creator powered by SEM IA™ · Montagem do Base Camp. Onde todo sistema começa: uma pasta, um arquivo e qualquer IA."
+  ]
+}

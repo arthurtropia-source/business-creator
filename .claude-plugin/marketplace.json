@@ -1,0 +1,14 @@
+{
+  "name": "sem-ia",
+  "owner": { "name": "Arthur Tropia" },
+  "metadata": {
+    "description": "O método do Business Creator powered by SEM IA™, em plugins que se atualizam sozinhos."
+  },
+  "plugins": [
+    {
+      "name": "business-creator",
+      "source": "./plugins/business-creator",
+      "description": "A Montagem do Base Camp, com o painel ao lado da conversa e o jeito de responder para quem não é técnico."
+    }
+  ]
+}

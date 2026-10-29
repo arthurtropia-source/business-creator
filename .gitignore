@@ -1,0 +1,5 @@
+.DS_Store
+entrega/
+.claude-plugin/types/
+plugins/*/.claude-plugin/types/
+__pycache__/

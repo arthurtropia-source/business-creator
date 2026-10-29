@@ -1,0 +1,9 @@
+# Sistema em montagem
+
+Este sistema de trabalho ainda está sendo montado.
+
+- **No começo de toda conversa, leia `base-camp.md`.**
+- **Enquanto houver etapa pendente ou em andamento ali, use a skill `montagem-do-base-camp` para responder a qualquer mensagem**, mesmo um "oi", e siga as instruções dela.
+- Se a pessoa pedir outra coisa no meio da montagem, ajude em poucas linhas e proponha voltar ao ponto onde pararam.
+
+Este arquivo é reescrito no fim da montagem e vira o arquivo principal do sistema da pessoa.
