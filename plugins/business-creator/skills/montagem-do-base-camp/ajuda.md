@@ -5,6 +5,13 @@
 ## O app pediu permissão para criar ou editar um arquivo
 "É o app confirmando que pode escrever na sua pasta. Pode permitir (o botão costuma se chamar 'Allow' ou 'Permitir'). Ele só escreve dentro desta pasta, e nada sai do seu computador sem você mandar."
 
+## O app pediu permissão para rodar alguma coisa
+"É o app confirmando uma ação no seu computador. A sua pasta já libera o que eu uso no dia a dia; o que pede o seu ok é apagar, baixar algo da internet ou mandar algo para fora. Leia a linha do pedido: se fizer sentido, permita; se não, recuse e me pergunte. Enquanto você não responde, eu fico parado esperando."
+- Se ela perguntar do seletor: "Embaixo da caixa de texto fica o modo do app. Deixe em Accept edits (aceitar edições): eu gravo nesta pasta sem perguntar e peço o seu ok para o resto."
+
+## A conversa parou e não responde (o app fechou com um pedido aberto)
+"Escreva **tente novamente**. Eu retomo do último passo; nada do que foi gravado se perdeu."
+
 ## Não estou vendo os arquivos
 "Eles ficam na pasta que você abriu no app. Você pode abrir essa pasta pelo Finder (no Mac) ou pelo Explorador de Arquivos (no Windows). Os arquivos são de texto: abrem em qualquer editor."
 - Se o app mostrar um painel de arquivos, diga que ela também pode clicar no nome do arquivo na conversa.
@@ -63,6 +70,7 @@
 - `contexto/`: o que o sistema sabe sobre você e como você trabalha.
 - `frentes/`: uma pasta para cada coisa que você toca.
 - `memoria.md`: as lições que você ensina corrigindo.
+- `contexto/computador.md`: o que o seu computador tem (sistema, programas), para eu usar as ferramentas certas.
 - `primeiro-processo.md`: a primeira tarefa que o sistema vai aprender a fazer por você.
 - `como-usar.md`: o seu guia de bolso, com o combinado e os pedidos que já funcionam.
 - `resumo-para-o-arthur.md`: o resumo do seu Base Camp em uma página, para mandar ao Arthur se quiser.

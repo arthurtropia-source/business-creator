@@ -1,6 +1,6 @@
 <!--
 MODELO de como-usar.md (na raiz): o guia de bolso da pessoa. Escreva na etapa 6.6; a seção "O seu combinado" entra no fim da 6.7.
-Para quem: a própria pessoa, não a IA. Em "você", com as frentes e as palavras dela. Uma página (até ~40 linhas), sem jargão (nada de "contexto", "skill", "prompt"). Os exemplos de pedido saem das frentes e do primeiro processo dela.
+Para quem: a própria pessoa, não a IA. Em "você", com as frentes e as palavras dela. Uma página (até ~50 linhas), sem jargão (nada de "contexto", "skill", "prompt"). Os exemplos de pedido saem das frentes e do primeiro processo dela.
 Tire estes comentários e as instruções entre <>.
 -->
 # Como usar o seu sistema
@@ -35,6 +35,12 @@ O seu primeiro processo é **<PROC.escolhido>**. Quando for a hora, abra uma con
 - `frentes/`: uma ficha para cada coisa que você toca. <só no completo>
 - `memoria.md`: o seu caderno de lições.
 - `primeiro-processo.md`: a primeira tarefa que o sistema vai aprender a fazer por você.
+- `contexto/computador.md`: o que o seu computador tem, para o sistema usar as ferramentas certas.
+- `rotinas/` e `modelos/` (dentro de cada frente): os passo a passos que o sistema guardou e os textos que você aprovou.
+
+## Permissões: quando o app pede o seu ok
+O app pede o seu ok antes de certas ações. A sua pasta já libera o que o sistema usa no dia a dia (ler e gravar os seus arquivos, rodar os passo a passos guardados); **apagar, baixar da internet e mandar algo para fora continuam pedindo**. Quando aparecer um pedido, leia a linha e responda: a conversa fica parada até você responder. O modo fica no seletor embaixo da caixa de texto do app; deixe em **Accept edits**.
 
 ## Se travar
-Escreva **travei** na conversa. <Se tiver o painel:> Ou use o botão Travei, no painel do Base Camp.
+- Escreva **travei** na conversa. <Se tiver o painel:> Ou use o botão Travei, no painel do Base Camp.
+- **Se a conversa parou sem resposta** (o app fechou, a janela de permissão sumiu): escreva **tente novamente**. O sistema retoma de onde parou; nada do que foi gravado se perde.

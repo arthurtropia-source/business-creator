@@ -1,6 +1,7 @@
 <!--
 MODELO de frentes/<nome>/AGENTS.md (só no completo). Escreva no fim do bloco 2, um por frente, e crie ao lado o CLAUDE.md de uma linha (@AGENTS.md).
 Regras: curto (até ~30 linhas); em primeira pessoa; só o que ela disse; cada coisa que existe com a marca em uso, a confirmar ou parado; sem dados da empresa onde ela trabalha; nome de cliente nunca entra (use "um cliente", "o contato de um cliente").
+As seções Palavras minhas, Pendências, Rotinas e Modelos aprovados ficam mesmo vazias ("nenhuma ainda"): crescem com o uso.
 Tire estes comentários e as instruções entre <>.
 -->
 # <Frente>: AGENTS.md
@@ -22,3 +23,18 @@ Tire estes comentários e as instruções entre <>.
 
 ## Regras desta frente
 - <O que vale só aqui, se ela disse (ex.: "nada desta frente vai para as outras").>
+
+## Palavras minhas
+- <Palavra ou apelido que ela usa com sentido próprio nesta frente, e o que quer dizer. Ex.: "banco de dados" = a planilha de controle. "Nenhuma ainda" se for o caso.>
+
+## Pendências
+| Pergunta ou assunto | De quem depende | Desde |
+|---|---|---|
+| <o que ficou sem resposta> | <ela, uma função, "a TI"> | <data> |
+<"Nenhuma" se for o caso. O sistema acrescenta aqui o que fica no ar ao fim de cada conversa e começa por elas na conversa seguinte desta frente.>
+
+## Rotinas
+- <Cada rotina gravada em `rotinas/` desta frente: o nome, para que serve e o pedido que a chama. "Nenhuma ainda.">
+
+## Modelos aprovados
+- <Cada texto ou arquivo que ela aprovou, guardado em `modelos/` desta frente. Na montagem, a primeira tarefa da 6.7 entra aqui, se for desta frente. "Nenhum ainda.">

@@ -17,3 +17,8 @@
 - O número de passos da instalação, do zero ao "oi" respondido, e cada pergunta que o app fez.
 - Onde travou e o que a pessoa leiga não entenderia.
 - O tempo entre o push e a chegada da versão nova.
+
+## Mudança de rota (30/10/2026)
+- O passo 3 passa a ser a implantação do Arthur com a 0.2.0, numa pasta limpa no Mac (`~/business-creator-arthur/meu-os`, montada com o esqueleto da 0.2), em 31/10 e 01/11. A 0.1.1 entrou dentro da 0.2.0.
+- Os passos 4 e 5 (a correção que chega sozinha) passam a ser a primeira versão que sair dos pontos dele (0.2.1), conferida contra as impressões digitais de `~/business-creator-arthur/impressoes-inicio.txt` e as que a pasta tiver no dia.
+- Pré-teste da 0.2.0 pelo terminal (30/10): a montagem abre com o texto do roteiro e grava a hora sem pedir nada; a etapa 6.0 conferiu o Mac com seis comandos, nenhum negado. Achado: a leitura do roteiro dentro do plugin pedia permissão (o plugin mora fora da pasta da pessoa); o esqueleto passou a liberar `Read(~/.claude/plugins/**)`. A confirmar no app.

@@ -37,7 +37,7 @@
 | `JEITO.formato` [leve] | como ela quer receber (tamanho, ordem, opções) | há pelo menos 2 traços | 3.1, 3.2 |
 | `JEITO.decide` | como ela decide | há um jeito descrito | 3.3 |
 | `JEITO.horarios` | quando e de onde trabalha nas frentes | há horários ou lugares | 3.4, 1.5 |
-| `AMBIENTE.computador` | Mac ou Windows | há a resposta | 3.4 |
+| `AMBIENTE.computador` | Mac ou Windows (o resto, o sistema confere sozinho no inventário da 6.0 e grava em `contexto/computador.md`) | há a resposta | 3.4 |
 | `VOZ.textos` | 2 ou 3 textos dela, inteiros | há pelo menos 1 texto | 3.5, D |
 
 ## memoria.md e as regras do AGENTS.md
@@ -73,6 +73,7 @@
 | `contexto/como-trabalhar-comigo.md` | sim, curto | sim |
 | `contexto/estilo-de-escrita.md` | não | sim |
 | `frentes/<nome>/AGENTS.md` | não (só o mapa no `AGENTS.md`) | sim, uma por frente |
+| `contexto/computador.md` (o inventário da 6.0) | sim | sim |
 | `memoria.md` | sim | sim |
 | `primeiro-processo.md` | sim | sim |
 | `resumo-para-o-arthur.md` | sim | sim |

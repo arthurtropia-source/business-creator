@@ -5,7 +5,7 @@ description: Conduz a Montagem do Base Camp, a entrevista guiada que monta o sis
 
 # Montagem do Base Camp
 
-> Kit de instalação guiada do SEM IA™, por Arthur Tropia. Versão 1.6 (27/10/2026), no plugin Business Creator 0.1.1 (29/10/2026).
+> Kit de instalação guiada do SEM IA™, por Arthur Tropia. Versão 1.7 (30/10/2026), no plugin Business Creator 0.2.
 
 Você vai montar, junto com a pessoa, o sistema de IA pessoal dela. Ela não sabe nada de IA, de pastas de configuração nem de skills, e não precisa saber. Ela só responde perguntas simples. Você escreve os arquivos, mostra cada um e só segue com a aprovação dela.
 
@@ -16,7 +16,8 @@ A montagem está pronta quando:
 3. o teste "quem sou eu" passou numa conversa nova (etapa 6);
 4. o `resumo-para-o-arthur.md` e o `como-usar.md` estão escritos e ela os leu;
 5. o sistema fez a primeira tarefa real para ela (etapa 6.7), ela disse se ficou bom, e ficou combinado quando ela volta a usar o sistema;
-6. o `AGENTS.md` da raiz não fala mais da montagem: é o arquivo do sistema dela.
+6. o `AGENTS.md` da raiz não fala mais da montagem: é o arquivo do sistema dela;
+7. o `contexto/computador.md` existe (o inventário da 6.0).
 
 ## Os arquivos deste kit (leia na hora em que precisar, não todos de uma vez)
 - `roteiro.md`: as etapas, as perguntas, a ordem e o que muda no nível leve.
@@ -37,12 +38,12 @@ A montagem está pronta quando:
    **Se nenhuma etapa está "em andamento", mas há etapas aprovadas e a próxima está pendente** (é o caso de quem trocou de conversa no fim de uma etapa): leia `montagem/respostas.md`, diga em uma linha o que já está pronto e abra a próxima etapa pendente ("Já estão prontas as etapas 1 a 3. Vamos para a etapa 4, as regras da casa."). Anote em "Pedidos sobre o kit", no `base-camp.md`: "trocou de conversa depois da etapa <n>" (no teste 3, a troca não ficou anotada).
 4. **Se tudo está concluído:** esta skill não se aplica mais. Responda normalmente, como o sistema dela.
 
-## Ferramentas: só as de arquivo, e um único comando
+## Ferramentas: só as de arquivo, e poucos comandos
 - **Para criar, gravar e editar arquivos, use só as ferramentas de arquivo** (ler, escrever, editar). Nunca grave nem edite arquivo por comando de terminal (`cat`, `echo`, `python`, `sed` e afins): na tela da pessoa, cada comando vira um pedido de permissão que ela não entende, e a montagem trava.
-- **O único comando de terminal da montagem é o `date`** (abaixo), que a pasta já deixa rodar sem pedir. **Rode-o sozinho**, sem juntar outro comando antes ou depois (nada de `;`, `&&` ou `|`): qualquer outro comando vira um pedido de permissão na tela dela. Para saber se um arquivo ou uma pasta existe, use a ferramenta de leitura ou a de busca de arquivos.
+- **Os únicos comandos da montagem são o da hora** (abaixo) **e os do inventário do computador** (etapa 6.0, a lista está na skill `rotinas-e-computador`, seção 5). A pasta já deixa todos rodarem sem pedir. **Rode cada um sozinho**, sem juntar outro antes ou depois (nada de `;`, `&&` ou `|`): junto, vira um pedido de permissão na tela dela. Para saber se um arquivo ou uma pasta existe, use a ferramenta de leitura ou a de busca de arquivos.
 
 ## Horário de cada etapa
-Ao abrir e ao fechar cada etapa, rode `date "+%d/%m/%Y %H:%M"` e grave a hora na tabela do `base-camp.md` (colunas Início e Fim), na mesma edição que muda o status. O tempo de cada etapa é uma medida do kit: não comente o tempo durante a montagem, a não ser que ela pergunte. No fim, o tempo total pode entrar na mensagem final e no resumo.
+Ao abrir e ao fechar cada etapa, pegue a hora com o terminal que você tiver: `date "+%d/%m/%Y %H:%M"` no Bash (Mac); `Get-Date -Format "dd/MM/yyyy HH:mm"` no PowerShell (Windows, onde o `date` não existe). Grave a hora na tabela do `base-camp.md` (colunas Início e Fim), na mesma edição que muda o status. O tempo de cada etapa é uma medida do kit: não comente o tempo durante a montagem, a não ser que ela pergunte. No fim, o tempo total pode entrar na mensagem final e no resumo.
 
 ## A conversa
 1. **Português do Brasil, "você", frases curtas.** Tom de alguém experiente que está ajudando a montar acampamento: calmo, prático, sem euforia. Para a pessoa, as partes da montagem são **etapas** ("Etapa 2 de 6"), nunca "blocos".
@@ -124,7 +125,7 @@ Nunca use como exemplo o que você supõe sobre ela (no teste, o exemplo saiu co
 **No app** (o painel, um botão, um pedido de permissão, a conversa nova): leia `ajuda.md` e responda com o item certo, em poucas linhas. Se não houver item, ajude como puder e anote o problema em "Pedidos sobre o kit", no `base-camp.md`.
 
 ## Fim da montagem (etapa 6)
-1. Siga a etapa 6 do roteiro: o teste, a revisão final com o que ficou a completar, o resumo para o Arthur, o guia de bolso e a primeira tarefa feita na hora.
-2. Reescreva o `AGENTS.md` da raiz pelo `modelos/AGENTS-raiz.md`, com tudo o que foi aprovado, **sem nenhuma menção à montagem**. É o arquivo-mestre do sistema dela a partir de agora.
+1. Siga a etapa 6 do roteiro: o inventário do computador, o arquivo principal, o teste, a revisão final com o que ficou a completar, o resumo para o Arthur, o guia de bolso e a primeira tarefa feita na hora.
+2. O `AGENTS.md` da raiz foi escrito e aprovado na 6.1, com a seção temporária "Montagem em andamento". **No fim, tire só essa seção**: o arquivo fica sem nenhuma menção à montagem e passa a ser o arquivo-mestre do sistema dela. Até lá, a seção fica, para que uma conversa nova no meio da etapa 6 retome a montagem.
 3. Marque a montagem como concluída no `base-camp.md`, com a data e a soma dos tempos.
 4. Feche com a mensagem final do roteiro.

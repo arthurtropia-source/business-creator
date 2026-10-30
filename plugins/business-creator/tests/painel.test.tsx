@@ -285,6 +285,24 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     })
     expect(await ui.find({ type: 'Text', text: /Escrevi a página sobre você/ })).toBeDefined()
     await ui.unmount()
+
+    // No Windows, a hora vem do PowerShell.
+    const hora = await $.ui.mount({
+      plugin: 'business-creator',
+      surface,
+      component: 'ToolUse',
+      requestId: 'u2',
+      props: {
+        tool_use_id: 'u2',
+        tool: 'PowerShell',
+        input: { command: 'Get-Date -Format "dd/MM/yyyy HH:mm"' },
+        isRunning: false,
+        isErrored: false,
+        isInterrupted: false,
+      },
+    })
+    expect(await hora.find({ type: 'Text', text: /Marquei a hora/ })).toBeDefined()
+    await hora.unmount()
   })
 }
 

@@ -2,6 +2,8 @@
 MODELO do arquivo-mestre do sistema da pessoa. Escreva no bloco 6, na raiz da pasta, substituindo o AGENTS.md da montagem.
 Regras: em primeira pessoa (é ela falando com a IA); curto (até ~80 linhas); só o que ela aprovou; nenhuma menção à montagem, ao kit ou a esta pasta de modelos.
 Tire estes comentários e as instruções entre <>. Seção sem conteúdo aprovado sai inteira.
+Na 6.1, grave o arquivo COM a seção "Montagem em andamento" logo abaixo do título (o texto está no fim deste modelo): ela garante que uma conversa nova, aberta no meio da etapa 6, retome a montagem. No Fim da montagem, tire só essa seção.
+No nível leve (sem pasta por frente), as seções "Palavras minhas" e "Pendências" ficam aqui, com "nenhuma ainda".
 -->
 # <Nome>: o meu sistema de trabalho
 
@@ -25,6 +27,17 @@ Antes de trabalhar numa frente, leia o `AGENTS.md` dela.
 
 - **Prioridade agora:** <a frente de FRENTES.prioridade>.
 - **A que mais gera ou poupa dinheiro:** <FRENTES.dinheiro>.
+
+<só no leve>
+## Palavras minhas
+- <palavra que eu uso com sentido próprio, e o que quer dizer. "Nenhuma ainda.">
+
+## Pendências
+- <pergunta ou assunto que ficou sem resposta · de quem depende · desde quando. "Nenhuma ainda.">
+</só no leve>
+
+## O meu computador
+- Antes de rodar qualquer rotina ou mexer em planilha, leia `contexto/computador.md`.
 
 ## Ferramentas que eu uso
 | Ferramenta | Para quê | Onde ficam as informações |
@@ -52,4 +65,14 @@ Antes de trabalhar numa frente, leia o `AGENTS.md` dela.
 ## Como este sistema cresce
 - **Um processo de cada vez.** O primeiro está em `primeiro-processo.md`: comece por ele e só abra o segundo quando este estiver rodando.
 - **Primeiro faz, depois empacota.** Um processo é feito junto, de ponta a ponta, com as minhas correções. Só depois de 2 ou 3 vezes ele vira um passo a passo salvo (uma skill, em `.claude/skills/`).
+- **Rotina não se perde:** toda rotina que produz uma entrega fica gravada na pasta (`frentes/<frente>/rotinas/`; <no leve: `rotinas/`>), com a conferência dentro, antes de a conversa acabar. Na vez seguinte, roda a gravada.
+- **O que eu aprovo vira arquivo:** texto em meu nome ou modelo aprovado vai para `frentes/<frente>/modelos/` <no leve: `modelos/`>.
+- **Nada fica no ar:** o que ficar sem resposta vai para as Pendências da frente antes de a conversa acabar.
 - **Toda tarefa tem linha de chegada:** antes de começar, diga o que é "pronto" (o quê, em que formato e onde fica). Se o meu pedido não disser, pergunte.
+
+<!--
+A seção temporária da 6.1. Vai logo abaixo do título e sai no Fim da montagem:
+
+## Montagem em andamento (esta seção sai no fim)
+- No começo de toda conversa, leia `base-camp.md`. Enquanto houver etapa pendente ou em andamento ali, use a skill `montagem-do-base-camp` para responder a qualquer mensagem, mesmo um "oi".
+-->

@@ -163,6 +163,7 @@ const NOMES: Record<string, string> = {
   'contexto/sobre-mim.md': 'a página sobre você',
   'contexto/como-trabalhar-comigo.md': 'a página de como você trabalha',
   'contexto/estilo-de-escrita.md': 'a página do seu jeito de escrever',
+  'contexto/computador.md': 'a ficha do seu computador',
   'montagem/mapa-das-frentes.md': 'o mapa das suas frentes',
   'montagem/regras.md': 'as regras da casa',
   'memoria.md': 'o seu caderno de lições',
@@ -301,9 +302,10 @@ function frase(tool: string, entrada: Record<string, unknown>, dir: string): Fra
       ? { feito: 'Abri a montagem do Base Camp', fazendo: 'Abrindo a montagem do Base Camp' }
       : null
   }
-  if (tool === 'Bash') {
+  if (tool === 'Bash' || tool === 'PowerShell') {
+    // No Windows a hora vem do PowerShell (Get-Date); no Mac, do date.
     const cmd = typeof entrada.command === 'string' ? entrada.command.trim() : ''
-    return /^date\b/.test(cmd) ? { feito: 'Marquei a hora', fazendo: 'Marcando a hora' } : null
+    return /^(date|Get-Date)\b/i.test(cmd) ? { feito: 'Marquei a hora', fazendo: 'Marcando a hora' } : null
   }
   if (tool === 'Glob' || tool === 'Grep' || tool === 'LS') {
     return { feito: 'Procurei nos seus arquivos', fazendo: 'Procurando nos seus arquivos' }

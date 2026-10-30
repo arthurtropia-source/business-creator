@@ -17,6 +17,7 @@ Sem a pasta, no app: clique no **+** ao lado da caixa de texto, **Plugins**, **A
 ## O que vem nele
 - `business-creator:montagem-do-base-camp`: a montagem, em 6 etapas.
 - O painel do Base Camp (`/base-camp`).
+- `business-creator:rotinas-e-computador`: as regras para o trabalho de verdade no computador, depois do Base Camp (rotina gravada, conferência, Windows e Mac).
 - O estilo de resposta `base-camp`, que entra sozinho quando o plugin está ligado.
 
 Por Arthur Tropia. Mudanças em `CHANGELOG.md`.
