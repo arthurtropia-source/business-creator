@@ -2,6 +2,13 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.2.1 (30/10/2026)
+A visão de workflow entra na montagem e no Campo 1 (direção do Arthur em 30/10/2026: "o que a gente faz no campo 1, 2 e 3 da primeira montanha é justamente montar o primeiro workflow de ponta a ponta"; decisões 2 e 3 aprovadas por ele: o termo "workflow" com uma linha de explicação, e o sinal de completo).
+- **O vocabulário:** cada frente é um conjunto de workflows; workflow é o caminho de uma tarefa, do ponto de partida até a entrega; os passos são feitos pela pessoa, por rotinas gravadas ou por skills, e toda skill nasce de um passo de workflow. No estilo de resposta, no `AGENTS.md` da raiz e na ficha da frente (tabela "Workflows").
+- **A etapa 5 vira "o primeiro workflow"** (montagem 1.8, roteiro 1.6): o começo e a entrega, os passos de hoje com as palavras dela (pergunta nova 5.4a, campo `PROC.passos`) e o "antes". Sai o `primeiro-processo.md`; entra o **cartão do workflow**, em `frentes/<frente>/workflows/<nome>.md` (no leve, `workflows/`), com os passos, quem faz cada um, o que o sistema aprendeu, as rodadas e o estado. O `base-camp.md` ganha a linha **Primeiro workflow** com o caminho do cartão.
+- **Skill nova `campo-1`:** detalhar e aprender o workflow passo a passo (o que entra, o que ela faz, o critério de cada decisão, as exceções, o que sai), decidir com ela quem faz cada passo e rodar de ponta a ponta com um caso de verdade, gravando no cartão. Completo é quando o workflow roda do começo à entrega com um pedido só dela e ela aprova a entrega.
+- **Painel:** lê o cartão pela linha do `base-camp.md` (e o `primeiro-processo.md` nas pastas de antes); fala em workflow na etapa 5 e no Campo 1.
+
 ## 0.2.0 (30/10/2026)
 As lições da primeira implantação com pessoa real (avaliação de 30/10/2026, mudanças M1, M2, M3, M5 e M6; decisões 1, 2 e 6 aprovadas pelo Arthur em 30/10). O que travava o uso real depois do Base Camp.
 - **Skill nova `rotinas-e-computador`:** antes de rodar algo, o sistema lê a ficha do computador; toda rotina que produz uma entrega fica gravada na pasta, com a conferência dentro; resultado zero, vazio ou fora de escala não sai sem conferência; o arquivo original nunca é editado; regras do Windows (UTF-8 com BOM, acento, vírgula decimal, Excel só fechado, `Get-Date`) e do Mac (Python sem abrir a janela de instalação, iCloud); sem Python numa máquina da empresa, vira pendência para a TI.

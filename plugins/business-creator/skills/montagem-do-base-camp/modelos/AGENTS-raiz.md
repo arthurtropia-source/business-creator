@@ -29,6 +29,11 @@ Antes de trabalhar numa frente, leia o `AGENTS.md` dela.
 - **A que mais gera ou poupa dinheiro:** <FRENTES.dinheiro>.
 
 <só no leve>
+## Workflows
+| Workflow | Tipo | Estado | Do começo à entrega | Cartão |
+|---|---|---|---|---|
+| <o primeiro> | <cíclico / pontual> | <incompleto: falta o Campo 1> | <X → Y> | `workflows/<nome>.md` |
+
 ## Palavras minhas
 - <palavra que eu uso com sentido próprio, e o que quer dizer. "Nenhuma ainda.">
 
@@ -63,9 +68,11 @@ Antes de trabalhar numa frente, leia o `AGENTS.md` dela.
 - Quando eu te corrigir ou disser "daqui pra frente faça assim", registre a lição no `memoria.md`, com a data. Se a lição for de uma frente só, registre no `AGENTS.md` daquela frente.
 
 ## Como este sistema cresce
-- **Um processo de cada vez.** O primeiro está em `primeiro-processo.md`: comece por ele e só abra o segundo quando este estiver rodando.
-- **Primeiro faz, depois empacota.** Um processo é feito junto, de ponta a ponta, com as minhas correções. Só depois de 2 ou 3 vezes ele vira um passo a passo salvo (uma skill, em `.claude/skills/`).
-- **Rotina não se perde:** toda rotina que produz uma entrega fica gravada na pasta (`frentes/<frente>/rotinas/`; <no leve: `rotinas/`>), com a conferência dentro, antes de a conversa acabar. Na vez seguinte, roda a gravada.
+- **Cada frente é um conjunto de workflows.** Workflow é o caminho de uma tarefa, do ponto de partida até a entrega. Cada um tem um cartão em `frentes/<frente>/workflows/` <no leve: `workflows/`>, com os passos, quem faz cada um, o que o sistema aprendeu e cada vez que rodou. Os passos são feitos por mim, por rotinas gravadas ou por skills, alimentadas pelos meus arquivos e pela memória.
+- **Um workflow de cada vez.** O primeiro está em `<caminho do cartão>`: comece por ele e só abra o segundo quando este estiver completo. Completo é quando ele roda do começo à entrega com um pedido só meu e eu aprovo a entrega.
+- **A primeira montanha:** no Campo 1, detalhar e aprender o workflow, passo a passo, rodando de ponta a ponta comigo; no Campo 2, os passos que se repetem viram skills (em `.claude/skills/`), e ele passa a sair pronto com um pedido meu; no Campo 3, se tem hora certa, ele chega sozinho. Toda skill nasce de um passo de um workflow.
+- **Tarefa que se repete sem cartão:** pergunte se vira workflow; se sim, entra na tabela da frente como o próximo, sem passar na frente do que está em curso.
+- **Rotina não se perde:** toda rotina que produz uma entrega fica gravada na pasta (`frentes/<frente>/rotinas/`; <no leve: `rotinas/`>), com a conferência dentro, antes de a conversa acabar, e o cartão do workflow aponta para ela no passo dela. Na vez seguinte, roda a gravada.
 - **O que eu aprovo vira arquivo:** texto em meu nome ou modelo aprovado vai para `frentes/<frente>/modelos/` <no leve: `modelos/`>.
 - **Nada fica no ar:** o que ficar sem resposta vai para as Pendências da frente antes de a conversa acabar.
 - **Toda tarefa tem linha de chegada:** antes de começar, diga o que é "pronto" (o quê, em que formato e onde fica). Se o meu pedido não disser, pergunte.

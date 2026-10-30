@@ -5,7 +5,7 @@ description: Regras para fazer trabalho de verdade no computador da pessoa sem t
 
 # Rotinas e computador
 
-> Plugin Business Creator 0.2 (30/10/2026). Nasceu da primeira implantação com pessoa real: a montagem funcionou, e o uso real travou em permissão, em ambiente e em rotina que não ficou gravada.
+> Plugin Business Creator 0.2.1 (30/10/2026). Nasceu da primeira implantação com pessoa real: a montagem funcionou, e o uso real travou em permissão, em ambiente e em rotina que não ficou gravada.
 
 ## Linha de chegada (de toda entrega feita no computador)
 1. o resultado foi conferido contra a fonte antes de sair (a conta bate, nenhum zero ou vazio sem explicação);
@@ -21,7 +21,7 @@ description: Regras para fazer trabalho de verdade no computador da pessoa sem t
 - **Toda rotina que produz uma entrega** (montar uma planilha, atualizar um relatório, cruzar duas listas) **é gravada na pasta antes de a conversa acabar**: `frentes/<frente>/rotinas/<nome-curto>.<py|ps1|sh>` (no nível leve, sem pastas de frente: `rotinas/`). Nunca só na pasta temporária da conversa: ela some, e a próxima vez recomeça do zero.
 - No topo da rotina, em comentário e em português: o que ela faz, de onde vêm as informações, o que sai e onde, e como conferir.
 - **A conferência vai dentro da rotina:** ela imprime o que confere (linhas lidas, totais da fonte e do resultado, quantos itens ficaram de fora e por quê). Se o resultado der zero, vazio ou fora de escala, ela para com uma mensagem clara.
-- Grave na ficha da frente (`frentes/<frente>/AGENTS.md`, seção "Rotinas"; no leve, no `AGENTS.md` da raiz) uma linha: o nome, para que serve e o pedido que a chama ("atualizar a planilha com o relatório novo").
+- Grave na ficha da frente (`frentes/<frente>/AGENTS.md`, seção "Rotinas"; no leve, no `AGENTS.md` da raiz) uma linha: o nome, o workflow e o passo a que serve, e o pedido que a chama ("atualizar a planilha com o relatório novo"). Se a rotina é de um workflow, o cartão dele aponta para ela, na coluna "Com quê" do passo.
 - **Na segunda vez, rode a rotina gravada.** Não reescreva do zero. Se precisar mudar, mude o arquivo e diga em meia linha o que mudou.
 - Diga à pessoa em meia linha: "guardei o passo a passo desta tarefa; da próxima vez sai mais rápido".
 

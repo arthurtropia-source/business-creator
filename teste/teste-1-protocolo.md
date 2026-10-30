@@ -19,6 +19,7 @@
 - O tempo entre o push e a chegada da versão nova.
 
 ## Mudança de rota (30/10/2026)
-- O passo 3 passa a ser a implantação do Arthur com a 0.2.0, numa pasta limpa no Mac (`~/business-creator-arthur/meu-os`, montada com o esqueleto da 0.2), em 31/10 e 01/11. A 0.1.1 entrou dentro da 0.2.0.
+- O passo 3 passa a ser a implantação do Arthur com a 0.2.1 (a 0.2.0 publicada em 30/10, às 20h; a 0.2.1, com o workflow na etapa 5 e o Campo 1, logo depois), numa pasta limpa no Mac (`~/business-creator-arthur/meu-os`, montada com o esqueleto da 0.2), em 31/10 e 01/11. A 0.1.1 entrou dentro da 0.2.0.
 - Os passos 4 e 5 (a correção que chega sozinha) passam a ser a primeira versão que sair dos pontos dele (0.2.1), conferida contra as impressões digitais de `~/business-creator-arthur/impressoes-inicio.txt` e as que a pasta tiver no dia.
 - Pré-teste da 0.2.0 pelo terminal (30/10): a montagem abre com o texto do roteiro e grava a hora sem pedir nada; a etapa 6.0 conferiu o Mac com seis comandos, nenhum negado. Achado: a leitura do roteiro dentro do plugin pedia permissão (o plugin mora fora da pasta da pessoa); o esqueleto passou a liberar `Read(~/.claude/plugins/**)`. A confirmar no app.
+- Pré-teste da 0.2.1 pelo terminal (30/10): a etapa 5 gravou o cartão em `frentes/<frente>/workflows/` e a linha **Primeiro workflow** no `base-camp.md`; "vamos rodar o primeiro workflow" chamou a skill `campo-1`, que abriu com o caminho e foi para o primeiro passo a detalhar. Nenhum pedido de permissão negado.

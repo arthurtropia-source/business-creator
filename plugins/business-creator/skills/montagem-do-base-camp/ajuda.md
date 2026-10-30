@@ -71,7 +71,8 @@
 - `frentes/`: uma pasta para cada coisa que você toca.
 - `memoria.md`: as lições que você ensina corrigindo.
 - `contexto/computador.md`: o que o seu computador tem (sistema, programas), para eu usar as ferramentas certas.
-- `primeiro-processo.md`: a primeira tarefa que o sistema vai aprender a fazer por você.
+- `frentes/<frente>/workflows/`: um cartão para cada workflow, o caminho de uma tarefa sua do começo à entrega. O primeiro nasce na etapa 5.
+- `frentes/<frente>/rotinas/` e `modelos/`: os passo a passos que o sistema guardou e os textos que você aprovou.
 - `como-usar.md`: o seu guia de bolso, com o combinado e os pedidos que já funcionam.
 - `resumo-para-o-arthur.md`: o resumo do seu Base Camp em uma página, para mandar ao Arthur se quiser.
 - `base-camp.md`: onde a montagem está.

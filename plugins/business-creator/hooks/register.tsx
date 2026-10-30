@@ -83,7 +83,7 @@ const PARA_QUE: Record<string, string> = {
   '2': 'Para cada frente ter o seu lugar e nada se misturar.',
   '3': 'Para as respostas chegarem no formato que você gosta.',
   '4': 'Para o sistema saber o que nunca fazer sem você.',
-  '5': 'Para escolher a primeira tarefa que o sistema vai fazer por você.',
+  '5': 'Para desenhar o primeiro workflow: o caminho de uma tarefa sua, do começo à entrega.',
   '6': 'Para testar o sistema e ver a primeira tarefa feita.',
 }
 
@@ -94,7 +94,7 @@ const OBRA: Record<string, string> = {
   '2': 'Etapa 2 montada: o sistema já conhece as suas frentes.',
   '3': 'Etapa 3 montada: o sistema já sabe como você gosta de receber.',
   '4': 'Etapa 4 montada: as regras da casa estão escritas.',
-  '5': 'Etapa 5 montada: o primeiro processo está escolhido e medido.',
+  '5': 'Etapa 5 montada: o primeiro workflow está desenhado, do começo à entrega, e medido.',
   '6': 'Base Camp montado. O seu sistema já trabalha para você.',
 }
 
@@ -149,7 +149,8 @@ const ROTULOS: Record<string, string> = {
   'REGRAS.sigilo': 'O que não se mistura nem se guarda',
   'PROC.candidatas': 'As tarefas que se repetem',
   'PROC.dinheiro': 'Quais geram ou poupam dinheiro',
-  'PROC.escolhido': 'A tarefa escolhida',
+  'PROC.escolhido': 'O workflow escolhido',
+  'PROC.passos': 'Os passos, do começo à entrega',
   'PROC.entrada': 'De onde vêm as informações',
   'PROC.saida': 'O que sai no fim',
   'PROC.para-quem': 'Para quem vai',
@@ -226,7 +227,9 @@ function lerBaseCamp(texto: string) {
     linhas.map(l => /^(?:- )?Combinado:\s*(.+)/i.exec(l)?.[1]?.trim()).find((x): x is string => Boolean(x)) ?? null
   const testeOk = /\*\*Quem sou eu:\*\*\s*passou/i.test(texto)
   const separacaoOk = /\*\*Separação entre frentes:\*\*\s*passou/i.test(texto)
-  return { nivel, iniciada, concluida, blocos, tarefas, feita, combinado, testeOk, separacaoOk }
+  // A etapa 5 grava aqui onde ficou o cartão do primeiro workflow.
+  const workflow = /\*\*Primeiro workflow:\*\*\s*`?([^`\n]+?)`?\s*$/m.exec(texto)?.[1]?.trim() || null
+  return { nivel, iniciada, concluida, blocos, tarefas, feita, combinado, testeOk, separacaoOk, workflow }
 }
 
 function lerProcesso(texto: string): { processo: string | null; antes: string | null } {
@@ -291,6 +294,9 @@ type Frase = { feito: string; fazendo: string }
 function nomeDoArquivo(rel: string): string | null {
   const frente = /^frentes\/([^/]+)\/AGENTS\.md$/.exec(rel)
   if (frente) return `a ficha de ${frente[1]}`
+  // O cartão de cada workflow mora na frente (no leve, em workflows/ da raiz).
+  const cartao = /^(?:frentes\/[^/]+\/)?workflows\/([^/]+)\.md$/.exec(rel)
+  if (cartao) return `o cartão do workflow ${cartao[1]}`
   return NOMES[rel] ?? null
 }
 
@@ -467,7 +473,9 @@ async function carregar($: EngineInterface) {
   let novo: Painel | null = null
   if (texto) {
     const base = lerBaseCamp(texto)
-    const proc = lerProcesso(await lerTexto($, `${dir}/primeiro-processo.md`))
+    // Antes da 0.2.1 o primeiro processo ficava na raiz; desde ela, é o cartão do primeiro workflow.
+    const cartao = base.workflow ? `${dir}/${base.workflow}` : `${dir}/primeiro-processo.md`
+    const proc = lerProcesso(await lerTexto($, cartao))
     const agentes = await lerTexto($, `${dir}/AGENTS.md`)
     const principal = Boolean(agentes) && !/Sistema em montagem/.test(agentes)
     const resumo = await existe($, `${dir}/resumo-para-o-arthur.md`)
@@ -477,7 +485,7 @@ async function carregar($: EngineInterface) {
       { rotulo: 'O mapa das suas frentes', ok: await existe($, `${dir}/montagem/mapa-das-frentes.md`) },
       { rotulo: 'Como você trabalha', ok: await existe($, `${dir}/contexto/como-trabalhar-comigo.md`) },
       { rotulo: 'O caderno de lições', ok: await existe($, `${dir}/memoria.md`) },
-      { rotulo: 'O primeiro processo', ok: await existe($, `${dir}/primeiro-processo.md`) },
+      { rotulo: 'O primeiro workflow', ok: await existe($, cartao) },
       { rotulo: 'O arquivo principal', ok: principal },
       { rotulo: 'O guia de bolso', ok: guia },
     ]
@@ -999,7 +1007,7 @@ export const register: Register = on => {
     // ----- Base Camp montado
     if (dado.concluida) {
       const campos = [
-        ['campo-1-rodar', 'Campo 1 · rodar o primeiro processo de ponta a ponta'],
+        ['campo-1-rodar', 'Campo 1 · detalhar e aprender o primeiro workflow, de ponta a ponta'],
         ['campo-2-skill', 'Campo 2 · sair pronto com um pedido seu'],
         ['campo-3-agendar', 'Campo 3 · se tiver hora certa, chegar sozinho'],
       ] as const
@@ -1040,7 +1048,7 @@ export const register: Register = on => {
           </Box>
           {dado.processo && (
             <Box flexDirection="column">
-              <Text color={CINZA} size="caption">O SEU PRIMEIRO PROCESSO</Text>
+              <Text color={CINZA} size="caption">O SEU PRIMEIRO WORKFLOW</Text>
               <Text color={ROCHA}>{dado.processo}</Text>
               {completo && dado.antes && <Text color={CINZA} size="caption">Hoje leva: {dado.antes}</Text>}
             </Box>
@@ -1057,7 +1065,7 @@ export const register: Register = on => {
             {completo && <Text color={CINZA}>Depois da Mera vêm a Island e a Lobuche East; no topo, o Everest.</Text>}
             <Text color={CINZA}>
               {completo
-                ? 'O Campo 1 começa numa conversa nova nesta pasta: escreva "vamos rodar o primeiro processo".'
+                ? 'O Campo 1 começa numa conversa nova nesta pasta: escreva "vamos rodar o primeiro workflow".'
                 : 'No programa, o Arthur sobe a Mera com você.'}
             </Text>
           </Box>
@@ -1145,7 +1153,7 @@ export const register: Register = on => {
         </Box>
         {dado.processo && (
           <Box flexDirection="column">
-            <Text color={CINZA} size="caption">O PRIMEIRO PROCESSO</Text>
+            <Text color={CINZA} size="caption">O PRIMEIRO WORKFLOW</Text>
             <Text color={ROCHA}>{dado.processo}</Text>
             {completo && dado.antes && <Text color={CINZA} size="caption">Hoje leva: {dado.antes}</Text>}
           </Box>

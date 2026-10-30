@@ -24,6 +24,13 @@ Tire estes comentários e as instruções entre <>.
 ## Regras desta frente
 - <O que vale só aqui, se ela disse (ex.: "nada desta frente vai para as outras").>
 
+## Workflows
+Esta frente é um conjunto de workflows: cada um é o caminho de uma tarefa, do ponto de partida até a entrega, com um cartão em `workflows/`.
+| Workflow | Tipo | Estado | Do começo à entrega | Cartão |
+|---|---|---|---|---|
+| <nome> | <cíclico / pontual> | <incompleto: falta X / em andamento / completo, em <data>> | <X → Y> | `workflows/<nome>.md` |
+<Na etapa 2 fica "Nenhum ainda"; o primeiro entra na etapa 5.>
+
 ## Palavras minhas
 - <Palavra ou apelido que ela usa com sentido próprio nesta frente, e o que quer dizer. Ex.: "banco de dados" = a planilha de controle. "Nenhuma ainda" se for o caso.>
 
@@ -34,7 +41,7 @@ Tire estes comentários e as instruções entre <>.
 <"Nenhuma" se for o caso. O sistema acrescenta aqui o que fica no ar ao fim de cada conversa e começa por elas na conversa seguinte desta frente.>
 
 ## Rotinas
-- <Cada rotina gravada em `rotinas/` desta frente: o nome, para que serve e o pedido que a chama. "Nenhuma ainda.">
+- <Cada rotina gravada em `rotinas/` desta frente: o nome, o workflow e o passo a que serve, e o pedido que a chama. "Nenhuma ainda.">
 
 ## Modelos aprovados
 - <Cada texto ou arquivo que ela aprovou, guardado em `modelos/` desta frente. Na montagem, a primeira tarefa da 6.7 entra aqui, se for desta frente. "Nenhum ainda.">

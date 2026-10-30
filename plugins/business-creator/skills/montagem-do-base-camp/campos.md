@@ -46,7 +46,7 @@
 | `REGRAS.lista` [leve] | as regras aprovadas, com o que ela tirou, mudou ou acrescentou | ela respondeu à 4.1 | 4.1 |
 | `REGRAS.sigilo` [leve] | o que não passa de uma frente para outra e o que nunca se guarda | há resposta (pode ser "nada") | 2.4, 4.2 |
 
-## primeiro-processo.md
+## O cartão do primeiro workflow (`frentes/<frente>/workflows/<nome>.md`; no leve, `workflows/<nome>.md`)
 | Código | O que é | Preenchido quando | Vem de |
 |---|---|---|---|
 | `PROC.candidatas` [leve] | até 5 tarefas repetidas, com o tempo de cada | há pelo menos 2 | 1.5, 5.1 |
@@ -55,6 +55,7 @@
 | `PROC.entrada` [leve] | de onde vêm as informações | há a fonte | 5.4 |
 | `PROC.saida` [leve] | o que sai no fim | há o formato do resultado | 5.4 |
 | `PROC.para-quem` [leve] | quem recebe | há uma pessoa ou "eu mesma" | 5.4 |
+| `PROC.passos` [leve] | os passos de hoje, do começo à entrega, numerados, com as palavras dela | há pelo menos 3 passos e ela confirmou a lista | 5.4a |
 | `PROC.antes` [leve] | o tempo de hoje, com a data e a origem (medido, lembrança ou estimativa) | há o número, a data e a origem | 5.5 |
 | `PROC.pronto` | como ela sabe que ficou certa | há pelo menos 1 critério | 5.6 |
 | `PROC.dependencias` [leve] | o que pode travar a tarefa (aprovação de alguém, acesso, informação que não está com ela) e o que fazer antes do Campo 1 | há resposta (pode ser "nada") | 5.7 |
@@ -75,7 +76,7 @@
 | `frentes/<nome>/AGENTS.md` | não (só o mapa no `AGENTS.md`) | sim, uma por frente |
 | `contexto/computador.md` (o inventário da 6.0) | sim | sim |
 | `memoria.md` | sim | sim |
-| `primeiro-processo.md` | sim | sim |
+| o cartão do primeiro workflow (`frentes/<frente>/workflows/<nome>.md`; no leve, `workflows/`) | sim | sim |
 | `resumo-para-o-arthur.md` | sim | sim |
 | `como-usar.md` (o guia de bolso) | sim | sim |
 | `base-camp.md` (o estado) | sim | sim |

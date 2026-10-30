@@ -220,8 +220,12 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
   test(`completo, montagem concluída (${surface})`, async ($, on) => {
     const enviados: string[] = []
     pasta(on, {
-      '/os/base-camp.md': CONCLUIDA.replace('NIVEL', 'completo'),
-      '/os/primeiro-processo.md': PROCESSO,
+      // Desde a 0.2.1, o primeiro workflow mora na frente e o base-camp.md diz onde.
+      '/os/base-camp.md': CONCLUIDA.replace('NIVEL', 'completo').replace(
+        '**Montagem:** concluída',
+        '**Montagem:** concluída\n- **Primeiro workflow:** `frentes/consultoria/workflows/proposta.md`',
+      ),
+      '/os/frentes/consultoria/workflows/proposta.md': PROCESSO,
       '/os/resumo-para-o-arthur.md': RESUMO,
     }, enviados)
     await $.session.start({ cwd: '/os', surface, isInteractive: true })
@@ -232,6 +236,7 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     expect(await ui.find({ type: 'Text', text: /O teste passou/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /amanhã, às 8h/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /Campo 1/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /A proposta da consultoria/ })).toBeDefined()
     expect(await ui.find({ type: 'Button', key: 'tarefa-2' })).toBeDefined()
     expect(await ui.find({ type: 'Button', key: 'tarefa-3' })).toBeUndefined()
     await ui.press({ key: 'tarefa-1' })

@@ -21,8 +21,8 @@ Tire estes comentários e as instruções entre <>.
 ## As ferramentas
 - <FERRAMENTAS.lista, numa linha, e onde ficam as informações da frente prioritária.> · Computador: <AMBIENTE.computador, ou "não perguntado" no leve>.
 
-## O primeiro processo
-- <O que é, a frente, a frequência.>
+## O primeiro workflow
+- <O que é, a frente, a frequência; do ponto de partida à entrega, em uma linha; quantos passos hoje; o caminho do cartão.>
 - **Tem hora certa?** <sim, e quando / não: acontece quando aparece>.
 - **O antes:** <tempo>, <vezes por mês>, <horas por mês>, <data>, <medido / lembrança / estimativa>.
 - **Por que este:** <em uma linha.>

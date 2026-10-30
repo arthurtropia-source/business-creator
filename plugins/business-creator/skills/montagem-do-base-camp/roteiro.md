@@ -1,6 +1,6 @@
 # Roteiro da Montagem do Base Camp
 
-> Versão 1.5 (30/10/2026), no plugin Business Creator 0.2. Cada pergunta diz os campos que alimenta (códigos de `campos.md`). **[leve]** = entra também no nível leve; sem a marca, só no completo. Antes de cada pergunta, confira os campos (regra "uma resposta adianta outras" da `SKILL.md`).
+> Versão 1.6 (30/10/2026), no plugin Business Creator 0.2.1. Cada pergunta diz os campos que alimenta (códigos de `campos.md`). **[leve]** = entra também no nível leve; sem a marca, só no completo. Antes de cada pergunta, confira os campos (regra "uma resposta adianta outras" da `SKILL.md`).
 > Para a pessoa, as partes da montagem se chamam **etapas** ("Etapa 2 de 6"); "bloco" é só o nome interno deste roteiro.
 > Tempo-alvo por etapa, para a pessoa que responde: entre parênteses. É alvo, não regra: nunca apresse ninguém.
 
@@ -124,9 +124,10 @@ D.1 [leve] "Pode mandar. Vale tudo: um áudio falando por uns 5 minutos de quem 
 
 ---
 
-## Etapa 5: o primeiro processo (10 a 20 min, mais o tempo de fazer a tarefa, se ela cronometrar hoje) [leve]
-**Arquivo:** `primeiro-processo.md` (modelo `modelos/primeiro-processo.md`).
-**Abra com:** "Etapa 5 de 6: o primeiro processo. A ideia é escolher uma tarefa que você repete e que o seu sistema vai aprender a fazer, até ela sair pronta, do seu jeito, com um pedido seu. Hoje a gente só escolhe e mede quanto tempo ela leva. Leva uns 15 minutos."
+## Etapa 5: o primeiro workflow (15 a 25 min, mais o tempo de fazer a tarefa, se ela cronometrar hoje) [leve]
+**Arquivo:** o cartão do workflow, em `frentes/<frente>/workflows/<nome-curto>.md` (no leve: `workflows/<nome-curto>.md`), pelo modelo `modelos/workflow.md`. O nome curto, sem espaço nem acento, você sugere e ela confirma (ex.: `proposta-de-cliente`).
+**Abra com:** "Etapa 5 de 6: o primeiro workflow. Workflow é o caminho de uma tarefa sua, do ponto de partida até a entrega. Cada frente sua é um conjunto deles, e o seu sistema cresce aprendendo um de cada vez. Hoje a gente escolhe o primeiro, desenha o caminho como ele é hoje e mede quanto tempo leva. Leva uns 20 minutos."
+- É a primeira vez que "workflow" aparece: a linha de explicação acima é obrigatória. Depois, use a palavra normalmente.
 
 5.1 [leve] "Liste até 5 tarefas que você repete toda semana ou todo mês, em qualquer frente. De cada uma: quanto tempo leva, mais ou menos." → `PROC.candidatas`
 - Se `DIA.perde-tempo` ou `PROC.candidatas` já têm algo, comece por aí: "Você já citou X e Y. Tem mais alguma?"
@@ -139,16 +140,19 @@ D.1 [leve] "Pode mandar. Vale tudo: um áudio falando por uns 5 minutos de quem 
    - não depende de outra pessoa aprovar para começar;
    - não usa dados da empresa sem autorização.
    Explique em palavras simples: "Eu começaria pela X, porque ela se repete toda semana, você já tem as informações na planilha e dá para conferir se ficou certo."
-5.4 [leve] "Para essa tarefa: de onde vêm as informações, o que sai no fim e para quem vai?" → `PROC.entrada`, `PROC.saida`, `PROC.para-quem`
+5.4 [leve] "Agora o começo e o fim desse caminho. O que faz essa tarefa começar, e de onde vêm as informações? E no fim: o que sai, em que formato, e para quem vai?" → `PROC.entrada`, `PROC.saida`, `PROC.para-quem`
+5.4a [leve] "Me conte como você faz hoje, passo a passo, do começo até a entrega. Pode ser solto, do jeito que vier; eu organizo." → `PROC.passos`
+- Organize em passos numerados, curtos, com as palavras dela (o que se faz, com que programa ou arquivo). Mostre a lista em poucas linhas e pergunte se falta algum passo ou se a ordem está certa.
+- Não detalhe cada passo agora (critérios, exceções, quem passa a fazer): isso é o Campo 1. Passo que ela não souber dizer fica "a completar no Campo 1".
 5.5 [leve] "Quanto tempo ela levou da última vez que você fez, e quando foi? Se puder, faça uma vez hoje, cronometrando, e me diga o tempo." → `PROC.antes`
 - Grave o tempo com a data e a origem: "medido hoje" ou "lembrança dela, da última vez em <data>". Esse é o "antes": o número contra o qual o resultado vai ser medido. Se ela não souber, peça uma estimativa e marque "estimativa".
 - Grave também quantas vezes por mês a tarefa acontece e as horas por mês (o tempo vezes as vezes, com a conta à vista). Se a frequência não ficou clara nas respostas, pergunte numa frase.
 - Anote se ela tem hora certa (acontece num dia e horário fixos, como toda segunda de manhã) ou se acontece quando aparece (como um orçamento que um cliente pede). Não pergunte se já ficou claro. Isso decide o passo depois do Campo 2: quando tem hora certa, ela pode passar a chegar sozinha.
 5.6 "Quando essa tarefa estiver pronta, como você sabe que ficou certa? O que não pode faltar?" → `PROC.pronto`
 5.7 [leve] "O que pode travar essa tarefa? Depende de alguém aprovar, de um acesso que você não tem, de uma informação que não está com você?" → `PROC.dependencias`
-- É o que mais faz um processo parar no meio. Se aparecer uma dependência, anote quem ou o quê, e o que fazer antes do Campo 1 (ex.: pedir o acesso).
+- É o que mais faz um workflow parar no meio. Se aparecer uma dependência, anote quem ou o quê, e o que fazer antes do Campo 1 (ex.: pedir o acesso).
 
-**Feche** mostrando o `primeiro-processo.md`.
+**Feche** mostrando o cartão do workflow inteiro, com uma linha antes: "Este é o cartão do seu primeiro workflow: o caminho, os passos de hoje e o tempo de partida. No Campo 1 ele ganha os detalhes e o que o sistema aprender." Com a aprovação, grave no `base-camp.md`, logo abaixo da linha **Montagem:**, a linha `- **Primeiro workflow:** \`<caminho do cartão>\`` (é assim que o painel o encontra). No completo, acrescente o workflow na tabela "Workflows" da ficha da frente; no leve, no rascunho do mapa (`montagem/mapa-das-frentes.md`), para entrar no `AGENTS.md` da raiz na 6.1.
 
 ---
 
@@ -156,7 +160,7 @@ D.1 [leve] "Pode mandar. Vale tudo: um áudio falando por uns 5 minutos de quem 
 **Arquivos:** `AGENTS.md` (final), `CLAUDE.md` (já existe; confira), `resumo-para-o-arthur.md` (modelo `modelos/resumo-para-o-arthur.md`), `como-usar.md` (modelo `modelos/como-usar.md`) e `base-camp.md` (concluído).
 **Abra com:** "Etapa 6 de 6: o teste e a primeira tarefa. Eu junto tudo no arquivo principal do seu sistema, a gente confere se ele já sabe quem você é e, no fim, ele faz a primeira tarefa para você. Leva uns 25 minutos."
 
-6.0 [leve] **O computador** (sem pergunta para ela): faça o inventário pela skill `rotinas-e-computador` (seção 5), um comando de cada vez, e grave `contexto/computador.md` no formato de lá. Diga em uma linha o que achou, sem jargão ("O seu Mac tem o Excel e ainda não tem o Python; anotei, para o sistema usar as ferramentas certas quando for mexer nas suas planilhas."). Não pede aprovação: é uma ficha técnica. Se faltar algo que o primeiro processo vai precisar (ex.: o Python, para um processo com planilha), anote na ficha, em "Pendências da máquina", e no `primeiro-processo.md`, em "o que pode travar".
+6.0 [leve] **O computador** (sem pergunta para ela): faça o inventário pela skill `rotinas-e-computador` (seção 5), um comando de cada vez, e grave `contexto/computador.md` no formato de lá. Diga em uma linha o que achou, sem jargão ("O seu Mac tem o Excel e ainda não tem o Python; anotei, para o sistema usar as ferramentas certas quando for mexer nas suas planilhas."). Não pede aprovação: é uma ficha técnica. Se faltar algo que o primeiro workflow vai precisar (ex.: o Python, para um workflow com planilha), anote na ficha, em "Pendências da máquina", e no cartão do workflow, em "O que pode travar".
 
 6.1 [leve] Monte o `AGENTS.md` final pelo modelo, com o mapa e as ferramentas (`montagem/mapa-das-frentes.md`) e as regras (`montagem/regras.md`). **Grave com a seção temporária "Montagem em andamento"** logo abaixo do título (o texto está no fim do modelo): ela só sai no Fim, para que uma conversa nova no meio da etapa 6 retome a montagem. Na hora de mostrar, diga que essa seção é provisória. **Mostre o arquivo inteiro** (não um resumo dele) e peça aprovação. Diga antes: "É o arquivo principal, o mais longo. A maior parte você já aprovou nas etapas; o que é novo são as partes 'Em uso ou parado', 'Memória e lições' e 'Como este sistema cresce'."
 
@@ -185,7 +189,7 @@ D.1 [leve] "Pode mandar. Vale tudo: um áudio falando por uns 5 minutos de quem 
 - **O combinado** (é o que faz o sistema virar hábito): pergunte, numa pergunta só, em que momento de amanhã ela vai abrir o sistema de novo e o que vai pedir (ex.: "amanhã, às 8h, antes dos e-mails, a lista do fechamento"). Grave no `base-camp.md`, em "Primeiras tarefas", numa linha que começa com **Combinado:** (sem traço), e no `como-usar.md`, na seção "O seu combinado".
 
 **Fim:** tire do `AGENTS.md` da raiz a seção "Montagem em andamento" (o resto foi aprovado na 6.1; não reescreva), marque tudo como concluído no `base-camp.md` com a soma dos tempos e mande:
-> "**Base Camp montado.** O seu sistema já sabe quem você é, o que você toca e como você trabalha, já fez a primeira tarefa para você, e o primeiro processo está escolhido, com o tempo de hoje anotado.
+> "**Base Camp montado.** O seu sistema já sabe quem você é, o que você toca e como você trabalha, já fez a primeira tarefa para você, e o primeiro workflow está desenhado, do começo à entrega, com o tempo de hoje anotado.
 > Combinado: <o combinado dela, com as palavras dela>. O resto está no seu guia de bolso.
-> O próximo passo é o Campo 1, na primeira montanha: fazer esse processo de ponta a ponta com o sistema, numa conversa nova. Quando for a hora, abra uma conversa nesta pasta e escreva: **'vamos rodar o primeiro processo'**.
+> O próximo passo é o Campo 1, na primeira montanha: detalhar o seu primeiro workflow passo a passo e rodá-lo de ponta a ponta com o sistema, numa conversa nova. Quando for a hora, abra uma conversa nesta pasta e escreva: **'vamos rodar o primeiro workflow'**.
 > Business Creator powered by SEM IA™. Um sistema, qualquer IA."

@@ -14,7 +14,7 @@
 | 2 · As suas frentes | pendente | | |
 | 3 · Como você trabalha | pendente | | |
 | 4 · As regras da casa | pendente | | |
-| 5 · O primeiro processo | pendente | | |
+| 5 · O primeiro workflow | pendente | | |
 | 6 · O teste e a primeira tarefa | pendente | | |
 
 <!-- Status possíveis: pendente, em andamento, aprovado, pulado. Horários no formato DD/MM/AAAA HH:MM. -->
