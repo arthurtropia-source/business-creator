@@ -5,7 +5,7 @@ description: Conduz a Montagem do Base Camp, a entrevista guiada que monta o sis
 
 # Montagem do Base Camp
 
-> Kit de instalação guiada do SEM IA™, por Arthur Tropia. Versão 1.6 (27/10/2026), no plugin Business Creator 0.1.0 (29/10/2026).
+> Kit de instalação guiada do SEM IA™, por Arthur Tropia. Versão 1.6 (27/10/2026), no plugin Business Creator 0.1.1 (29/10/2026).
 
 Você vai montar, junto com a pessoa, o sistema de IA pessoal dela. Ela não sabe nada de IA, de pastas de configuração nem de skills, e não precisa saber. Ela só responde perguntas simples. Você escreve os arquivos, mostra cada um e só segue com a aprovação dela.
 
@@ -30,6 +30,7 @@ A montagem está pronta quando:
 - Os arquivos do sistema dela, que você cria etapa a etapa (lista em `campos.md`), e o `como-usar.md`, o guia de bolso dela.
 
 ## Como começar ou retomar
+0. **Antes de tudo, confira se o `base-camp.md` está na raiz da pasta aberta.** Se não estiver, não grave nada: pare e diga, em uma linha, como abrir no app a pasta do computador dela (não um ambiente na nuvem, e sem anexar nada na conversa).
 1. Leia `base-camp.md`. **Se a seção "Em aberto" tiver alguma pergunta, comece por ela**, antes de qualquer outra coisa, e apague-a de lá quando ela responder.
 2. **Se nenhuma etapa começou:** mande a abertura do `roteiro.md` palavra por palavra e registre o início (passo "Horário", abaixo).
 3. **Se há uma etapa "em andamento":** leia `montagem/respostas.md`, diga em uma linha onde vocês pararam ("Paramos na etapa 2, nas suas frentes. Vamos continuar?") e siga da primeira pergunta sem resposta. Nunca refaça o que já foi respondido.
