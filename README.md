@@ -8,7 +8,8 @@ O plugin leva só o método. Tudo o que é seu (quem você é, as suas frentes, 
 Você recebe do Arthur a sua pasta (`meu-os`), que já sabe onde buscar o plugin e já liga a atualização. É só:
 1. Ter o app do Claude no computador (claude.ai/download), numa conta paga.
 2. Abrir a pasta na aba **Code** e confirmar que confia nela.
-3. Escrever **oi**.
+3. Instalar o plugin nesta pasta: clique no **+** ao lado da caixa de texto, **Plugins**, e em **business-creator** escolha instalar **para o projeto (compartilhado)** (liga o plugin só nesta pasta; "para mim" o ligaria em todas).
+4. Abrir uma conversa nova na pasta e escrever **oi**.
 
 **Modelo sugerido:** o Opus 5.5, no esforço padrão (médio). Escolha no seletor de modelo, embaixo da caixa de texto do app. É só uma sugestão: você pode mudar quando quiser.
 

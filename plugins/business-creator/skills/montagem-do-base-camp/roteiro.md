@@ -1,6 +1,6 @@
 # Roteiro da Montagem do Base Camp
 
-> Versão 1.6 (30/10/2026), no plugin Business Creator 0.2.1. Cada pergunta diz os campos que alimenta (códigos de `campos.md`). **[leve]** = entra também no nível leve; sem a marca, só no completo. Antes de cada pergunta, confira os campos (regra "uma resposta adianta outras" da `SKILL.md`).
+> Versão 1.7 (31/10/2026), no plugin Business Creator 0.2.2. Cada pergunta diz os campos que alimenta (códigos de `campos.md`). **[leve]** = entra também no nível leve; sem a marca, só no completo. Antes de cada pergunta, confira os campos (regra "uma resposta adianta outras" da `SKILL.md`).
 > Para a pessoa, as partes da montagem se chamam **etapas** ("Etapa 2 de 6"); "bloco" é só o nome interno deste roteiro.
 > Tempo-alvo por etapa, para a pessoa que responde: entre parênteses. É alvo, não regra: nunca apresse ninguém.
 
@@ -18,7 +18,8 @@
 > **2.** que eu vá perguntando, uma coisa de cada vez?
 
 - **Se a pasta tiver o painel** (você sabe pela sua lista de ferramentas: a ferramenta `teste_do_base_camp` vem com ele; não precisa conferir a pasta), acrescente uma linha antes das duas opções: "Ao lado da conversa abriu o painel do Base Camp: ele mostra a sua subida, o que o seu sistema já sabe e o que vem a seguir. Se ele não aparecer, escreva /base-camp."
-- **A escolha 1 ou 2 é fechada:** se você tiver a ferramenta de pergunta com opções, use-a (veja "Escolhas com clique" na `SKILL.md`).
+- **Nada antes da abertura:** ela é a primeira coisa que a pessoa lê; sem frase sua antes dela ("Estou abrindo...", "Segue o texto...").
+- **Primeiro o texto, depois a caixa.** Escreva na resposta o texto inteiro, de "Boas-vindas ao seu Base Camp" até "Para começar, você prefere:" (com a linha do painel, se houver). Só então, se você tiver a ferramenta de pergunta com opções, abra a caixa com as duas opções (veja "Escolhas com clique" na `SKILL.md`); nesse caso as opções 1 e 2 não se repetem no texto. A caixa nunca vem sozinha.
 - Se ela escolher **1**, faça a etapa D. Se escolher **2**, pule para a etapa 1 e marque a D como "pulado".
 - Se ela já começar contando, isso é o "conte do seu jeito": siga a etapa D.
 
