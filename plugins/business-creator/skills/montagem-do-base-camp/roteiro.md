@@ -1,6 +1,6 @@
 # Roteiro da Montagem do Base Camp
 
-> Versão 1.8 (31/10/2026), no plugin Business Creator 0.2.4. Cada pergunta diz os campos que alimenta (códigos de `campos.md`). **[leve]** = entra também no nível leve; sem a marca, só no completo. Antes de cada pergunta, confira os campos (regra "uma resposta adianta outras" da `SKILL.md`).
+> Versão 1.9 (31/10/2026), no plugin Business Creator 0.2.5. Cada pergunta diz os campos que alimenta (códigos de `campos.md`). **[leve]** = entra também no nível leve; sem a marca, só no completo. Antes de cada pergunta, confira os campos (regra "uma resposta adianta outras" da `SKILL.md`).
 > Para a pessoa, as partes da montagem se chamam **etapas** ("Etapa 2 de 6"); "bloco" é só o nome interno deste roteiro.
 > Tempo-alvo por etapa, para a pessoa que responde: entre parênteses. É alvo, não regra: nunca apresse ninguém.
 
@@ -13,17 +13,28 @@
 >
 > São 6 etapas curtas, e você só responde. Eu escrevo os arquivos e te mostro cada um para você aprovar. Pode responder por voz (o ditado do computador: no Mac, a tecla do microfone; no Windows, Windows + H), solto, do jeito que vier. Dá para parar quando quiser: eu guardo onde paramos. No fim, o seu sistema já faz a primeira tarefa para você.
 >
-> **Para começar, me conte de uma vez só, aqui na conversa, em uns 5 minutos:**
-> 1. o que você faz no dia a dia: o seu trabalho e tudo o que mais você toca hoje (um negócio, um projeto, um estudo, a casa);
-> 2. o que você gostaria que o seu sistema fizesse por você, e se isso tem mais a ver com o seu trabalho ou com a sua vida pessoal;
-> 3. uma tarefa que você repete toda semana e que toma o seu tempo.
+> **Para começar, são só 2 pedidos.**
 >
-> **Para acelerar, se você tiver, mande junto:** o seu perfil do LinkedIn em PDF, se estiver atualizado (no LinkedIn, no seu perfil: Mais, Salvar como PDF; depois arraste o arquivo para esta conversa); o texto do seu perfil numa rede social, se você tem presença pública; um currículo ou uma bio.
+> **1. O que a IA que você mais usa já sabe sobre você.** Copie o texto abaixo (o botão de copiar fica no canto da caixa), cole no ChatGPT, no Gemini ou no Claude do navegador, e traga a resposta para cá:
 >
-> Quando terminar, escreva **terminei**.
+> ```text
+> Com base em tudo o que você sabe sobre mim pelas nossas conversas, escreva um retrato meu para eu levar para outro assistente. Use estas seções, em tópicos curtos:
+> 1. Quem eu sou: nome, cidade, trabalho principal e o que eu faço de fato no dia a dia.
+> 2. Tudo o que eu toco hoje: trabalho, negócios, projetos, estudos, casa. Uma linha para cada, dizendo o que anda e o que está parado.
+> 3. As tarefas que eu repito com frequência e quanto tempo elas parecem me tomar.
+> 4. Os programas e aplicativos que eu uso, e para quê.
+> 5. Como eu gosto de trabalhar e de receber respostas (formato, tamanho, tom).
+> 6. O que eu quero alcançar nos próximos meses.
+> Em cada item, marque [eu disse] quando eu falei com todas as letras e [deduzido] quando você concluiu. Ponha a data aproximada, se souber. Não invente: o que você não souber, deixe de fora. Deixe de fora saúde, finanças pessoais, senhas, assuntos íntimos de família e dados de clientes ou da empresa onde eu trabalho (números, nomes de colegas e de clientes).
+> ```
+>
+> **2. Enquanto a outra IA escreve, me conte com as suas palavras**, escrevendo ou por voz: quem você é, o que você faz e o que você pretende com o seu sistema.
+>
+> Quando tiver as duas coisas, mande aqui e escreva **terminei**. Se você não usa nenhuma outra IA, mande só o pedido 2.
 
 - **Se a pasta tiver o painel** (você sabe pela sua lista de ferramentas: a ferramenta `teste_do_base_camp` vem com ele; não precisa conferir a pasta), acrescente uma linha antes de "Para começar": "Ao lado da conversa abriu o painel do Base Camp: ele mostra a sua subida, o que o seu sistema já sabe e o que vem a seguir. Se ele não aparecer, escreva /base-camp."
 - **Nada antes da abertura:** ela é a primeira coisa que a pessoa lê; sem frase sua antes dela ("Estou abrindo...", "Segue o texto...").
+- **O texto do pedido 1 vai sempre numa caixa de código** (entre três crases, com `text`), sozinho, como acima: é ela que mostra o botão de copiar no app. Nada dentro da caixa além do texto a copiar. A abertura vai como texto normal, sem as marcas de citação (`>`) que ela tem neste roteiro, e a caixa de código fora de qualquer citação.
 - **Sem escolha na abertura** (decisão do Arthur, 31/10/2026: "o mínimo de decisões possíveis para o usuário e o máximo de orientações objetivas"; "se é um kit de implementação guiada, é para ela ser guiada"). Nada de caixa de opções nem de "você prefere". A abertura sempre leva à etapa D. Registre o início da D na mesma resposta da abertura.
 
 ---
@@ -32,12 +43,8 @@
 **Arquivo:** nenhum (só `montagem/respostas.md`). **Fecha quando:** ela escrever "terminei" ou disser que acabou.
 
 - Enquanto ela manda, **não pergunte nada**: grave em `respostas.md` e responda só "Anotado. Pode seguir; quando acabar, escreva terminei."
-- **PDF ou texto colado:** leia, grave nos campos certos e não peça confirmação item por item agora; as etapas confirmam.
-- **Se ela disser que usa outra IA** (ChatGPT, Gemini, o Claude do navegador) e quiser trazer o que ela já sabe, dê este pedido para colar lá e trazer a resposta:
-
-> "Liste tudo o que você sabe sobre mim a partir das nossas conversas: quem eu sou, o que faço, meus projetos, como eu gosto de trabalhar e de receber respostas, e os programas e aplicativos que eu uso. Separe em duas listas: o que eu disse com todas as letras e o que você deduziu. Coloque a data aproximada de cada item, se souber. Deixe de fora saúde, finanças pessoais e assuntos íntimos de família."
-
-- O que vier da outra IA entra como `[memória de outra IA, a confirmar]` e só vale depois que ela confirmar, nas perguntas das etapas.
+- **O que vier da outra IA** entra como `[memória de outra IA, a confirmar]`, com as marcas [eu disse] e [deduzido] dela, e só vale depois que ela confirmar, nas perguntas das etapas. **O que ela contar com as palavras dela** entra como `[despejo]` e vale mais que o da outra IA quando os dois falarem da mesma coisa.
+- Se ela mandar só um dos dois, siga com o que veio: não peça o outro.
 - **Não procure a pessoa na internet** (LinkedIn, Google) nem use ferramenta que ela não tenha pedido: o que entra é o que ela manda.
 
 **Ao terminar:** distribua tudo pelos campos de `campos.md` e diga, em até 4 linhas, o que já ficou claro e que parte das próximas perguntas vira confirmação rápida. Na mesma mensagem, abra a etapa 1 com a primeira pergunta que falta (sem perguntar se ela quer seguir). **Não prometa um número de perguntas** (no teste, a promessa de "4 perguntas" virou 7). Não mostre a lista de campos.

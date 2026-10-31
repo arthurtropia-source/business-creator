@@ -2,6 +2,12 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.2.5 (31/10/2026)
+A abertura em 2 pedidos (correção 10 revisada pelo Arthur, 31/10: "vão ser só 2 pedidos"), no lugar das 3 perguntas e das sugestões de LinkedIn e rede social da 0.2.4.
+- **Pedido 1:** o texto para a IA que a pessoa mais usa, numa caixa de código com o botão de copiar, para ela colar lá e trazer a resposta. O texto foi reescrito para o resultado que a montagem precisa: um retrato em 6 seções (quem é, o que toca, as tarefas que repete, os programas, como gosta de receber, o que quer), cada item marcado [eu disse] ou [deduzido], sem inventar e sem saúde, finanças pessoais, senhas, família íntima nem dados de cliente ou da empresa. **A revisar pelo Arthur.**
+- **Pedido 2:** enquanto a outra IA escreve, a pessoa conta com as palavras dela, escrevendo ou por voz: quem é, o que faz e o que pretende. O que ela conta vale mais que o da outra IA quando os dois falarem da mesma coisa.
+- Sem escolha e sem ferramenta externa; quem não usa outra IA manda só o pedido 2 (montagem 1.11, roteiro 1.9).
+
 ## 0.2.4 (31/10/2026)
 A montagem guiada, sem escolhas (correção 10 do teste do Arthur, 31/10: "o mínimo de decisões possíveis para o usuário e o máximo de orientações objetivas"; "se é um kit de implementação guiada, é para ela ser guiada").
 - **A abertura não pergunta mais "conto do meu jeito ou vá perguntando".** Ela pede, de uma vez, 3 coisas: o que a pessoa faz no dia a dia e tudo o que toca; o que quer que o sistema faça por ela, no trabalho ou na vida pessoal; uma tarefa que repete e que toma tempo. E sugere o que acelera, sem escolha: o PDF do LinkedIn, se atualizado; o texto de um perfil público; um currículo ou uma bio. A etapa D vira o começo de sempre (montagem 1.10, roteiro 1.8).

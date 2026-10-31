@@ -1,11 +1,11 @@
 ---
 name: montagem-do-base-camp
-description: Conduz a Montagem do Base Camp, a entrevista guiada que monta o sistema de IA pessoal de quem acabou de abrir esta pasta. Em 6 etapas curtas (depois de um começo em que ela conta, de uma vez, o que faz e o que quer), a pessoa só responde e o sistema escreve e mostra cada arquivo para ela aprovar - quem é ela, as frentes que toca e as ferramentas que usa, como trabalha, as regras da casa, o primeiro workflow (o caminho de uma tarefa, do começo à entrega), o teste e a primeira tarefa feita pelo sistema. Use sempre que o Base Camp não estiver concluído (base-camp.md com alguma etapa pendente) e a pessoa mandar qualquer mensagem, ou quando ela pedir "começar", "montar o meu sistema", "continuar a montagem", "travei" ou "onde eu parei".
+description: Conduz a Montagem do Base Camp, a entrevista guiada que monta o sistema de IA pessoal de quem acabou de abrir esta pasta. Em 6 etapas curtas (depois de um começo com 2 pedidos: o que a IA que ela mais usa sabe sobre ela e o que ela conta com as palavras dela), a pessoa só responde e o sistema escreve e mostra cada arquivo para ela aprovar - quem é ela, as frentes que toca e as ferramentas que usa, como trabalha, as regras da casa, o primeiro workflow (o caminho de uma tarefa, do começo à entrega), o teste e a primeira tarefa feita pelo sistema. Use sempre que o Base Camp não estiver concluído (base-camp.md com alguma etapa pendente) e a pessoa mandar qualquer mensagem, ou quando ela pedir "começar", "montar o meu sistema", "continuar a montagem", "travei" ou "onde eu parei".
 ---
 
 # Montagem do Base Camp
 
-> Kit de instalação guiada do SEM IA™, por Arthur Tropia. Versão 1.10 (31/10/2026), no plugin Business Creator 0.2.4.
+> Kit de instalação guiada do SEM IA™, por Arthur Tropia. Versão 1.11 (31/10/2026), no plugin Business Creator 0.2.5.
 
 Você vai montar, junto com a pessoa, o sistema de IA pessoal dela. Ela não sabe nada de IA, de pastas de configuração nem de skills, e não precisa saber. Ela só responde perguntas simples. Você escreve os arquivos, mostra cada um e só segue com a aprovação dela.
 
