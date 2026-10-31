@@ -503,7 +503,16 @@ async function carregar($: EngineInterface) {
         { codigo: '6.6', rotulo: 'O guia de bolso', estado: ok(guia) },
         { codigo: '6.7', rotulo: 'A primeira tarefa feita', estado: ok(base.feita) },
       ]
-    } else if (atual && atual.codigo !== 'D' && !base.concluida) {
+    } else if (atual?.codigo === 'D' && !base.concluida) {
+      // O começo não tem campos: o painel mostra os 2 pedidos da abertura e a conferência (0.2.7).
+      const r = await lerTexto($, `${dir}/montagem/respostas.md`)
+      const ok = (x: boolean): Campo['estado'] => (x ? 'ok' : 'falta')
+      campos = [
+        { codigo: 'D.1', rotulo: 'Pedido 1: o que a outra IA já sabe de você', estado: ok(/\[memória de outra IA/.test(r)) },
+        { codigo: 'D.2', rotulo: 'Pedido 2: você, com as suas palavras', estado: ok(/\[despejo\]/.test(r)) },
+        { codigo: 'D.3', rotulo: 'A conferência do que veio da outra IA', estado: ok(/confirmado em/.test(r)) },
+      ]
+    } else if (atual && !base.concluida) {
       const defs = lerDefinicoes(await lerTexto($, `${$.plugin.root}/skills/montagem-do-base-camp/campos.md`))
       campos = lerCampos(defs, await lerTexto($, `${dir}/montagem/respostas.md`), atual.codigo, base.nivel)
     }
@@ -933,6 +942,18 @@ export const register: Register = on => {
       </Box>
     )
 
+    // Em curso, a subida vira uma linha só; o destaque é o andamento da etapa atual (pedido do Arthur, 31/10).
+    const progresso = (
+      <Text color={CINZA} size="caption">
+        {dado.blocos
+          .map(b => {
+            const atual = !dado.concluida && atualBloco?.codigo === b.codigo
+            return `${atual ? '●' : b.status === 'aprovado' || b.status === 'pulado' ? '✓' : '○'} ${b.codigo === 'D' ? 'Começo' : b.codigo}`
+          })
+          .join('   ')}
+      </Text>
+    )
+
     const docAberto =
       aberto && textoDoc ? (
         <Box flexDirection="column" gap={1} borderStyle="round" borderColor={TINTA} padding={1}>
@@ -1041,6 +1062,7 @@ export const register: Register = on => {
     const textoArquivo = await read($, arquivoTexto)
     const sabidos = dado.campos.filter(c => c.estado === 'ok').length
     const ehEntrega = atualBloco?.codigo === '6'
+    const ehComeco = atualBloco?.codigo === 'D'
     const lembrete = (await read($, parado)) && !ocupado
     const nomeAprov = aprov?.arquivo ? nomeDoArquivo(aprov.arquivo) : null
 
@@ -1081,18 +1103,15 @@ export const register: Register = on => {
             {ver && textoArquivo && <Markdown text={textoArquivo} />}
           </Box>
         )}
-        {trilha}
-        <Text color={CINZA} size="caption">{completo ? 'A SUA SUBIDA DE HOJE' : 'A SUA SUBIDA'}</Text>
-        {subida}
         {dado.campos.length > 0 &&
           (sabidos === dado.campos.length ? (
             <Text color={TINTA}>
-              ✓ {ehEntrega ? 'Tudo o que esta etapa entrega já está pronto.' : 'Tudo o que esta etapa precisa já está anotado.'}
+              ✓ {ehEntrega ? 'Tudo o que esta etapa entrega já está pronto.' : ehComeco ? 'O começo está completo.' : 'Tudo o que esta etapa precisa já está anotado.'}
             </Text>
           ) : (
             <Box flexDirection="column">
               <Text color={CINZA} size="caption">
-                {ehEntrega ? 'O QUE ESTA ETAPA ENTREGA' : 'O QUE O SEU SISTEMA JÁ SABE'} · {sabidos} DE {dado.campos.length}
+                {ehEntrega ? 'O QUE ESTA ETAPA ENTREGA' : ehComeco ? 'O SEU COMEÇO' : 'O QUE O SEU SISTEMA JÁ SABE'} · {sabidos} DE {dado.campos.length}
               </Text>
               {dado.campos.map(c => (
                 <Text key={`campo-${c.codigo}`} color={c.estado === 'falta' ? CINZA : ROCHA} dimColor={c.estado === 'falta'}>
@@ -1102,6 +1121,7 @@ export const register: Register = on => {
               ))}
             </Box>
           ))}
+        {progresso}
         <Box flexDirection="column">
           <Text color={CINZA} size="caption">O QUE JÁ ESTÁ MONTADO</Text>
           {dado.montado.map(m => (

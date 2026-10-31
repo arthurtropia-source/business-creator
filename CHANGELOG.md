@@ -2,6 +2,9 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.2.7 (31/10/2026)
+- **O painel mostra o andamento da etapa atual, não a lista das próximas** (melhoria 12 do teste do Arthur, 31/10: "ao invés de mostrar o passo a passo das próximas etapas, acho que podemos mostrar o andamento da etapa atual"). Em curso, a subida vira uma linha só (● a etapa atual, ✓ as feitas, ○ as que faltam) e o destaque é o que a etapa já tem. No começo, o painel mostra os 2 pedidos da abertura (o que a outra IA sabe, as palavras dela) e a conferência, cada um com ✓ quando chega. A lista inteira das etapas fica só nas boas-vindas, antes de a montagem começar.
+
 ## 0.2.6 (31/10/2026)
 O que vem da outra IA pode estar velho (correção 11 do teste do Arthur, 31/10: a fala da pessoa "vai ser mais atual em relação ao momento e às intenções dela"; a outra IA "pode trazer coisas do passado que não se aplicam mais").
 - **Regra:** o que a pessoa fala ou escreve hoje vale mais; em conflito, ganha a fala dela, sem perguntar.

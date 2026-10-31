@@ -149,10 +149,9 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     expect(await ui.find({ type: 'Text', text: /Base Camp by/ })).toBeUndefined()
     expect(await ui.find({ type: 'Text', text: /ETAPA 2 DE 6 · AS SUAS FRENTES/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /Para cada frente ter o seu lugar/ })).toBeDefined()
-    expect((await ui.find({ type: 'Text', text: /2 · As suas frentes/ }))?.text).toContain('●')
-    expect(await ui.find({ type: 'Text', text: /A base: a pasta aberta/ })).toBeDefined()
-    expect((await ui.find({ type: 'Text', text: /12 min/ }))?.text).toBe('12 min')
-    expect((await ui.find({ type: 'Text', text: /^agora$/ }))?.text).toBe('agora')
+    // Em curso, a subida é uma linha só; o destaque é o andamento da etapa (0.2.7).
+    expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toContain('● 2')
+    expect(await ui.find({ type: 'Text', text: /3 · Como você trabalha/ })).toBeUndefined()
     expect(await ui.find({ type: 'Text', text: /O QUE O SEU SISTEMA JÁ SABE · 1 DE 4/ })).toBeDefined()
     expect((await ui.find({ type: 'Text', text: /Quem está em cada frente/ }))?.text).toContain('pulada')
     expect((await ui.find({ type: 'Text', text: /Os programas que você usa/ }))?.text).toContain('○')
@@ -177,6 +176,22 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     expect(await ui.findAll({ type: 'Button' })).toHaveLength(0)
     expect((await ui.find({ type: 'Text', text: /Espere a resposta/ }))?.text).toContain('continuar')
     expect(enviados).toEqual(['continuar'])
+    await ui.unmount()
+  })
+
+  test(`no começo, o painel mostra os 2 pedidos e a conferência (${surface})`, async ($, on) => {
+    const comeco = BASE_CAMP.replace('NIVEL', 'completo')
+      .replace('| D · Conte do seu jeito | aprovado | 23/10/2026 17:24 | 23/10/2026 17:36 |', '| D · Conte do seu jeito | em andamento | 23/10/2026 17:24 | |')
+      .replace('| 1 · Quem é você | aprovado | 23/10/2026 17:36 | 23/10/2026 18:01 |', '| 1 · Quem é você | pendente | | |')
+      .replace('| 2 · As suas frentes | em andamento | 23/10/2026 18:01 | |', '| 2 · As suas frentes | pendente | | |')
+    pasta(on, { '/os/base-camp.md': comeco, '/os/montagem/respostas.md': RESPOSTAS }, [])
+    await $.session.start({ cwd: '/os', surface, isInteractive: true })
+
+    const ui = await $.ui.mount({ ...PANE, surface })
+    expect(await ui.find({ type: 'Text', text: /O SEU COMEÇO · 1 DE 3/ })).toBeDefined()
+    expect((await ui.find({ type: 'Text', text: /Pedido 2: você, com as suas palavras/ }))?.text).toContain('✓')
+    expect((await ui.find({ type: 'Text', text: /Pedido 1: o que a outra IA/ }))?.text).toContain('○')
+    expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toContain('● Começo')
     await ui.unmount()
   })
 
