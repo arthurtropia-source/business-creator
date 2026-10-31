@@ -158,7 +158,9 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     expect((await ui.find({ type: 'Text', text: /Os programas que você usa/ }))?.text).toContain('○')
     expect((await ui.find({ type: 'Text', text: /A página sobre você/ }))?.text).toContain('✓')
     expect((await ui.find({ type: 'Text', text: /Hoje leva/ }))?.text).toContain('3 horas')
-    expect(await ui.findAll({ type: 'Button' })).toHaveLength(3)
+    // Continuar e Travei; o botão de ler em voz alta saiu na 0.2.3 (pedido do Arthur, 31/10).
+    expect(await ui.findAll({ type: 'Button' })).toHaveLength(2)
+    expect(await ui.find({ type: 'Button', key: 'voz' })).toBeUndefined()
 
     await ui.press({ key: 'travei' })
     expect(enviados).toContain('travei')
@@ -172,7 +174,7 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
 
     const ui = await $.ui.mount({ ...PANE, surface })
     await ui.press({ key: 'continuar' })
-    expect(await ui.findAll({ type: 'Button' })).toHaveLength(1)
+    expect(await ui.findAll({ type: 'Button' })).toHaveLength(0)
     expect((await ui.find({ type: 'Text', text: /Espere a resposta/ }))?.text).toContain('continuar')
     expect(enviados).toEqual(['continuar'])
     await ui.unmount()
@@ -190,7 +192,7 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     expect(await ui.find({ type: 'Text', text: /12 min/ })).toBeUndefined()
     expect(await ui.find({ type: 'Text', text: /O que está parado/ })).toBeUndefined()
     expect(await ui.find({ type: 'Text', text: /JÁ SABE · 1 DE 3/ })).toBeDefined()
-    expect(await ui.findAll({ type: 'Button' })).toHaveLength(2)
+    expect(await ui.findAll({ type: 'Button' })).toHaveLength(1)
     await ui.unmount()
   })
 

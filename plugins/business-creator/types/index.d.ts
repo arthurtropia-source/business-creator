@@ -69,7 +69,6 @@ declare module 'claude-code' {
       festa: Festa | null
       fim: number | null
       parado: boolean
-      voz: boolean
       verArquivo: boolean
       arquivoTexto: string | null
       doc: 'guia' | 'resumo' | null

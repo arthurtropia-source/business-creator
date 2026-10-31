@@ -35,7 +35,6 @@ const festa = atom({ plugin: 'business-creator', key: 'festa' } as const, null)
 // Quando a última resposta terminou, e se a pessoa está parada há um tempo.
 const fim = atom({ plugin: 'business-creator', key: 'fim' } as const, null)
 const parado = atom({ plugin: 'business-creator', key: 'parado' } as const, false)
-const voz = atom({ plugin: 'business-creator', key: 'voz' } as const, false)
 const verArquivo = atom({ plugin: 'business-creator', key: 'verArquivo' } as const, false)
 const arquivoTexto = atom({ plugin: 'business-creator', key: 'arquivoTexto' } as const, null)
 const doc = atom({ plugin: 'business-creator', key: 'doc' } as const, null)
@@ -562,25 +561,6 @@ async function corrigir($: EngineInterface) {
   await $.prompt.fill({ text: 'quero corrigir: ', mode: 'replace' })
 }
 
-async function falar($: EngineInterface, texto: string) {
-  try {
-    await $.audio.speak(texto, { voice: 'Luciana' })
-  } catch {
-    try {
-      await $.audio.speak(texto)
-    } catch {
-      // Sem voz no computador: o painel segue em silêncio.
-    }
-  }
-}
-
-async function alternarVoz($: EngineInterface) {
-  const ligada = !(await read($, voz))
-  await update($, voz, () => ligada)
-  await $.store.set('voz', ligada)
-  if (ligada) void falar($, 'Pronto. Eu leio as próximas perguntas em voz alta.')
-}
-
 async function abrirArquivo($: EngineInterface) {
   const aberto = !(await read($, verArquivo))
   await update($, verArquivo, () => aberto)
@@ -665,20 +645,6 @@ function sugestao(resposta: string): string | null {
   return null
 }
 
-// O último parágrafo que pergunta algo, sem a marcação, para a voz ler.
-function paraFalar(resposta: string): string | null {
-  const limpo = resposta.replace(/```[\s\S]*?```/g, ' ').replace(/[*_`>#|]/g, '')
-  const paragrafos = limpo
-    .split(/\n\s*\n/)
-    .map(p => p.replace(/\s+/g, ' ').trim())
-    .filter(Boolean)
-  const ultimo = [...paragrafos].reverse().find(p => p.includes('?'))
-  if (!ultimo) return null
-  if (ultimo.length <= 400) return ultimo
-  const frases = ultimo.split(/(?<=[.?!])\s+/)
-  return [...frases].reverse().find(f => f.endsWith('?')) ?? ultimo.slice(0, 400)
-}
-
 async function naPastaDaSessao($: EngineInterface): Promise<boolean> {
   const dir = await read($, pasta)
   return Boolean(dir) && dir === (await read($, sessao))
@@ -717,8 +683,6 @@ export const register: Register = on => {
     await limpar($)
     await update($, trabalhando, () => false)
     await update($, atividade, () => null)
-    const vozGuardada = (await $.store.get('voz')) === true
-    await update($, voz, () => vozGuardada)
     const dado = await carregar($)
     if (dado) void $.ui.open({ id: PANE, title: TITULO })
     if (await existe($, `${e.cwd}/base-camp.md`)) {
@@ -820,10 +784,6 @@ export const register: Register = on => {
     if (resposta && (await emMontagem($))) {
       const s = sugestao(resposta)
       if (s) $.clock.after(400, () => void $.prompt.suggest({ text: s }))
-      if (await read($, voz)) {
-        const fala = paraFalar(resposta)
-        if (fala) void falar($, fala)
-      }
     }
 
     return r
@@ -1080,7 +1040,6 @@ export const register: Register = on => {
     const ver = await read($, verArquivo)
     const textoArquivo = await read($, arquivoTexto)
     const sabidos = dado.campos.filter(c => c.estado === 'ok').length
-    const vozLigada = await read($, voz)
     const ehEntrega = atualBloco?.codigo === '6'
     const lembrete = (await read($, parado)) && !ocupado
     const nomeAprov = aprov?.arquivo ? nomeDoArquivo(aprov.arquivo) : null
@@ -1164,12 +1123,6 @@ export const register: Register = on => {
             <Button key="travei" label="Travei" onPress={() => void enviar($, 'travei')} />
           </Box>
         )}
-        <Button
-          key="voz"
-          dimColor
-          label={vozLigada ? 'Ler as perguntas em voz alta: ligado' : 'Ler as perguntas em voz alta: desligado'}
-          onPress={() => void alternarVoz($)}
-        />
         {rodape}
       </Box>
     )

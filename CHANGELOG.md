@@ -2,6 +2,9 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.2.3 (31/10/2026)
+- **Sai do painel o botão "Ler as perguntas em voz alta"** e a leitura em voz alta das respostas (melhoria 9 do teste do Arthur, 31/10: "retirar esse botão que tem lá no painel de ler as perguntas em voz alta"). Responder por voz, pelo ditado do computador, continua.
+
 ## 0.2.2 (31/10/2026)
 Correções do teste do Arthur na pasta limpa (31/10, observações 3, 4, 6, 7 e 8 em `laboratorio-os/2026-10-31-implantacao-arthur-observacoes.md`). Publicada com a autorização dele para o ciclo de teste ("pode publicar cada correção do teste sem me perguntar").
 - **Plugin não instalado (trava):** o app adicionou o marketplace pela pasta, mas não instalou o plugin. O esqueleto da pasta passa a conferir isso: sem a skill da montagem, o sistema não procura arquivos nem roda comandos; mostra os 3 passos de instalação (o **+**, Plugins, instalar "para o projeto (compartilhado)") e pede uma conversa nova. O README e o guia de instalação ganham o passo antes do "oi".

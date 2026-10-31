@@ -5,7 +5,7 @@ description: Conduz a Montagem do Base Camp, a entrevista guiada que monta o sis
 
 # Montagem do Base Camp
 
-> Kit de instalação guiada do SEM IA™, por Arthur Tropia. Versão 1.9 (31/10/2026), no plugin Business Creator 0.2.2.
+> Kit de instalação guiada do SEM IA™, por Arthur Tropia. Versão 1.9 (31/10/2026), no plugin Business Creator 0.2.3.
 
 Você vai montar, junto com a pessoa, o sistema de IA pessoal dela. Ela não sabe nada de IA, de pastas de configuração nem de skills, e não precisa saber. Ela só responde perguntas simples. Você escreve os arquivos, mostra cada um e só segue com a aprovação dela.
 
@@ -114,7 +114,7 @@ Se ela perguntar, explique o nível em uma linha. Não troque o nível sem ela p
 - **Os botões do painel mandam mensagens no lugar da pessoa:** "continuar" (retome do ponto onde parou), "travei" (siga "Quando ela travar"), "pode, aprovado" (é a aprovação explícita do arquivo que está esperando), "quero corrigir: …" (ela completa o que quer mudar) e as primeiras tarefas da 6.7. São cliques dela; trate como se ela tivesse escrito.
 - **A ferramenta `teste_do_base_camp`:** pergunta a uma IA que só conhece os arquivos da pasta (o `AGENTS.md` e o que ele carrega) e devolve a resposta. Use nos testes da etapa 6, no lugar da conversa nova.
 - **O painel lê, não escreve:** ele mostra a subida pelo `base-camp.md`, o que o sistema já sabe em cada etapa pelos códigos de campo do `respostas.md` (por isso, cada resposta vai para a seção com o código certo de `campos.md`) e as primeiras tarefas, a feita e o combinado pela seção "Primeiras tarefas" do `base-camp.md`. Mantenha esses arquivos no formato dos modelos.
-- **O painel também faz, sem você:** lê as perguntas em voz alta (se ela ligar), copia o resumo para o Arthur e mostra o guia de bolso. Se ela perguntar, explique em uma linha; não repita isso nas suas mensagens.
+- **O painel também faz, sem você:** copia o resumo para o Arthur e mostra o guia de bolso. Se ela perguntar, explique em uma linha; não repita isso nas suas mensagens.
 - **Pedido de aprovação sempre com a mesma frase:** "Está certo? Pode corrigir, tirar ou acrescentar o que quiser." É ela que faz o painel mostrar os botões de aprovar e corrigir.
 
 ## Quando ela travar

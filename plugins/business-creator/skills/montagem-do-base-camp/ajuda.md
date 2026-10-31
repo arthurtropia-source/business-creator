@@ -41,7 +41,7 @@
 "Aprovar vale como o seu 'pode': o arquivo fica como está. Quero corrigir coloca a frase na caixa de texto para você completar com o que quer mudar."
 
 ## Quero responder por voz
-"Use o ditado do computador: no Mac, a tecla do microfone (ou fn duas vezes); no Windows, Windows + H. Fale à vontade, do jeito que vier: eu organizo. Se nada acontecer, o ditado está desligado: no Mac, abra Ajustes do Sistema, Teclado, e ligue o Ditado (ali aparece o atalho do seu Mac); no Windows, Configurações, Hora e idioma, Fala." Se o painel estiver aberto, diga também: "No painel, o botão 'Ler as perguntas em voz alta' faz o sistema ler cada pergunta para você."
+"Use o ditado do computador: no Mac, a tecla do microfone (ou fn duas vezes); no Windows, Windows + H. Fale à vontade, do jeito que vier: eu organizo. Se nada acontecer, o ditado está desligado: no Mac, abra Ajustes do Sistema, Teclado, e ligue o Ditado (ali aparece o atalho do seu Mac); no Windows, Configurações, Hora e idioma, Fala."
 
 ## Respondi errado ou quero mudar uma resposta
 "Sem problema. Diga o que quer mudar (ex.: 'na pergunta das frentes, tira a consultoria'). Eu corrijo o arquivo e te mostro."
