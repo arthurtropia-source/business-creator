@@ -2,6 +2,12 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.2.4 (31/10/2026)
+A montagem guiada, sem escolhas (correção 10 do teste do Arthur, 31/10: "o mínimo de decisões possíveis para o usuário e o máximo de orientações objetivas"; "se é um kit de implementação guiada, é para ela ser guiada").
+- **A abertura não pergunta mais "conto do meu jeito ou vá perguntando".** Ela pede, de uma vez, 3 coisas: o que a pessoa faz no dia a dia e tudo o que toca; o que quer que o sistema faça por ela, no trabalho ou na vida pessoal; uma tarefa que repete e que toma tempo. E sugere o que acelera, sem escolha: o PDF do LinkedIn, se atualizado; o texto de um perfil público; um currículo ou uma bio. A etapa D vira o começo de sempre (montagem 1.10, roteiro 1.8).
+- **Regra geral:** o sistema não pergunta como ela prefere fazer nem se quer seguir; ao fechar uma etapa, já abre a próxima; depois da etapa 3, orienta a conversa nova em vez de oferecer. Ela só escolhe o workflow (5.3) e a primeira tarefa (6.7).
+- **Não procura a pessoa na internet:** o que entra é o que ela manda (no teste, o sistema buscou o LinkedIn por conta própria).
+
 ## 0.2.3 (31/10/2026)
 - **Sai do painel o botão "Ler as perguntas em voz alta"** e a leitura em voz alta das respostas (melhoria 9 do teste do Arthur, 31/10: "retirar esse botão que tem lá no painel de ler as perguntas em voz alta"). Responder por voz, pelo ditado do computador, continua.
 

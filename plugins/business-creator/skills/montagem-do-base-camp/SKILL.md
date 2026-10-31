@@ -1,11 +1,11 @@
 ---
 name: montagem-do-base-camp
-description: Conduz a Montagem do Base Camp, a entrevista guiada que monta o sistema de IA pessoal de quem acabou de abrir esta pasta. Em 6 etapas curtas (mais um "conte do seu jeito" opcional no começo), a pessoa só responde e o sistema escreve e mostra cada arquivo para ela aprovar - quem é ela, as frentes que toca e as ferramentas que usa, como trabalha, as regras da casa, o primeiro workflow (o caminho de uma tarefa, do começo à entrega), o teste e a primeira tarefa feita pelo sistema. Use sempre que o Base Camp não estiver concluído (base-camp.md com alguma etapa pendente) e a pessoa mandar qualquer mensagem, ou quando ela pedir "começar", "montar o meu sistema", "continuar a montagem", "travei" ou "onde eu parei".
+description: Conduz a Montagem do Base Camp, a entrevista guiada que monta o sistema de IA pessoal de quem acabou de abrir esta pasta. Em 6 etapas curtas (depois de um começo em que ela conta, de uma vez, o que faz e o que quer), a pessoa só responde e o sistema escreve e mostra cada arquivo para ela aprovar - quem é ela, as frentes que toca e as ferramentas que usa, como trabalha, as regras da casa, o primeiro workflow (o caminho de uma tarefa, do começo à entrega), o teste e a primeira tarefa feita pelo sistema. Use sempre que o Base Camp não estiver concluído (base-camp.md com alguma etapa pendente) e a pessoa mandar qualquer mensagem, ou quando ela pedir "começar", "montar o meu sistema", "continuar a montagem", "travei" ou "onde eu parei".
 ---
 
 # Montagem do Base Camp
 
-> Kit de instalação guiada do SEM IA™, por Arthur Tropia. Versão 1.9 (31/10/2026), no plugin Business Creator 0.2.3.
+> Kit de instalação guiada do SEM IA™, por Arthur Tropia. Versão 1.10 (31/10/2026), no plugin Business Creator 0.2.4.
 
 Você vai montar, junto com a pessoa, o sistema de IA pessoal dela. Ela não sabe nada de IA, de pastas de configuração nem de skills, e não precisa saber. Ela só responde perguntas simples. Você escreve os arquivos, mostra cada um e só segue com a aprovação dela.
 
@@ -33,7 +33,7 @@ A montagem está pronta quando:
 ## Como começar ou retomar
 0. **Antes de tudo, confira se o `base-camp.md` está na raiz da pasta aberta.** Se não estiver, não grave nada: pare e diga, em uma linha, como abrir no app a pasta do computador dela (não um ambiente na nuvem, e sem anexar nada na conversa).
 1. Leia `base-camp.md`. **Se a seção "Em aberto" tiver alguma pergunta, comece por ela**, antes de qualquer outra coisa, e apague-a de lá quando ela responder.
-2. **Se nenhuma etapa começou:** mande a abertura do `roteiro.md` palavra por palavra e registre o início (passo "Horário", abaixo). **O texto de boas-vindas vai inteiro, escrito na resposta, antes da caixa de opções**: a caixa só traz a escolha 1 ou 2 e nunca substitui o texto (no teste de 31/10, a caixa veio sozinha e a pessoa não soube das 6 etapas, da voz nem do painel).
+2. **Se nenhuma etapa começou:** mande a abertura do `roteiro.md` palavra por palavra, inteira, escrita na resposta, e registre o início da etapa D (passo "Horário", abaixo). A abertura não tem escolha nem caixa de opções: ela já pede o que a pessoa deve mandar.
 3. **Se há uma etapa "em andamento":** leia `montagem/respostas.md`, diga em uma linha onde vocês pararam ("Paramos na etapa 2, nas suas frentes. Vamos continuar?") e siga da primeira pergunta sem resposta. Nunca refaça o que já foi respondido.
    **Se nenhuma etapa está "em andamento", mas há etapas aprovadas e a próxima está pendente** (é o caso de quem trocou de conversa no fim de uma etapa): leia `montagem/respostas.md`, diga em uma linha o que já está pronto e abra a próxima etapa pendente ("Já estão prontas as etapas 1 a 3. Vamos para a etapa 4, as regras da casa."). Anote em "Pedidos sobre o kit", no `base-camp.md`: "trocou de conversa depois da etapa <n>" (no teste 3, a troca não ficou anotada).
 4. **Se tudo está concluído:** esta skill não se aplica mais. Responda normalmente, como o sistema dela.
@@ -65,7 +65,7 @@ Ao abrir e ao fechar cada etapa, pegue a hora com o terminal que você tiver: `d
 - **Confirmar com as palavras dela:** quando resumir algo que ela disse, use o vocabulário dela, não o seu.
 
 ## Escolhas com clique
-Para escolhas fechadas (a abertura "1 ou 2"; "seguir agora ou parar por hoje"; o workflow candidato na 5.3; a primeira tarefa na 6.7), **se você tiver a ferramenta de pergunta com opções (AskUserQuestion), use-a**: a pessoa clica em vez de digitar. Opções curtas, no máximo 4, a recomendada primeiro. Sem a ferramenta, pergunte por texto, numerado. Nunca use a ferramenta para perguntas abertas (as de fato, as histórias) nem para a aprovação de arquivo, que pode pedir correção.
+**O mínimo de decisões para ela, o máximo de orientação** (decisão do Arthur, 31/10/2026). Não pergunte como ela prefere fazer, se quer seguir ou parar, nem por onde começar: diga o que fazer, com um exemplo. Ela só escolhe o que é dela de fato: o workflow candidato na 5.3 e a primeira tarefa na 6.7. Nessas, **se você tiver a ferramenta de pergunta com opções (AskUserQuestion), use-a**: a pessoa clica em vez de digitar. Opções curtas, no máximo 4, a recomendada primeiro. Sem a ferramenta, pergunte por texto, numerado. Nunca use a ferramenta para perguntas abertas (as de fato, as histórias) nem para a aprovação de arquivo, que pode pedir correção.
 
 ## "Uma resposta adianta outras"
 Antes de cada pergunta, confira os campos que ela alimenta, pelo que você já leu e gravou nesta conversa (`campos.md` e `respostas.md`; ao retomar numa conversa nova, leia os dois uma vez):
@@ -96,7 +96,7 @@ Gravar a cada resposta é o que deixa a pessoa parar e voltar sem perder nada.
 3. Pergunte: "Está certo? Pode corrigir, tirar ou acrescentar o que quiser."
 4. **Só marque "aprovado" com uma palavra explícita dela** ("aprovado", "pode", "ok", "isso", "certo"). Se ela corrigir, corrija, mostre o trecho mudado e pergunte de novo.
 5. Confira que o arquivo foi gravado e que o `base-camp.md` mudou.
-6. Diga o que vem a seguir em uma linha e pergunte se ela quer seguir agora ou parar por hoje (escolha com clique). No fim da etapa 3, faça a recomendação de trocar de conversa (no `roteiro.md`).
+6. Na mesma mensagem, abra a próxima etapa com a primeira pergunta dela, e diga em meia linha que ela pode parar quando quiser ("se precisar parar, é só fechar: eu guardo onde paramos"). Não pergunte se ela quer seguir. No fim da etapa 3, a orientação é trocar de conversa (no `roteiro.md`).
 
 ## Cuidados
 - **Sigilo:** saúde, conflitos de família, dinheiro pessoal e assuntos íntimos não são necessários para montar o sistema. Se aparecerem, não grave o conteúdo: anote só "[assunto pessoal, não registrado]" e siga. Se ela quiser que algo pessoal entre (por exemplo, uma frente de finanças da casa), registre só o que ela pedir, com o mínimo necessário.

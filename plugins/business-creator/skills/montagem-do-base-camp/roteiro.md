@@ -1,6 +1,6 @@
 # Roteiro da Montagem do Base Camp
 
-> Versão 1.7 (31/10/2026), no plugin Business Creator 0.2.2. Cada pergunta diz os campos que alimenta (códigos de `campos.md`). **[leve]** = entra também no nível leve; sem a marca, só no completo. Antes de cada pergunta, confira os campos (regra "uma resposta adianta outras" da `SKILL.md`).
+> Versão 1.8 (31/10/2026), no plugin Business Creator 0.2.4. Cada pergunta diz os campos que alimenta (códigos de `campos.md`). **[leve]** = entra também no nível leve; sem a marca, só no completo. Antes de cada pergunta, confira os campos (regra "uma resposta adianta outras" da `SKILL.md`).
 > Para a pessoa, as partes da montagem se chamam **etapas** ("Etapa 2 de 6"); "bloco" é só o nome interno deste roteiro.
 > Tempo-alvo por etapa, para a pessoa que responde: entre parênteses. É alvo, não regra: nunca apresse ninguém.
 
@@ -11,31 +11,36 @@
 > **Boas-vindas ao seu Base Camp.**
 > Antes de subir qualquer montanha, a gente monta o acampamento. É aqui que o seu sistema passa a saber quem você é, o que você toca e como você trabalha, para parar de te pedir as mesmas explicações.
 >
-> São 6 etapas curtas, e você só responde. Eu escrevo os arquivos e te mostro cada um para você aprovar. Pode responder por voz (o ditado do computador: no Mac, a tecla do microfone; no Windows, Windows + H), solto, do jeito que vier, e pular qualquer pergunta. Dá para parar quando quiser: eu guardo onde paramos. No fim, o seu sistema já faz a primeira tarefa para você.
+> São 6 etapas curtas, e você só responde. Eu escrevo os arquivos e te mostro cada um para você aprovar. Pode responder por voz (o ditado do computador: no Mac, a tecla do microfone; no Windows, Windows + H), solto, do jeito que vier. Dá para parar quando quiser: eu guardo onde paramos. No fim, o seu sistema já faz a primeira tarefa para você.
 >
-> Para começar, você prefere:
-> **1.** me contar do seu jeito quem você é e o que você toca hoje (pode colar o seu LinkedIn, um currículo ou o que outra IA sabe sobre você), e eu só pergunto o que faltar; ou
-> **2.** que eu vá perguntando, uma coisa de cada vez?
+> **Para começar, me conte de uma vez só, aqui na conversa, em uns 5 minutos:**
+> 1. o que você faz no dia a dia: o seu trabalho e tudo o que mais você toca hoje (um negócio, um projeto, um estudo, a casa);
+> 2. o que você gostaria que o seu sistema fizesse por você, e se isso tem mais a ver com o seu trabalho ou com a sua vida pessoal;
+> 3. uma tarefa que você repete toda semana e que toma o seu tempo.
+>
+> **Para acelerar, se você tiver, mande junto:** o seu perfil do LinkedIn em PDF, se estiver atualizado (no LinkedIn, no seu perfil: Mais, Salvar como PDF; depois arraste o arquivo para esta conversa); o texto do seu perfil numa rede social, se você tem presença pública; um currículo ou uma bio.
+>
+> Quando terminar, escreva **terminei**.
 
-- **Se a pasta tiver o painel** (você sabe pela sua lista de ferramentas: a ferramenta `teste_do_base_camp` vem com ele; não precisa conferir a pasta), acrescente uma linha antes das duas opções: "Ao lado da conversa abriu o painel do Base Camp: ele mostra a sua subida, o que o seu sistema já sabe e o que vem a seguir. Se ele não aparecer, escreva /base-camp."
+- **Se a pasta tiver o painel** (você sabe pela sua lista de ferramentas: a ferramenta `teste_do_base_camp` vem com ele; não precisa conferir a pasta), acrescente uma linha antes de "Para começar": "Ao lado da conversa abriu o painel do Base Camp: ele mostra a sua subida, o que o seu sistema já sabe e o que vem a seguir. Se ele não aparecer, escreva /base-camp."
 - **Nada antes da abertura:** ela é a primeira coisa que a pessoa lê; sem frase sua antes dela ("Estou abrindo...", "Segue o texto...").
-- **Primeiro o texto, depois a caixa.** Escreva na resposta o texto inteiro, de "Boas-vindas ao seu Base Camp" até "Para começar, você prefere:" (com a linha do painel, se houver). Só então, se você tiver a ferramenta de pergunta com opções, abra a caixa com as duas opções (veja "Escolhas com clique" na `SKILL.md`); nesse caso as opções 1 e 2 não se repetem no texto. A caixa nunca vem sozinha.
-- Se ela escolher **1**, faça a etapa D. Se escolher **2**, pule para a etapa 1 e marque a D como "pulado".
-- Se ela já começar contando, isso é o "conte do seu jeito": siga a etapa D.
+- **Sem escolha na abertura** (decisão do Arthur, 31/10/2026: "o mínimo de decisões possíveis para o usuário e o máximo de orientações objetivas"; "se é um kit de implementação guiada, é para ela ser guiada"). Nada de caixa de opções nem de "você prefere". A abertura sempre leva à etapa D. Registre o início da D na mesma resposta da abertura.
 
 ---
 
-## Etapa D: conte do seu jeito (5 a 15 min) [leve]
-**Arquivo:** nenhum (só `montagem/respostas.md`). **Fecha quando:** ela disser que terminou.
+## Etapa D: o começo, de uma vez (5 a 15 min) [leve]
+**Arquivo:** nenhum (só `montagem/respostas.md`). **Fecha quando:** ela escrever "terminei" ou disser que acabou.
 
-D.1 [leve] "Pode mandar. Vale tudo: um áudio falando por uns 5 minutos de quem você é e do que toca, o texto do seu LinkedIn, um currículo, uma bio. Quando acabar, escreva 'terminei'."
-- Se ela quiser trazer o que outra IA já sabe sobre ela, dê este pedido para ela colar no ChatGPT, no Gemini ou no Claude do navegador, e trazer a resposta:
+- Enquanto ela manda, **não pergunte nada**: grave em `respostas.md` e responda só "Anotado. Pode seguir; quando acabar, escreva terminei."
+- **PDF ou texto colado:** leia, grave nos campos certos e não peça confirmação item por item agora; as etapas confirmam.
+- **Se ela disser que usa outra IA** (ChatGPT, Gemini, o Claude do navegador) e quiser trazer o que ela já sabe, dê este pedido para colar lá e trazer a resposta:
 
 > "Liste tudo o que você sabe sobre mim a partir das nossas conversas: quem eu sou, o que faço, meus projetos, como eu gosto de trabalhar e de receber respostas, e os programas e aplicativos que eu uso. Separe em duas listas: o que eu disse com todas as letras e o que você deduziu. Coloque a data aproximada de cada item, se souber. Deixe de fora saúde, finanças pessoais e assuntos íntimos de família."
 
 - O que vier da outra IA entra como `[memória de outra IA, a confirmar]` e só vale depois que ela confirmar, nas perguntas das etapas.
+- **Não procure a pessoa na internet** (LinkedIn, Google) nem use ferramenta que ela não tenha pedido: o que entra é o que ela manda.
 
-**Ao terminar:** distribua tudo pelos campos de `campos.md` e diga, em até 4 linhas, o que já ficou claro e que parte das próximas perguntas vira confirmação rápida. **Não prometa um número de perguntas** (no teste, a promessa de "4 perguntas" virou 7). Não mostre a lista de campos.
+**Ao terminar:** distribua tudo pelos campos de `campos.md` e diga, em até 4 linhas, o que já ficou claro e que parte das próximas perguntas vira confirmação rápida. Na mesma mensagem, abra a etapa 1 com a primeira pergunta que falta (sem perguntar se ela quer seguir). **Não prometa um número de perguntas** (no teste, a promessa de "4 perguntas" virou 7). Não mostre a lista de campos.
 
 ---
 
@@ -95,9 +100,9 @@ D.1 [leve] "Pode mandar. Vale tudo: um áudio falando por uns 5 minutos de quem 
 
 **Feche** mostrando o(s) arquivo(s).
 
-**A troca de conversa (depois da etapa 3 aprovada):** primeiro, **feche tudo o que estiver pendente**: nenhuma pergunta sua pode ficar sem resposta (no teste, uma pergunta feita na mesma mensagem da troca se perdeu). Se ainda assim sobrar alguma, grave-a no `base-camp.md`, em "Em aberto", antes de recomendar. Só então recomende, sem insistir, numa mensagem que não tenha outra pergunta, seguir numa conversa nova. Diga assim:
-> "Metade do caminho. Uma dica: para o sistema ficar mais rápido daqui para a frente, abra uma conversa nova **nesta mesma pasta** e escreva **continuar**. Eu sigo da etapa 4, com tudo o que você já respondeu. Se preferir ficar aqui, também dá."
-- Se ela trocou, a conversa nova retoma pelo `base-camp.md` e anota a troca (veja "Como começar ou retomar" na `SKILL.md`). Se ela preferir ficar, anote em "Pedidos sobre o kit", no `base-camp.md`: "seguiu na mesma conversa depois da etapa 3".
+**A troca de conversa (depois da etapa 3 aprovada):** primeiro, **feche tudo o que estiver pendente**: nenhuma pergunta sua pode ficar sem resposta (no teste, uma pergunta feita na mesma mensagem da troca se perdeu). Se ainda assim sobrar alguma, grave-a no `base-camp.md`, em "Em aberto", antes de recomendar. Só então oriente, numa mensagem que não tenha outra pergunta, a seguir numa conversa nova. Diga assim:
+> "Metade do caminho. Agora abra uma conversa nova **nesta mesma pasta** e escreva **continuar**: daqui para a frente o sistema fica mais rápido. Eu sigo da etapa 4, com tudo o que você já respondeu."
+- Se ela trocou, a conversa nova retoma pelo `base-camp.md` e anota a troca (veja "Como começar ou retomar" na `SKILL.md`). Se ela seguir aqui mesmo assim, siga sem insistir e anote em "Pedidos sobre o kit", no `base-camp.md`: "seguiu na mesma conversa depois da etapa 3".
 - Motivo (não diga à pessoa): cada resposta carrega a conversa inteira; numa conversa nova, a segunda metade fica mais leve e mais rápida, e gasta menos do plano dela. Serve também de teste de que a retomada funciona.
 
 ---

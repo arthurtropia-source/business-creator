@@ -9,7 +9,7 @@
 
 | Etapa | Status | Início | Fim |
 |---|---|---|---|
-| D · Conte do seu jeito | pendente | | |
+| D · O começo | pendente | | |
 | 1 · Quem é você | pendente | | |
 | 2 · As suas frentes | pendente | | |
 | 3 · Como você trabalha | pendente | | |
