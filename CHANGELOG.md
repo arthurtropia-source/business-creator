@@ -2,6 +2,12 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.2.6 (31/10/2026)
+O que vem da outra IA pode estar velho (correção 11 do teste do Arthur, 31/10: a fala da pessoa "vai ser mais atual em relação ao momento e às intenções dela"; a outra IA "pode trazer coisas do passado que não se aplicam mais").
+- **Regra:** o que a pessoa fala ou escreve hoje vale mais; em conflito, ganha a fala dela, sem perguntar.
+- **O texto para a outra IA** pede, em cada item, quando aquilo apareceu pela última vez (mês e ano, ou "sem data"), e separa a resposta em "Atual" (últimos 3 meses) e "Pode estar desatualizado".
+- **A conferência (D.2):** depois do "terminei", a montagem leva à pessoa só os itens da outra IA em dúvida (deduzidos, antigos ou sem data, ou que podem ter sido mal entendidos), no máximo 8, com clique: Vale hoje, Não vale mais, Está errado (montagem 1.12, roteiro 1.10).
+
 ## 0.2.5 (31/10/2026)
 A abertura em 2 pedidos (correção 10 revisada pelo Arthur, 31/10: "vão ser só 2 pedidos"), no lugar das 3 perguntas e das sugestões de LinkedIn e rede social da 0.2.4.
 - **Pedido 1:** o texto para a IA que a pessoa mais usa, numa caixa de código com o botão de copiar, para ela colar lá e trazer a resposta. O texto foi reescrito para o resultado que a montagem precisa: um retrato em 6 seções (quem é, o que toca, as tarefas que repete, os programas, como gosta de receber, o que quer), cada item marcado [eu disse] ou [deduzido], sem inventar e sem saúde, finanças pessoais, senhas, família íntima nem dados de cliente ou da empresa. **A revisar pelo Arthur.**

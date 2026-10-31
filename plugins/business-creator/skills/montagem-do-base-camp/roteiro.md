@@ -1,6 +1,6 @@
 # Roteiro da Montagem do Base Camp
 
-> Versão 1.9 (31/10/2026), no plugin Business Creator 0.2.5. Cada pergunta diz os campos que alimenta (códigos de `campos.md`). **[leve]** = entra também no nível leve; sem a marca, só no completo. Antes de cada pergunta, confira os campos (regra "uma resposta adianta outras" da `SKILL.md`).
+> Versão 1.10 (31/10/2026), no plugin Business Creator 0.2.6. Cada pergunta diz os campos que alimenta (códigos de `campos.md`). **[leve]** = entra também no nível leve; sem a marca, só no completo. Antes de cada pergunta, confira os campos (regra "uma resposta adianta outras" da `SKILL.md`).
 > Para a pessoa, as partes da montagem se chamam **etapas** ("Etapa 2 de 6"); "bloco" é só o nome interno deste roteiro.
 > Tempo-alvo por etapa, para a pessoa que responde: entre parênteses. É alvo, não regra: nunca apresse ninguém.
 
@@ -25,7 +25,9 @@
 > 4. Os programas e aplicativos que eu uso, e para quê.
 > 5. Como eu gosto de trabalhar e de receber respostas (formato, tamanho, tom).
 > 6. O que eu quero alcançar nos próximos meses.
-> Em cada item, marque [eu disse] quando eu falei com todas as letras e [deduzido] quando você concluiu. Ponha a data aproximada, se souber. Não invente: o que você não souber, deixe de fora. Deixe de fora saúde, finanças pessoais, senhas, assuntos íntimos de família e dados de clientes ou da empresa onde eu trabalho (números, nomes de colegas e de clientes).
+> Em cada item, marque [eu disse] quando eu falei com todas as letras ou [deduzido] quando você concluiu, e ponha quando isso apareceu pela última vez nas nossas conversas (o mês e o ano, mesmo aproximados; se não souber, escreva "sem data").
+> Depois, separe a resposta em duas partes: "Atual" (o que apareceu nos últimos 3 meses) e "Pode estar desatualizado" (o que é mais antigo ou sem data). Coisas mudam: prefira dizer que não sabe se ainda vale a apresentar algo antigo como atual.
+> Não invente: o que você não souber, deixe de fora. Deixe de fora saúde, finanças pessoais, senhas, assuntos íntimos de família e dados de clientes ou da empresa onde eu trabalho (números, nomes de colegas e de clientes).
 > ```
 >
 > **2. Enquanto a outra IA escreve, me conte com as suas palavras**, escrevendo ou por voz: quem você é, o que você faz e o que você pretende com o seu sistema.
@@ -43,8 +45,14 @@
 **Arquivo:** nenhum (só `montagem/respostas.md`). **Fecha quando:** ela escrever "terminei" ou disser que acabou.
 
 - Enquanto ela manda, **não pergunte nada**: grave em `respostas.md` e responda só "Anotado. Pode seguir; quando acabar, escreva terminei."
-- **O que vier da outra IA** entra como `[memória de outra IA, a confirmar]`, com as marcas [eu disse] e [deduzido] dela, e só vale depois que ela confirmar, nas perguntas das etapas. **O que ela contar com as palavras dela** entra como `[despejo]` e vale mais que o da outra IA quando os dois falarem da mesma coisa.
+- **O que ela fala ou escreve hoje vale mais que a memória da outra IA** (regra do Arthur, 31/10/2026: a fala dela "vai ser mais atual em relação ao momento e às intenções dela"; a outra IA "pode trazer coisas do passado que não se aplicam mais"). O que ela contar com as palavras dela entra como `[despejo]`. O que vier da outra IA entra como `[memória de outra IA, a confirmar]`, com a marca [eu disse] ou [deduzido] e a data que a outra IA deu. **Em conflito, ganha a fala dela**, sem perguntar: o item da outra IA sai.
 - Se ela mandar só um dos dois, siga com o que veio: não peça o outro.
+
+D.2 **A conferência da outra IA** (só se veio a resposta da outra IA; logo depois do "terminei", antes de distribuir pelos campos). Separe os itens da outra IA que **não** foram confirmados pela fala dela e que estão em dúvida: os [deduzido], os da parte "Pode estar desatualizado" ou sem data, e os que podem ter sido mal entendidos. No máximo 8, os que mais pesam no sistema dela (trabalho, frentes, o que quer) primeiro. Os que a fala dela já confirmou não entram; os que ela contradisse já saíram.
+- Diga em uma linha: "Antes de seguir, confira estes pontos que vieram da outra IA. Eles podem ser antigos."
+- **Com a ferramenta de pergunta com opções:** um item por pergunta, até 4 por caixa (até 2 caixas), com o item resumido em uma linha e as opções **Vale hoje**, **Não vale mais**, **Está errado** (ela corrige em "Outra").
+- **Sem a ferramenta:** os itens numerados, e o pedido: "Responda com os números que não valem mais ou estão errados, e o certo, se quiser (ex.: '2 e 5 não valem mais; 3: hoje eu faço X'). Se tudo vale, escreva **tudo certo**."
+- Grave: "Vale hoje" vira `[memória de outra IA, confirmado em <data>]`; "Não vale mais" sai de `respostas.md`; "Está errado" entra com a correção dela, como `[confirmado]`. O que não foi para a conferência segue `[memória de outra IA, a confirmar]` e é confirmado nas etapas, como antes.
 - **Não procure a pessoa na internet** (LinkedIn, Google) nem use ferramenta que ela não tenha pedido: o que entra é o que ela manda.
 
 **Ao terminar:** distribua tudo pelos campos de `campos.md` e diga, em até 4 linhas, o que já ficou claro e que parte das próximas perguntas vira confirmação rápida. Na mesma mensagem, abra a etapa 1 com a primeira pergunta que falta (sem perguntar se ela quer seguir). **Não prometa um número de perguntas** (no teste, a promessa de "4 perguntas" virou 7). Não mostre a lista de campos.
