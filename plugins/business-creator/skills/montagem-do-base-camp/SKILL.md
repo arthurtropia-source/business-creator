@@ -5,7 +5,7 @@ description: Conduz a Montagem do Base Camp, a entrevista guiada que monta o sis
 
 # Montagem do Base Camp
 
-> Kit de instalação guiada do SEM IA™, por Arthur Tropia. Versão 1.12 (31/10/2026), no plugin Business Creator 0.2.6.
+> Kit de instalação guiada do SEM IA™, por Arthur Tropia. Versão 1.13 (31/10/2026), no plugin Business Creator 0.2.8.
 
 Você vai montar, junto com a pessoa, o sistema de IA pessoal dela. Ela não sabe nada de IA, de pastas de configuração nem de skills, e não precisa saber. Ela só responde perguntas simples. Você escreve os arquivos, mostra cada um e só segue com a aprovação dela.
 

@@ -2,6 +2,14 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.2.8 (31/10/2026)
+Da proposta "jornada de zero clique" (Arthur, 31/10, 12:33), o que entra agora, com a regra dele: "trazer o que é um sinal claro para a implementação do sistema", não ruído.
+- **O texto para a outra IA** junta o de 6 seções ao do item: 8 seções (quem é; o que toca; as tarefas que se repetem, inclusive o que já pediu mais de uma vez; o que trava; as ferramentas; como gosta de receber; as pessoas, só pelo papel; o que quer), no máximo 5 linhas cada, só o que serve ao sistema, a resposta num único bloco de código (que se copia de volta com um botão) e cada linha com a data [AAAA-MM] ou [?] e a marca [eu disse] ou [deduzido].
+- **Sinal, não ruído:** a montagem grava só o que preenche um campo; o resto da resposta da outra IA fica de fora.
+- **"Já sei isto / Falta isto":** depois da conferência, duas listas curtas; as etapas perguntam só o que falta.
+- **O primeiro workflow já sugerido:** a etapa 5 começa pelas tarefas que já vieram, em vez de pedir a lista do zero (montagem 1.13, roteiro 1.11).
+- Ficam para depois: a leitura dos conectores no "olá" (Campo 1, na 0.3), o zip de exportação (Campos 2 e 3) e a contagem de gestos (medida de domingo).
+
 ## 0.2.7 (31/10/2026)
 - **O painel mostra o andamento da etapa atual, não a lista das próximas** (melhoria 12 do teste do Arthur, 31/10: "ao invés de mostrar o passo a passo das próximas etapas, acho que podemos mostrar o andamento da etapa atual"). Em curso, a subida vira uma linha só (● a etapa atual, ✓ as feitas, ○ as que faltam) e o destaque é o que a etapa já tem. No começo, o painel mostra os 2 pedidos da abertura (o que a outra IA sabe, as palavras dela) e a conferência, cada um com ✓ quando chega. A lista inteira das etapas fica só nas boas-vindas, antes de a montagem começar.
 
