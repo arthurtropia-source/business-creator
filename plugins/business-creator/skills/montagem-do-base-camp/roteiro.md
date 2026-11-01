@@ -1,6 +1,6 @@
 # Roteiro da Montagem do Base Camp
 
-> Versão 1.12 (31/10/2026), no plugin Business Creator 0.2.9. Cada pergunta diz os campos que alimenta (códigos de `campos.md`). **[leve]** = entra também no nível leve; sem a marca, só no completo. Antes de cada pergunta, confira os campos (regra "uma resposta adianta outras" da `SKILL.md`).
+> Versão 1.13 (31/10/2026), no plugin Business Creator 0.2.10. Cada pergunta diz os campos que alimenta (códigos de `campos.md`). **[leve]** = entra também no nível leve; sem a marca, só no completo. Antes de cada pergunta, confira os campos (regra "uma resposta adianta outras" da `SKILL.md`).
 > Para a pessoa, as partes da montagem se chamam **etapas** ("Etapa 2 de 6"); "bloco" é só o nome interno deste roteiro.
 > Tempo-alvo por etapa, para a pessoa que responde: entre parênteses. É alvo, não regra: nunca apresse ninguém.
 
@@ -54,12 +54,27 @@
 - Se ela mandar só um dos dois, siga com o que veio: não peça o outro.
 - **Detalhe útil fica, ruído sai** (regras do Arthur, 31/10/2026: "trazer o que é um sinal claro para a implementação do sistema" e "aproveitar ao máximo os detalhes gravados na memória da IA", com "contexto, detalhes ricos que fazem o sistema ser muito mais assertivo"). Grave em `respostas.md`, no campo certo, cada detalhe que ajuda a trabalhar com ela: exemplos, critérios, o porquê, como funciona, números de tempo e frequência, com as palavras do texto. Fica de fora só o que não serve ao sistema: assunto pontual, traço genérico ("é dedicado"), o que é sigilo.
 
-D.2 **Um resumo para ela conferir, de uma vez** (logo depois do "terminei"). Distribua tudo pelos campos de `campos.md` e mande **uma mensagem só**, com as palavras dela:
-> **Já sei isto:** o que ficou claro, agrupado por assunto (quem é, o que toca, as tarefas que se repetem, como trabalha e gosta de receber, o que quer), em frases completas, com os detalhes que importam. Os pontos da outra IA que estão em dúvida (os deduzidos, os com mais de 3 meses ou sem data, os que podem ter sido mal entendidos) vêm **no lugar deles, marcados** assim: "(veio da outra IA, de mar/2024: ainda vale?)".
-> **Falta isto:** até 6 linhas, o que as etapas ainda precisam saber, em palavras simples. Nada do que o sistema confere sozinho (o computador, na 6.0).
-> E o pedido: "Corrija ou complete o que quiser, escrevendo ou por voz, tudo numa resposta só. Se estiver tudo certo, escreva **ok**."
+D.2 **O resumo vai para o painel; a conversa só pede a conferência** (logo depois do "terminei"). Distribua tudo pelos campos de `campos.md` e grave `montagem/resumo.md`, que o painel mostra em cartões, neste formato exato:
+```
+# O que o sistema já sabe
+
+## Já sei isto
+### Quem você é
+- <frase completa, com os detalhes que importam>
+- (?) <ponto da outra IA em dúvida> · da outra IA, de <mês/ano ou sem data>
+### O que você toca
+- ...
+### O que se repete
+### Como você trabalha e gosta de receber
+### Aonde quer chegar
+
+## Falta isto
+- <até 6 linhas, o que as etapas ainda precisam saber, em palavras simples>
+```
+- Os cartões (`###`) seguem os assuntos dela; até 3 linhas por cartão. Os pontos da outra IA em dúvida (os deduzidos, os com mais de 3 meses ou sem data, os que podem ter sido mal entendidos) vão no cartão deles, começando por `(?)`. Em "Falta isto", nada do que o sistema confere sozinho (o computador, na 6.0).
+- Na conversa, só: "Anotei tudo. O que eu já sei está no painel ao lado, em cartões; os marcados com ? vieram da outra IA e podem ser antigos.", a linha `---` e, em negrito, **"Corrija o que estiver errado, numa resposta só, escrevendo ou por voz. Se estiver tudo certo, escreva ok."** Se o painel não aparecer (no celular ou no terminal), mande os cartões na conversa, no máximo 8 linhas.
 - **Sem caixa de opções e sem pergunta item por item** (decisão do Arthur, 31/10/2026, depois de ver as perguntas uma a uma: "esse formato é péssimo"; "menos cliques e mais facilidade de resposta"). O que ela não corrigir vale.
-- Grave: o que ela corrigiu entra com a correção, como `[confirmado]`; o que ela disse que não vale mais sai; os pontos marcados que ela não tocou viram `[memória de outra IA, confirmado em <data>]`.
+- Grave: o que ela corrigiu entra com a correção, como `[confirmado]`; o que ela disse que não vale mais sai; os pontos marcados que ela não tocou viram `[memória de outra IA, confirmado em <data>]`. Atualize o `resumo.md` na mesma hora: tire o `(?)` do que ela confirmou, corrija o que ela corrigiu, apague o que não vale mais. Nas etapas seguintes, quando algo novo e importante entrar, acrescente uma linha no cartão certo.
 - Os que a fala dela já confirmou não precisam de marca; os que ela contradisse já saíram, sem perguntar.
 - **Nenhum ponto da outra IA some sem ela ver**, a não ser o que a fala dela contradisse: ou entra no "Já sei isto", ou entra marcado (no pré-teste, um projeto antigo e sem data sumiu da lista sem ela saber).
 - **Não procure a pessoa na internet** (LinkedIn, Google) nem use ferramenta que ela não tenha pedido: o que entra é o que ela manda.

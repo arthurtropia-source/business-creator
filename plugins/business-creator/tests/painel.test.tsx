@@ -184,7 +184,8 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
       .replace('| D · Conte do seu jeito | aprovado | 23/10/2026 17:24 | 23/10/2026 17:36 |', '| D · Conte do seu jeito | em andamento | 23/10/2026 17:24 | |')
       .replace('| 1 · Quem é você | aprovado | 23/10/2026 17:36 | 23/10/2026 18:01 |', '| 1 · Quem é você | pendente | | |')
       .replace('| 2 · As suas frentes | em andamento | 23/10/2026 18:01 | |', '| 2 · As suas frentes | pendente | | |')
-    pasta(on, { '/os/base-camp.md': comeco, '/os/montagem/respostas.md': RESPOSTAS }, [])
+    const resumo = '# O que o sistema já sabe\n\n## Já sei isto\n### O que você toca\n- A consultoria de RH, sozinha\n- (?) Uma loja online parada · da outra IA, sem data\n\n## Falta isto\n- A sua última semana, na prática\n'
+    pasta(on, { '/os/base-camp.md': comeco, '/os/montagem/respostas.md': RESPOSTAS, '/os/montagem/resumo.md': resumo }, [])
     await $.session.start({ cwd: '/os', surface, isInteractive: true })
 
     const ui = await $.ui.mount({ ...PANE, surface })
@@ -192,6 +193,12 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     expect((await ui.find({ type: 'Text', text: /Pedido 2: você, com as suas palavras/ }))?.text).toContain('✓')
     expect((await ui.find({ type: 'Text', text: /Pedido 1: o que a outra IA/ }))?.text).toContain('○')
     expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toContain('● Começo')
+    // O que o sistema já sabe vai para o painel, em cartões (0.2.10).
+    expect(await ui.find({ type: 'Text', text: /O QUE EU JÁ SEI DE VOCÊ/ })).toBeDefined()
+    expect((await ui.find({ type: 'Text', text: /A consultoria de RH/ }))?.text).toContain('✓')
+    expect((await ui.find({ type: 'Text', text: /Uma loja online parada/ }))?.text).toContain('ainda vale?')
+    expect((await ui.find({ type: 'Text', text: /A sua última semana/ }))?.text).toContain('○')
+    expect(await ui.find({ type: 'Button', key: 'corrigir-resumo' })).toBeDefined()
     await ui.unmount()
   })
 

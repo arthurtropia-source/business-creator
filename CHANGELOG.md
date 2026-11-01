@@ -2,6 +2,12 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.2.10 (31/10/2026)
+Menos texto, mais visual (pedido do Arthur, 31/10: "é um monte de texto empilhado"; "o pedido do próximo passo fica perdido"; mockup aprovado: "vamos com os 3").
+- **A. A conversa só pede a próxima resposta:** cada mensagem tem no máximo uma linha do que foi feito, um separador e a pergunta da vez, sozinha, em negrito (montagem 1.15).
+- **B. O que o sistema já sabe vai para o painel, em cartões:** a montagem grava `montagem/resumo.md` (cartões por assunto, os pontos da outra IA em dúvida marcados com ?, e o que falta) e o painel mostra "O que eu já sei de você" com ✓, ? e ○, e o botão "Quero corrigir algo". A conversa só pede a conferência (roteiro 1.13).
+- **C. A faixa acima da caixa de texto mostra a pergunta da vez** ("Base Camp · Sua vez: como foi a sua última semana?"), tirada do fim da última resposta.
+
 ## 0.2.9 (31/10/2026)
 Dois pontos do teste do Arthur na tentativa com a 0.2.8 (31/10).
 - **O texto para a outra IA pede a história, não a ficha:** a resposta tinha vindo "muito objetiva e pouco detalhada". Agora pede que a outra IA o apresente "como a um assistente novo que vai trabalhar com ele todos os dias", em parágrafos, com contexto, exemplos reais das conversas, detalhes e o porquê, em 8 seções (quem é; cada coisa que toca e como funciona; o dia e a semana; o que já pediu mais de uma vez, com exemplos; como trabalha e decide; como escreve e gosta de receber; as ferramentas e onde ficam os dados; o que quer). Cada fato com a data entre parênteses e "(deduzido)" quando for o caso. A montagem grava cada detalhe útil no campo certo.

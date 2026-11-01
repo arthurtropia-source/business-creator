@@ -1,7 +1,7 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register, RenderSurface } from 'claude-code'
 
-import type { Bloco, Campo, Festa, Montado, Nivel, Painel, Status } from '../types'
+import type { Bloco, Campo, Festa, Montado, Nivel, Painel, Resumo, Status } from '../types'
 
 // Painel da Montagem do Base Camp (v0.5.1). Veste a montagem com a marca e tira a
 // barreira técnica: mostra a subida, de quem é a vez e o que o sistema já sabe,
@@ -39,6 +39,7 @@ const verArquivo = atom({ plugin: 'business-creator', key: 'verArquivo' } as con
 const arquivoTexto = atom({ plugin: 'business-creator', key: 'arquivoTexto' } as const, null)
 const doc = atom({ plugin: 'business-creator', key: 'doc' } as const, null)
 const docTexto = atom({ plugin: 'business-creator', key: 'docTexto' } as const, null)
+const pergunta = atom({ plugin: 'business-creator', key: 'pergunta' } as const, null)
 
 // Identidade SEM IA™ (23 e 24/10/2026): tinta, rocha e papel; o laranja de
 // sinal num ponto só, o cume da primeira montanha.
@@ -229,6 +230,45 @@ function lerBaseCamp(texto: string) {
   // A etapa 5 grava aqui onde ficou o cartão do primeiro workflow.
   const workflow = /\*\*Primeiro workflow:\*\*\s*`?([^`\n]+?)`?\s*$/m.exec(texto)?.[1]?.trim() || null
   return { nivel, iniciada, concluida, blocos, tarefas, feita, combinado, testeOk, separacaoOk, workflow }
+}
+
+// O resumo do que o sistema já sabe (montagem/resumo.md): cartões por assunto e o que falta (0.2.10).
+function lerResumo(texto: string): Resumo | null {
+  if (!texto) return null
+  const cartoes: Resumo['cartoes'] = []
+  const falta: string[] = []
+  let secao: 'sei' | 'falta' | null = null
+  for (const bruta of texto.split('\n')) {
+    const linha = bruta.trim()
+    if (/^##\s+J[áa] sei/i.test(linha)) secao = 'sei'
+    else if (/^##\s+Falta/i.test(linha)) secao = 'falta'
+    else if (/^###\s+/.test(linha) && secao === 'sei') cartoes.push({ titulo: linha.replace(/^###\s+/, ''), linhas: [] })
+    else if (/^- \S/.test(linha)) {
+      const item = linha.slice(2).trim()
+      if (secao === 'falta') falta.push(item)
+      else if (secao === 'sei' && cartoes.length) {
+        const duvida = /^\(\?\)\s*/.test(item)
+        cartoes[cartoes.length - 1]?.linhas.push({ texto: item.replace(/^\(\?\)\s*/, ''), duvida })
+      }
+    }
+  }
+  return cartoes.length || falta.length ? { cartoes, falta } : null
+}
+
+// A pergunta da vez, tirada da resposta: o que vem depois do último separador, a última frase com "?".
+function extrairPergunta(resposta: string): string | null {
+  const partes = resposta.split(/\n\s*---+\s*\n/)
+  const fim = partes[partes.length - 1] ?? ''
+  const linhas = fim
+    .replace(/```[\s\S]*?```/g, ' ')
+    .split('\n')
+    .map(l => l.replace(/[*_`>#]/g, '').trim())
+    .filter(l => l.includes('?'))
+  const ultima = linhas[linhas.length - 1]
+  if (!ultima) return null
+  const frases = ultima.split(/(?<=[.!?])\s+/)
+  const q = [...frases].reverse().find(f => f.endsWith('?')) ?? ultima
+  return q.length <= 90 ? q : `${q.slice(0, 87).replace(/\s+\S*$/, '')}…`
 }
 
 function lerProcesso(texto: string): { processo: string | null; antes: string | null } {
@@ -516,7 +556,8 @@ async function carregar($: EngineInterface) {
       const defs = lerDefinicoes(await lerTexto($, `${$.plugin.root}/skills/montagem-do-base-camp/campos.md`))
       campos = lerCampos(defs, await lerTexto($, `${dir}/montagem/respostas.md`), atual.codigo, base.nivel)
     }
-    novo = { ...base, ...proc, campos, montado }
+    const sabido = lerResumo(await lerTexto($, `${dir}/montagem/resumo.md`))
+    novo = { ...base, ...proc, campos, montado, resumo: sabido }
   }
   const anterior = await read($, painel)
   if (JSON.stringify(anterior) === JSON.stringify(novo)) return novo
@@ -790,6 +831,7 @@ export const register: Register = on => {
     await update($, aprovacao, () => (pede ? { arquivo } : null))
     await update($, ultimo, () => null)
     await carregar($)
+    await update($, pergunta, () => (resposta ? extrairPergunta(resposta) : null))
     if (resposta && (await emMontagem($))) {
       const s = sugestao(resposta)
       if (s) $.clock.after(400, () => void $.prompt.suggest({ text: s }))
@@ -854,6 +896,18 @@ export const register: Register = on => {
       : (await read($, aprovacao))
         ? 'sua vez: aprove ou corrija'
         : 'sua vez: responda acima'
+    // Com a pergunta da vez, a faixa mostra a própria pergunta, colada onde ela digita (0.2.10).
+    const q = ocupado ? null : await read($, pergunta)
+    if (q && !(await read($, aprovacao))) {
+      return (
+        <Box flexDirection="row" gap={1}>
+          <Text bold color={TINTA}>Base Camp</Text>
+          <Text color={CINZA}>·</Text>
+          <Text bold color={TINTA}>Sua vez:</Text>
+          <Text color={ROCHA}>{q}</Text>
+        </Box>
+      )
+    }
     return (
       <Box flexDirection="row" gap={1}>
         <Text bold color={TINTA}>Base Camp</Text>
@@ -1121,6 +1175,30 @@ export const register: Register = on => {
               ))}
             </Box>
           ))}
+        {dado.resumo && dado.resumo.cartoes.length > 0 && (
+          <Box flexDirection="column" gap={1}>
+            <Text color={CINZA} size="caption">O QUE EU JÁ SEI DE VOCÊ</Text>
+            {dado.resumo.cartoes.map((c, i) => (
+              <Box key={`cartao-${i}`} flexDirection="column" borderStyle="round" borderColor={CINZA} paddingX={1}>
+                <Text bold color={ROCHA}>{c.titulo}</Text>
+                {c.linhas.map((l, j) => (
+                  <Text key={`cartao-${i}-${j}`} color={l.duvida ? SINAL : ROCHA}>
+                    {l.duvida ? '? ' : '✓ '}{l.texto}{l.duvida ? ' (ainda vale?)' : ''}
+                  </Text>
+                ))}
+              </Box>
+            ))}
+            {ehComeco && dado.resumo.falta.length > 0 && (
+              <Box flexDirection="column" borderStyle="round" borderColor={CINZA} paddingX={1}>
+                <Text bold color={ROCHA}>Falta isto</Text>
+                {dado.resumo.falta.map((f, j) => (
+                  <Text key={`falta-${j}`} color={CINZA}>○ {f}</Text>
+                ))}
+              </Box>
+            )}
+            {!pendente && <Button key="corrigir-resumo" label="Quero corrigir algo" onPress={() => void corrigir($)} />}
+          </Box>
+        )}
         {progresso}
         <Box flexDirection="column">
           <Text color={CINZA} size="caption">O QUE JÁ ESTÁ MONTADO</Text>

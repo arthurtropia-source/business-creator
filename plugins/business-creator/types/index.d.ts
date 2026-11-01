@@ -34,6 +34,12 @@ export type Painel = {
   separacaoOk: boolean
   campos: Campo[]
   montado: Montado[]
+  resumo: Resumo | null
+}
+
+export type Resumo = {
+  cartoes: { titulo: string; linhas: { texto: string; duvida: boolean }[] }[]
+  falta: string[]
 }
 
 export type Aprovacao = {
@@ -73,6 +79,7 @@ declare module 'claude-code' {
       arquivoTexto: string | null
       doc: 'guia' | 'resumo' | null
       docTexto: string | null
+      pergunta: string | null
     }
   }
 }
