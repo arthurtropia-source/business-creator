@@ -78,21 +78,15 @@ const ICONES = ['campo-1-rodar', 'campo-2-skill', 'campo-3-agendar']
 
 // Uma linha do que cada etapa entrega, sempre à vista (a pessoa sabe para que responde).
 const PARA_QUE: Record<string, string> = {
-  D: 'Você conta do seu jeito; o sistema separa o que serve para cada arquivo.',
-  '1': 'Para o sistema saber quem você é, sem você repetir.',
-  '2': 'Para cada frente ter o seu lugar e nada se misturar.',
-  '3': 'Para desenhar o primeiro workflow: o caminho de uma tarefa sua, do começo à entrega.',
-  '4': 'Para as respostas chegarem no formato que você gosta.',
-  '5': 'Para conferir as regras, testar o sistema e ver a primeira tarefa feita.',
+  D: 'Dois pedidos: o que a IA que você mais usa sabe de você, e você com as suas palavras.',
+  '1': 'O sistema monta o seu retrato de uma vez; você só confirma ou corrige.',
+  '2': 'O sistema faz a primeira tarefa para você, e combina a próxima.',
 }
 
 // Ao fechar uma etapa, o painel celebra a obra, não a pessoa.
 const OBRA: Record<string, string> = {
   D: 'Pronto: o sistema já tem a sua história, do seu jeito.',
-  '1': 'Etapa 1 montada: o sistema já sabe quem você é.',
-  '2': 'Etapa 2 montada: o sistema já conhece as suas frentes.',
-  '3': 'Etapa 3 montada: o primeiro workflow está desenhado, do começo à entrega, e medido.',
-  '4': 'Etapa 4 montada: o sistema já sabe como você gosta de receber.',
+  '1': 'Retrato confirmado: o sistema já sabe quem você é, o que você toca e como você trabalha.',
   fim: 'Base Camp montado. O seu sistema já trabalha para você.',
 }
 
@@ -110,10 +104,7 @@ const PALAVRAS = [
 
 // O que cada etapa precisa saber, pelos prefixos dos códigos de campos.md.
 const PREFIXOS: Record<string, string[]> = {
-  '1': ['QUEM', 'DIA'],
-  '2': ['FRENTES', 'FRENTE', 'FERRAMENTAS'],
-  '3': ['PROC'],
-  '4': ['JEITO'],
+  '1': ['QUEM', 'DIA', 'FRENTES', 'FRENTE', 'FERRAMENTAS', 'JEITO', 'REGRAS', 'PROC'],
 }
 
 // Os campos de campos.md ditos para a pessoa, em "você".
@@ -528,7 +519,22 @@ async function carregar($: EngineInterface) {
     const atual = base.blocos.find(b => b.status === 'em andamento') ?? base.blocos.find(b => b.status === 'pendente')
     let campos: Campo[] = []
     const ultima = base.blocos[base.blocos.length - 1]?.codigo
-    if (atual && atual.codigo === ultima && !base.concluida) {
+    const curto = base.blocos.length === 3
+    if (curto && atual?.codigo === '1' && !base.concluida) {
+      // O retrato (0.2.12): o painel mostra o que já foi montado e o teste.
+      const ok = (x: boolean): Campo['estado'] => (x ? 'ok' : 'falta')
+      campos = [
+        ...montado.map(m => ({ codigo: `1.${m.rotulo}`, rotulo: m.rotulo, estado: ok(m.ok) })),
+        { codigo: '1.computador', rotulo: 'O seu computador, conferido', estado: ok(await existe($, `${dir}/contexto/computador.md`)) },
+        { codigo: '1.teste', rotulo: 'O teste: quem sou eu', estado: ok(base.testeOk) },
+      ]
+    } else if (curto && atual?.codigo === '2' && !base.concluida) {
+      const ok = (x: boolean): Campo['estado'] => (x ? 'ok' : 'falta')
+      campos = [
+        { codigo: '2.tarefa', rotulo: 'A primeira tarefa feita', estado: ok(base.feita) },
+        { codigo: '2.combinado', rotulo: 'O combinado', estado: ok(Boolean(base.combinado)) },
+      ]
+    } else if (atual && atual.codigo === ultima && !base.concluida) {
       // A última etapa não pergunta: entrega. O painel mostra o que falta entregar.
       const ok = (x: boolean): Campo['estado'] => (x ? 'ok' : 'falta')
       const e = atual.codigo
@@ -890,7 +896,8 @@ export const register: Register = on => {
     if (!atual) return next(e)
     const { Box, Text } = $.ui.resolve(e)
     const total = p.blocos.filter(b => b.codigo !== 'D').length
-    const etapa = atual.codigo === 'D' ? 'Começo' : `Etapa ${atual.codigo} de ${total} · ${atual.nome}`
+    const palavra = p.blocos.length === 3 ? 'Passo' : 'Etapa'
+    const etapa = atual.codigo === 'D' ? 'Começo' : `${palavra} ${atual.codigo} de ${total} · ${atual.nome}`
     const ocupado = e.props.isWorking || (await read($, trabalhando))
     const vez = ocupado
       ? 'o sistema está escrevendo…'
@@ -1024,7 +1031,7 @@ export const register: Register = on => {
           {titulo}
           <Text color={CINZA}>Onde todo sistema começa: uma pasta, um arquivo e qualquer IA.</Text>
           {trilha}
-          <Text bold color={ROCHA}>{dado.blocos.filter(b => b.codigo !== 'D').length} etapas, uma tarde, com parada no fim de cada uma.</Text>
+          <Text bold color={ROCHA}>{dado.blocos.length === 3 ? '3 passos, uns 30 minutos: você manda, confirma e vê a primeira tarefa feita.' : `${dado.blocos.filter(b => b.codigo !== 'D').length} etapas, uma tarde, com parada no fim de cada uma.`}</Text>
           <Text color={ROCHA}>
             Você responde do seu jeito, até por voz. O sistema escreve cada arquivo e mostra para você aprovar. No fim, ele já faz a primeira tarefa para você.
           </Text>
@@ -1115,7 +1122,7 @@ export const register: Register = on => {
             {atualBloco
               ? atualBloco.codigo === 'D'
                 ? 'AGORA · O COMEÇO'
-                : `AGORA · ETAPA ${atualBloco.codigo} DE ${total} · ${atualBloco.nome.toUpperCase()}`
+                : `AGORA · ${dado.blocos.length === 3 ? 'PASSO' : 'ETAPA'} ${atualBloco.codigo} DE ${total} · ${atualBloco.nome.toUpperCase()}`
               : 'AGORA'}
           </Text>
           {ocupado ? (
@@ -1146,12 +1153,12 @@ export const register: Register = on => {
         {dado.campos.length > 0 &&
           (sabidos === dado.campos.length ? (
             <Text color={TINTA}>
-              ✓ {ehEntrega ? 'Tudo o que esta etapa entrega já está pronto.' : ehComeco ? 'O começo está completo.' : 'Tudo o que esta etapa precisa já está anotado.'}
+              ✓ {ehEntrega ? 'Tudo o que este passo entrega já está pronto.' : ehComeco ? 'O começo está completo.' : dado.blocos.length === 3 ? 'O retrato está montado: é só confirmar.' : 'Tudo o que esta etapa precisa já está anotado.'}
             </Text>
           ) : (
             <Box flexDirection="column">
               <Text color={CINZA} size="caption">
-                {ehEntrega ? 'O QUE ESTA ETAPA ENTREGA' : ehComeco ? 'O SEU COMEÇO' : 'O QUE ESTA ETAPA JÁ TEM'} · {sabidos} DE {dado.campos.length}
+                {ehEntrega ? 'O QUE ESTE PASSO ENTREGA' : ehComeco ? 'O SEU COMEÇO' : dado.blocos.length === 3 ? 'O QUE JÁ ESTÁ MONTADO' : 'O QUE ESTA ETAPA JÁ TEM'} · {sabidos} DE {dado.campos.length}
               </Text>
               {dado.campos.map(c => (
                 <Text key={`campo-${c.codigo}`} color={c.estado === 'falta' ? CINZA : ROCHA} dimColor={c.estado === 'falta'}>

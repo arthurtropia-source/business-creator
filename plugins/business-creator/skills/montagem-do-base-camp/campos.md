@@ -1,8 +1,8 @@
 # Mapa de campos
 
-> O que cada arquivo final precisa saber. Cada campo tem um código, o arquivo onde entra, o que conta como "preenchido" e as perguntas que podem preenchê-lo. Use antes de cada pergunta (regra "uma resposta adianta outras" da `SKILL.md`) e ao escrever cada arquivo.
+> O que cada arquivo final precisa saber. Cada campo tem um código, o arquivo onde entra e o que conta como "preenchido". **Desde o Base Camp curto (01/11/2026), todos os campos são preenchidos no passo 1 (o retrato) a partir dos 2 pedidos do começo; a coluna "Vem de" diz de que pergunta da montagem longa o campo vinha, e hoje aponta para `perguntas-do-uso-real.md`**, onde essas perguntas moram, para o uso real. O que o retrato não conseguir preencher fica fora do arquivo (ou "a completar no Campo 1", no cartão do workflow) e entra em "Falta isto" do `montagem/resumo.md`.
 > Em `montagem/respostas.md`, cada campo é uma seção com o código no título (`## QUEM.trabalho`), e embaixo as respostas com a origem.
-> **[leve]** = o campo também é pedido no nível leve.
+> **[leve]** = o campo também entra no nível leve.
 
 ## contexto/sobre-mim.md
 | Código | O que é | Preenchido quando | Vem de |
@@ -69,10 +69,10 @@
 | Arquivo | Leve | Completo |
 |---|---|---|
 | `CLAUDE.md` (já vem na pasta) | sim | sim |
-| `AGENTS.md` (reescrito no bloco 6) | sim | sim |
+| `AGENTS.md` (final no passo 1, com a seção temporária até o fim) | sim | sim |
 | `contexto/sobre-mim.md` | sim | sim |
 | `contexto/como-trabalhar-comigo.md` | sim, curto | sim |
-| `contexto/estilo-de-escrita.md` | não (no Campo 1) | não (no Campo 1) |
+| `contexto/estilo-de-escrita.md` | não (no uso real, quando o sistema for escrever em nome dela) | idem |
 | `frentes/<nome>/AGENTS.md` | não (só o mapa no `AGENTS.md`) | sim, uma por frente |
 | `contexto/computador.md` (o inventário da 5.0) | sim | sim |
 | `memoria.md` | sim | sim |

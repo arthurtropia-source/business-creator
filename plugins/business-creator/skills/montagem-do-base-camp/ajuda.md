@@ -16,6 +16,9 @@
 "Eles ficam na pasta que você abriu no app. Você pode abrir essa pasta pelo Finder (no Mac) ou pelo Explorador de Arquivos (no Windows). Os arquivos são de texto: abrem em qualquer editor."
 - Se o app mostrar um painel de arquivos, diga que ela também pode clicar no nome do arquivo na conversa.
 
+## Não uso outra IA, ou não achei o texto
+"Então me conte só com as suas palavras, por voz se quiser: quem você é e o que faz; tudo o que você toca hoje; a tarefa que você repete e toma tempo; como gosta de receber as coisas. Quando acabar, escreva terminei."
+
 ## Parei no meio, fechei o app ou caiu a conexão
 "Nada se perdeu: eu gravo a cada resposta. Abra o app de novo nesta mesma pasta e escreva 'continuar'."
 
@@ -25,7 +28,7 @@
 ## Apareceu um aviso de limite de uso
 "O seu plano do Claude tem um limite de uso por período. Está tudo gravado: quando o limite voltar (o aviso diz o horário), abra uma conversa nesta pasta e escreva 'continuar'."
 
-## Conversa nova (para o teste da etapa 5, quando não houver o painel)
+## Conversa nova (quando não houver o painel para o teste)
 "No app, use o botão de nova conversa (nova sessão) e escolha esta mesma pasta. No terminal, feche e abra de novo o Claude dentro da pasta. A conversa nova não sabe nada desta aqui: é por isso que ela serve de teste."
 
 ## O painel sumiu ou não apareceu

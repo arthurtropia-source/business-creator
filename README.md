@@ -16,7 +16,7 @@ Você recebe do Arthur a sua pasta (`meu-os`), que já sabe onde buscar o plugin
 Sem a pasta, no app: clique no **+** ao lado da caixa de texto, **Plugins**, **Add marketplace** com `arthurtropia-source/business-creator`, depois **Add plugin** e escolha `business-creator`. Num terminal: `claude plugin install business-creator --marketplace arthurtropia-source/business-creator`.
 
 ## O que vem nele
-- `business-creator:montagem-do-base-camp`: a montagem, em 6 etapas.
+- `business-creator:montagem-do-base-camp`: a montagem em 3 passos (o começo, o retrato, a primeira tarefa) e a reserva de perguntas do uso real.
 - O painel do Base Camp (`/base-camp`).
 - `business-creator:campo-1`: o Campo 1 da primeira montanha, que detalha e ensina ao sistema o seu primeiro workflow, do ponto de partida até a entrega, e o roda de ponta a ponta com você.
 - `business-creator:rotinas-e-computador`: as regras para o trabalho de verdade no computador, depois do Base Camp (rotina gravada, conferência, Windows e Mac).

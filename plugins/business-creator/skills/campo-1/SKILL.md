@@ -7,7 +7,7 @@ description: Conduz o Campo 1 da primeira montanha, depois do Base Camp - detalh
 
 > Plugin Business Creator 0.2.1 (30/10/2026). O Campo 2 (os passos que se repetem viram skills) e o Campo 3 (chegar sozinho) vêm na 0.3.
 
-Um workflow é o caminho de uma tarefa da pessoa, do ponto de partida até a entrega. Cada frente dela é um conjunto de workflows. O primeiro foi desenhado na etapa 3 do Base Camp, como é hoje, com os passos que ela contou. **O Campo 1 é onde o sistema aprende esse workflow:** cada passo detalhado, com os critérios e as exceções dela, quem passa a fazer cada um, e uma rodada inteira com dado real, do começo à entrega.
+Um workflow é o caminho de uma tarefa da pessoa, do ponto de partida até a entrega. Cada frente dela é um conjunto de workflows. O primeiro foi desenhado no retrato do Base Camp, escolhido pelo sistema, como é hoje, com os passos que ela contou. **O Campo 1 é onde o sistema aprende esse workflow:** cada passo detalhado, com os critérios e as exceções dela, quem passa a fazer cada um, e uma rodada inteira com dado real, do começo à entrega.
 
 ## Linha de chegada do Campo 1
 1. todos os passos do cartão estão **detalhados** (o que entra, o que se faz, o critério de cada decisão, as exceções, o que sai) e cada um tem **quem faz**: ela, o sistema (com rotina gravada ou modelo) ou "ainda não dá" (com a pendência);

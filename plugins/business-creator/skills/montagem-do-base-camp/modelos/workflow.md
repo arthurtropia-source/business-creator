@@ -1,6 +1,6 @@
 <!--
 MODELO do cartão de um workflow: frentes/<frente>/workflows/<nome-curto>.md (no nível leve, sem pasta por frente: workflows/<nome-curto>.md).
-O primeiro nasce no fim da etapa 3 da montagem; o Campo 1 o detalha; cada rodada e cada lição entram nele. É o arquivo que diz, sem a pessoa precisar lembrar, onde o workflow está.
+O primeiro nasce no passo 1 da montagem (o retrato), escolhido pelo sistema; o Campo 1 o detalha; cada rodada e cada lição entram nele. É o arquivo que diz, sem a pessoa precisar lembrar, onde o workflow está.
 Regras: com as palavras dela; o "antes" sempre com o número, a data e a origem (medido hoje, lembrança ou estimativa), mais as vezes por mês e as horas por mês (a conta à vista); a sugestão da IA marcada como sugestão; até ~60 linhas.
 Na montagem, os passos são os de HOJE, como ela contou (quem faz: ela). O Campo 1 detalha cada passo e decide quem faz cada um.
 Tire estes comentários e as instruções entre <>.

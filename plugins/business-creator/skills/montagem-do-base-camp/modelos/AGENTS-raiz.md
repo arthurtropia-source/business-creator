@@ -1,8 +1,8 @@
 <!--
-MODELO do arquivo-mestre do sistema da pessoa. Escreva no bloco 6, na raiz da pasta, substituindo o AGENTS.md da montagem.
+MODELO do arquivo-mestre do sistema da pessoa. Escreva no passo 1 (o retrato), na raiz da pasta, substituindo o AGENTS.md da montagem.
 Regras: em primeira pessoa (é ela falando com a IA); curto (até ~80 linhas); só o que ela aprovou; nenhuma menção à montagem, ao kit ou a esta pasta de modelos.
 Tire estes comentários e as instruções entre <>. Seção sem conteúdo aprovado sai inteira.
-Na 5.2, grave o arquivo COM a seção "Montagem em andamento" logo abaixo do título (o texto está no fim deste modelo): ela garante que uma conversa nova, aberta no meio da etapa 6, retome a montagem. No Fim da montagem, tire só essa seção.
+No passo 1 (o retrato), grave o arquivo COM a seção "Montagem em andamento" logo abaixo do título (o texto está no fim deste modelo): ela garante que uma conversa nova, aberta no meio da etapa 6, retome a montagem. No Fim da montagem, tire só essa seção.
 No nível leve (sem pasta por frente), as seções "Palavras minhas" e "Pendências" ficam aqui, com "nenhuma ainda".
 -->
 # <Nome>: o meu sistema de trabalho
@@ -78,7 +78,7 @@ Antes de trabalhar numa frente, leia o `AGENTS.md` dela.
 - **Toda tarefa tem linha de chegada:** antes de começar, diga o que é "pronto" (o quê, em que formato e onde fica). Se o meu pedido não disser, pergunte.
 
 <!--
-A seção temporária da 5.2. Vai logo abaixo do título e sai no Fim da montagem:
+A seção temporária do passo 1. Vai logo abaixo do título e sai no Fim da montagem:
 
 ## Montagem em andamento (esta seção sai no fim)
 - No começo de toda conversa, leia `base-camp.md`. Enquanto houver etapa pendente ou em andamento ali, use a skill `montagem-do-base-camp` para responder a qualquer mensagem, mesmo um "oi".

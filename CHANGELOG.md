@@ -2,6 +2,13 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.2.12 (01/11/2026)
+**O Base Camp curto** (proposta `laboratorio-os/propostas/2026-11-01-base-camp-curto.md`, as 5 decisões aprovadas pelo Arthur em 01/11: "pode aprovar, gostei da visão"). A montagem pela regra padrão do onboarding: curta, com o valor na próxima coisa que a pessoa já ia fazer.
+- **3 passos e um "confirmo"** (montagem 3.0, roteiro 3.0): o começo (os 2 pedidos de sempre; quem não usa outra IA conta por voz em 4 tópicos); **o retrato, montado de uma vez** pelo sistema, sem perguntar (quem é, as frentes e fichas, como gosta de receber, as 7 regras, o computador, o arquivo principal e o primeiro workflow, escolhido pelo sistema pelos critérios de sempre), mostrado em cartões no painel e confirmado numa resposta só, com o teste "quem sou eu" rodando sozinho; **a primeira tarefa, proposta pelo sistema e já feita**, com o combinado proposto e preso ao gatilho do workflow.
+- **O roteiro longo vira a reserva do uso real** (`perguntas-do-uso-real.md`): as 32 perguntas das etapas 1 a 5, agrupadas pelo momento em que o sistema pergunta (ao escrever em nome dela; ao tocar uma frente; no Campo 1; ao decidir; num assunto delicado; com o tempo), uma por conversa. A regra entrou no estilo de resposta.
+- **O painel:** 3 passos na subida (Começo, Retrato, 1ª tarefa); no retrato, a lista do que já foi montado e o teste; na 1ª tarefa, a tarefa e o combinado. Pastas da montagem longa continuam funcionando (o painel conta pela tabela).
+- Meta, pelo roteiro: de cerca de 49 respostas e cliques para cerca de 7; do primeiro valor aos 90 a 150 minutos para 15 a 25. A primeira medida de verdade é o teste do Arthur.
+
 ## 0.2.11 (31/10/2026)
 O painel como produto, pelas lógicas do Tim Gabe (`laboratorio-os/radar/tim-gabe/2026-10-31-painel-como-produto.md`; as 3 decisões aprovadas pelo Arthur em 31/10, "inclusive a 2 de encurtar o caminho").
 - **A ordem nova da montagem, em 5 etapas (montagem 2.0, roteiro 2.0):** o começo; 1, quem é você; 2, as suas frentes; **3, o primeiro workflow** (antes era a 5); 4, como você trabalha; 5, as regras numa confirmação só, o teste e a primeira tarefa. O primeiro resultado concreto chega mais cedo; o estilo de escrita sai da montagem e fica para o Campo 1; a troca de conversa passa a ser depois da etapa 3.

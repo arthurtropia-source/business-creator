@@ -10,13 +10,9 @@ const BASE_CAMP = `# Base Camp: o estado da montagem
 
 | Etapa | Status | Início | Fim |
 |---|---|---|---|
-| D · Conte do seu jeito | aprovado | 23/10/2026 17:24 | 23/10/2026 17:36 |
-| 1 · Quem é você | aprovado | 23/10/2026 17:36 | 23/10/2026 18:01 |
-| 2 · As suas frentes | em andamento | 23/10/2026 18:01 | |
-| 3 · Como você trabalha | pendente | | |
-| 4 · As regras da casa | pendente | | |
-| 5 · O primeiro processo | pendente | | |
-| 6 · O teste e a primeira tarefa | pendente | | |
+| D · O começo | aprovado | 23/10/2026 17:24 | 23/10/2026 17:36 |
+| 1 · O retrato | em andamento | 23/10/2026 17:36 | |
+| 2 · A primeira tarefa | pendente | | |
 
 ## Testes
 - **Quem sou eu:** não feito
@@ -147,20 +143,18 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     expect(await ui.find({ type: 'Text', text: /^Montagem do Base Camp$/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /^Business Creator powered by SEM IA™ · Um sistema, qualquer IA\.$/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /Base Camp by/ })).toBeUndefined()
-    expect(await ui.find({ type: 'Text', text: /ETAPA 2 DE 6 · AS SUAS FRENTES/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /Para cada frente ter o seu lugar/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /PASSO 1 DE 2 · O RETRATO/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /você só confirma ou corrige/ })).toBeDefined()
     // Em curso, a subida é uma linha só; o destaque é o andamento da etapa (0.2.7).
-    expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toContain('● 2')
-    expect(await ui.find({ type: 'Text', text: /3 · Como você trabalha/ })).toBeUndefined()
-    expect(await ui.find({ type: 'Text', text: /O QUE ESTA ETAPA JÁ TEM · 1 DE 4/ })).toBeDefined()
-    expect((await ui.find({ type: 'Text', text: /Quem está em cada frente/ }))?.text).toContain('pulada')
-    expect((await ui.find({ type: 'Text', text: /Os programas que você usa/ }))?.text).toContain('○')
-    // A lista do que já está montado saiu do painel em andamento (0.2.11): a subida é uma linha só.
-    expect(await ui.find({ type: 'Text', text: /O QUE JÁ ESTÁ MONTADO/ })).toBeUndefined()
+    expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toContain('● 1')
+    // O retrato: o painel mostra o que já foi montado (a página sobre você existe no fixture) e o teste.
+    expect(await ui.find({ type: 'Text', text: /O QUE JÁ ESTÁ MONTADO · 2 DE 9/ })).toBeDefined()
+    expect((await ui.find({ type: 'Text', text: /A página sobre você/ }))?.text).toContain('✓')
+    expect((await ui.find({ type: 'Text', text: /O teste: quem sou eu/ }))?.text).toContain('○')
     // O cartão Agora (0.2.11): Continuar, Quero corrigir e Travei; nada de ler em voz alta.
     expect(await ui.findAll({ type: 'Button' })).toHaveLength(3)
     expect(await ui.find({ type: 'Button', key: 'voz' })).toBeUndefined()
-    expect(await ui.find({ type: 'Text', text: /AGORA · ETAPA 2 DE 6/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /AGORA · PASSO 1 DE 2/ })).toBeDefined()
 
     await ui.press({ key: 'travei' })
     expect(enviados).toContain('travei')
@@ -182,9 +176,8 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
 
   test(`no começo, o painel mostra os 2 pedidos e a conferência (${surface})`, async ($, on) => {
     const comeco = BASE_CAMP.replace('NIVEL', 'completo')
-      .replace('| D · Conte do seu jeito | aprovado | 23/10/2026 17:24 | 23/10/2026 17:36 |', '| D · Conte do seu jeito | em andamento | 23/10/2026 17:24 | |')
-      .replace('| 1 · Quem é você | aprovado | 23/10/2026 17:36 | 23/10/2026 18:01 |', '| 1 · Quem é você | pendente | | |')
-      .replace('| 2 · As suas frentes | em andamento | 23/10/2026 18:01 | |', '| 2 · As suas frentes | pendente | | |')
+      .replace('| D · O começo | aprovado | 23/10/2026 17:24 | 23/10/2026 17:36 |', '| D · O começo | em andamento | 23/10/2026 17:24 | |')
+      .replace('| 1 · O retrato | em andamento | 23/10/2026 17:36 | |', '| 1 · O retrato | pendente | | |')
     const resumo = '# O que o sistema já sabe\n\n## Já sei isto\n### O que você toca\n- A consultoria de RH, sozinha\n- (?) Uma loja online parada · da outra IA, sem data\n\n## Falta isto\n- A sua última semana, na prática\n'
     pasta(on, { '/os/base-camp.md': comeco, '/os/montagem/respostas.md': RESPOSTAS, '/os/montagem/resumo.md': resumo }, [])
     await $.session.start({ cwd: '/os', surface, isInteractive: true })
@@ -214,7 +207,7 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     expect(await ui.find({ type: 'Text', text: /^Business Creator powered by SEM IA™ · Um sistema, qualquer IA\.$/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /12 min/ })).toBeUndefined()
     expect(await ui.find({ type: 'Text', text: /O que está parado/ })).toBeUndefined()
-    expect(await ui.find({ type: 'Text', text: /JÁ TEM · 1 DE 3/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /O QUE JÁ ESTÁ MONTADO · 2 DE 9/ })).toBeDefined()
     expect(await ui.findAll({ type: 'Button' })).toHaveLength(2)
     await ui.unmount()
   })
@@ -348,7 +341,7 @@ for (const surface of ['desktop', 'terminal'] as const) {
       component: 'AbovePrompt',
       props: { hasSurvey: false, isWorking: false, maxRows: 10, bodyColumns: 80, scroll: { offset: 0, bodyRows: 10 }, view: {} },
     })
-    expect(await ui.find({ type: 'Text', text: /Etapa 2 de 6 · As suas frentes/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /Passo 1 de 2 · O retrato/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /sua vez: responda acima/ })).toBeDefined()
     await ui.unmount()
   })
