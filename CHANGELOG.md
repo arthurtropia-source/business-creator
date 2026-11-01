@@ -2,6 +2,14 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.2.11 (31/10/2026)
+O painel como produto, pelas lógicas do Tim Gabe (`laboratorio-os/radar/tim-gabe/2026-10-31-painel-como-produto.md`; as 3 decisões aprovadas pelo Arthur em 31/10, "inclusive a 2 de encurtar o caminho").
+- **A ordem nova da montagem, em 5 etapas (montagem 2.0, roteiro 2.0):** o começo; 1, quem é você; 2, as suas frentes; **3, o primeiro workflow** (antes era a 5); 4, como você trabalha; 5, as regras numa confirmação só, o teste e a primeira tarefa. O primeiro resultado concreto chega mais cedo; o estilo de escrita sai da montagem e fica para o Campo 1; a troca de conversa passa a ser depois da etapa 3.
+- **O cartão "Agora" fixo no topo do painel:** a etapa, a pergunta da vez e um botão principal só (Aprovar, ou Continuar quando não há pergunta), com "Quero corrigir" e "Travei" fixos e discretos. Um "Quero corrigir" só.
+- **O painel em andamento em 3 zonas:** Agora; o que esta etapa já tem e os cartões do que o sistema sabe; a subida em uma linha. Saem a lista do que já está montado e o bloco do primeiro workflow (repetiam).
+- **O fim do Base Camp abre o Campo 1 num clique:** o botão "Rodar o meu primeiro workflow" é o único botão principal do painel final; o resto recolhe.
+- O painel conta as etapas pela tabela do `base-camp.md`, então pastas antigas (6 etapas) continuam funcionando.
+
 ## 0.2.10 (31/10/2026)
 Menos texto, mais visual (pedido do Arthur, 31/10: "é um monte de texto empilhado"; "o pedido do próximo passo fica perdido"; mockup aprovado: "vamos com os 3").
 - **A. A conversa só pede a próxima resposta:** cada mensagem tem no máximo uma linha do que foi feito, um separador e a pergunta da vez, sozinha, em negrito (montagem 1.15).

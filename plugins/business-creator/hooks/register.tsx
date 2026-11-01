@@ -81,10 +81,9 @@ const PARA_QUE: Record<string, string> = {
   D: 'Você conta do seu jeito; o sistema separa o que serve para cada arquivo.',
   '1': 'Para o sistema saber quem você é, sem você repetir.',
   '2': 'Para cada frente ter o seu lugar e nada se misturar.',
-  '3': 'Para as respostas chegarem no formato que você gosta.',
-  '4': 'Para o sistema saber o que nunca fazer sem você.',
-  '5': 'Para desenhar o primeiro workflow: o caminho de uma tarefa sua, do começo à entrega.',
-  '6': 'Para testar o sistema e ver a primeira tarefa feita.',
+  '3': 'Para desenhar o primeiro workflow: o caminho de uma tarefa sua, do começo à entrega.',
+  '4': 'Para as respostas chegarem no formato que você gosta.',
+  '5': 'Para conferir as regras, testar o sistema e ver a primeira tarefa feita.',
 }
 
 // Ao fechar uma etapa, o painel celebra a obra, não a pessoa.
@@ -92,10 +91,9 @@ const OBRA: Record<string, string> = {
   D: 'Pronto: o sistema já tem a sua história, do seu jeito.',
   '1': 'Etapa 1 montada: o sistema já sabe quem você é.',
   '2': 'Etapa 2 montada: o sistema já conhece as suas frentes.',
-  '3': 'Etapa 3 montada: o sistema já sabe como você gosta de receber.',
-  '4': 'Etapa 4 montada: as regras da casa estão escritas.',
-  '5': 'Etapa 5 montada: o primeiro workflow está desenhado, do começo à entrega, e medido.',
-  '6': 'Base Camp montado. O seu sistema já trabalha para você.',
+  '3': 'Etapa 3 montada: o primeiro workflow está desenhado, do começo à entrega, e medido.',
+  '4': 'Etapa 4 montada: o sistema já sabe como você gosta de receber.',
+  fim: 'Base Camp montado. O seu sistema já trabalha para você.',
 }
 
 // O "pensando…" do app, na voz da expedição: uma por resposta.
@@ -114,9 +112,8 @@ const PALAVRAS = [
 const PREFIXOS: Record<string, string[]> = {
   '1': ['QUEM', 'DIA'],
   '2': ['FRENTES', 'FRENTE', 'FERRAMENTAS'],
-  '3': ['JEITO', 'VOZ', 'AMBIENTE'],
-  '4': ['REGRAS'],
-  '5': ['PROC'],
+  '3': ['PROC'],
+  '4': ['JEITO'],
 }
 
 // Os campos de campos.md ditos para a pessoa, em "você".
@@ -390,11 +387,11 @@ function ehArquivoDoSistema(rel: string): boolean {
 
 // ------------------------------------------------------------ desenho: a aproximação até o Base Camp
 
-// As 7 marcas (o começo e as 6 etapas) levam ao Base Camp, no pé da primeira
+// As marcas (o começo e as etapas; 6 desde a 0.2.11) levam ao Base Camp, no pé da primeira
 // montanha. A rota da montanha, com os três campos, sobe até o cume, o único
 // laranja da peça: o que vem depois do Base Camp.
 const APROX = [[14, 106], [70, 84], [126, 130], [190, 118]] as const
-const MARCAS = [0.06, 0.2, 0.34, 0.48, 0.62, 0.76, 0.9]
+const marcas = (n: number): number[] => Array.from({ length: n }, (_, i) => 0.06 + (0.84 * i) / Math.max(1, n - 1))
 const ROTA = [[198, 114], [254, 108], [288, 36]] as const
 const CAMPOS_NA_ROTA = [0.3, 0.55, 0.78]
 
@@ -426,7 +423,7 @@ function progresso(p: Painel): number {
   if (p.concluida) return 1
   if (!p.iniciada) return 0
   const i = p.blocos.findIndex(b => b.status === 'em andamento' || b.status === 'pendente')
-  return MARCAS[Math.max(0, i)] ?? 0
+  return marcas(p.blocos.length)[Math.max(0, i)] ?? 0
 }
 
 function quadrado(x: number, y: number, lado: number, extra: string): string {
@@ -465,7 +462,7 @@ function trilhaSvg(p: Painel, f: Festa | null): string {
     const fim = (100 - prog * 100).toFixed(1)
     s += `<path d="${caminho}" pathLength="100" fill="none" stroke="${TINTA}" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="100" stroke-dashoffset="${fim}"${f ? ' class="anda"' : ''}/>`
   }
-  MARCAS.forEach((t, i) => {
+  marcas(p.blocos.length).forEach((t, i) => {
     const [x, y] = ponto(t)
     const b = p.blocos[i]
     const feito = p.concluida || (b !== undefined && (b.status === 'aprovado' || b.status === 'pulado'))
@@ -530,18 +527,21 @@ async function carregar($: EngineInterface) {
     ]
     const atual = base.blocos.find(b => b.status === 'em andamento') ?? base.blocos.find(b => b.status === 'pendente')
     let campos: Campo[] = []
-    if (atual?.codigo === '6' && !base.concluida) {
-      // A etapa 6 não pergunta: entrega. O painel mostra o que falta entregar.
+    const ultima = base.blocos[base.blocos.length - 1]?.codigo
+    if (atual && atual.codigo === ultima && !base.concluida) {
+      // A última etapa não pergunta: entrega. O painel mostra o que falta entregar.
       const ok = (x: boolean): Campo['estado'] => (x ? 'ok' : 'falta')
+      const e = atual.codigo
       campos = [
-        { codigo: '6.1', rotulo: 'O arquivo principal', estado: ok(principal) },
-        { codigo: '6.2', rotulo: 'O teste: quem sou eu', estado: ok(base.testeOk) },
+        { codigo: `${e}.1`, rotulo: 'As regras da casa', estado: ok(await existe($, `${dir}/memoria.md`)) },
+        { codigo: `${e}.2`, rotulo: 'O arquivo principal', estado: ok(principal) },
+        { codigo: `${e}.3`, rotulo: 'O teste: quem sou eu', estado: ok(base.testeOk) },
         ...(base.nivel === 'completo'
-          ? [{ codigo: '6.3', rotulo: 'O teste: as frentes não se misturam', estado: ok(base.separacaoOk) }]
+          ? [{ codigo: `${e}.4`, rotulo: 'O teste: as frentes não se misturam', estado: ok(base.separacaoOk) }]
           : []),
-        { codigo: '6.5', rotulo: 'O resumo para o Arthur', estado: ok(resumo) },
-        { codigo: '6.6', rotulo: 'O guia de bolso', estado: ok(guia) },
-        { codigo: '6.7', rotulo: 'A primeira tarefa feita', estado: ok(base.feita) },
+        { codigo: `${e}.6`, rotulo: 'O resumo para o Arthur', estado: ok(resumo) },
+        { codigo: `${e}.7`, rotulo: 'O guia de bolso', estado: ok(guia) },
+        { codigo: `${e}.8`, rotulo: 'A primeira tarefa feita', estado: ok(base.feita) },
       ]
     } else if (atual?.codigo === 'D' && !base.concluida) {
       // O começo não tem campos: o painel mostra os 2 pedidos da abertura e a conferência (0.2.7).
@@ -569,7 +569,7 @@ async function carregar($: EngineInterface) {
 async function celebrar($: EngineInterface, antes: Painel, depois: Painel) {
   let texto: string | null = null
   if (!antes.concluida && depois.concluida) {
-    texto = OBRA['6'] ?? null
+    texto = OBRA.fim ?? null
   } else if (!depois.concluida) {
     const fechou = depois.blocos.find(
       b => b.status === 'aprovado' && antes.blocos.find(a => a.codigo === b.codigo)?.status !== 'aprovado',
@@ -889,7 +889,8 @@ export const register: Register = on => {
     const atual = p.blocos.find(b => b.status === 'em andamento') ?? p.blocos.find(b => b.status === 'pendente')
     if (!atual) return next(e)
     const { Box, Text } = $.ui.resolve(e)
-    const etapa = atual.codigo === 'D' ? 'Começo · conte do seu jeito' : `Etapa ${atual.codigo} de 6 · ${atual.nome}`
+    const total = p.blocos.filter(b => b.codigo !== 'D').length
+    const etapa = atual.codigo === 'D' ? 'Começo' : `Etapa ${atual.codigo} de ${total} · ${atual.nome}`
     const ocupado = e.props.isWorking || (await read($, trabalhando))
     const vez = ocupado
       ? 'o sistema está escrevendo…'
@@ -1023,7 +1024,7 @@ export const register: Register = on => {
           {titulo}
           <Text color={CINZA}>Onde todo sistema começa: uma pasta, um arquivo e qualquer IA.</Text>
           {trilha}
-          <Text bold color={ROCHA}>6 etapas, uma tarde, com parada no fim de cada uma.</Text>
+          <Text bold color={ROCHA}>{dado.blocos.filter(b => b.codigo !== 'D').length} etapas, uma tarde, com parada no fim de cada uma.</Text>
           <Text color={ROCHA}>
             Você responde do seu jeito, até por voz. O sistema escreve cada arquivo e mostra para você aprovar. No fim, ele já faz a primeira tarefa para você.
           </Text>
@@ -1041,11 +1042,6 @@ export const register: Register = on => {
 
     // ----- Base Camp montado
     if (dado.concluida) {
-      const campos = [
-        ['campo-1-rodar', 'Campo 1 · detalhar e aprender o primeiro workflow, de ponta a ponta'],
-        ['campo-2-skill', 'Campo 2 · sair pronto com um pedido seu'],
-        ['campo-3-agendar', 'Campo 3 · se tiver hora certa, chegar sozinho'],
-      ] as const
       return (
         <Box {...fundo}>
           {marca}
@@ -1076,33 +1072,20 @@ export const register: Register = on => {
                 : 'Se quiser que o Arthur dê uma olhada no seu Base Camp, mande o resumo para ele.'}
             </Text>
             <Box flexDirection="row" gap={1}>
-              <Button key="copiar-resumo" variant="primary" label="Copiar o resumo" onPress={press => void copiarResumo($, press.surface)} />
+              <Button key="copiar-resumo" label="Copiar o resumo" onPress={press => void copiarResumo($, press.surface)} />
               <Button key="ver-resumo" label={aberto === 'resumo' ? 'Fechar' : 'Ver o resumo'} onPress={() => void abrirDoc($, 'resumo')} />
             </Box>
             {aberto === 'resumo' && docAberto}
           </Box>
-          {dado.processo && (
-            <Box flexDirection="column">
-              <Text color={CINZA} size="caption">O SEU PRIMEIRO WORKFLOW</Text>
-              <Text color={ROCHA}>{dado.processo}</Text>
-              {completo && dado.antes && <Text color={CINZA} size="caption">Hoje leva: {dado.antes}</Text>}
-            </Box>
-          )}
-          <Box flexDirection="column" gap={1}>
-            <Text color={CINZA} size="caption">A PRÓXIMA SUBIDA: A MERA, A PRIMEIRA MONTANHA</Text>
-            {campos.map(([nome, texto]) => (
-              <Box key={`campo-${nome}`} flexDirection="row" gap={1} alignItems="center">
-                {figura(ic[nome] ?? '', texto, 18)}
-                <Text color={ROCHA}>{texto}</Text>
-              </Box>
-            ))}
-            <Text color={ROCHA}>Cume · medir as horas que voltaram para você</Text>
-            {completo && <Text color={CINZA}>Depois da Mera vêm a Island e a Lobuche East; no topo, o Everest.</Text>}
-            <Text color={CINZA}>
-              {completo
-                ? 'O Campo 1 começa numa conversa nova nesta pasta: escreva "vamos rodar o primeiro workflow".'
-                : 'No programa, o Arthur sobe a Mera com você.'}
-            </Text>
+          <Box flexDirection="column" gap={1} borderStyle="round" borderColor={TINTA} padding={1}>
+            <Text color={CINZA} size="caption">O PRÓXIMO PASSO · A MERA, A PRIMEIRA MONTANHA</Text>
+            <Text bold color={ROCHA}>Campo 1: detalhar e aprender o seu primeiro workflow, de ponta a ponta.</Text>
+            {dado.processo && <Text color={ROCHA}>{dado.processo}{completo && dado.antes ? ` · hoje leva ${dado.antes}` : ''}</Text>}
+            {pendente ? aviso : (
+              <Button key="rodar-workflow" variant="primary" label="Rodar o meu primeiro workflow" onPress={() => void enviar($, 'vamos rodar o primeiro workflow')} />
+            )}
+            <Text color={CINZA} size="caption">Depois: Campo 2, sair pronto com um pedido seu · Campo 3, chegar sozinho · Cume, medir as horas que voltaram.</Text>
+            {!completo && <Text color={CINZA} size="caption">No programa, o Arthur sobe a Mera com você.</Text>}
           </Box>
           <Button key="guia" label={aberto === 'guia' ? 'Fechar o guia de bolso' : 'Ver o guia de bolso'} onPress={() => void abrirDoc($, 'guia')} />
           {aberto === 'guia' && docAberto}
@@ -1111,52 +1094,55 @@ export const register: Register = on => {
       )
     }
 
-    // ----- Em andamento
+    // ----- Em andamento: três zonas (Agora; o que esta etapa já tem e o que o sistema sabe; a subida em uma linha).
     const ver = await read($, verArquivo)
     const textoArquivo = await read($, arquivoTexto)
     const sabidos = dado.campos.filter(c => c.estado === 'ok').length
-    const ehEntrega = atualBloco?.codigo === '6'
+    const total = dado.blocos.filter(b => b.codigo !== 'D').length
+    const ehEntrega = atualBloco !== undefined && atualBloco.codigo === dado.blocos[dado.blocos.length - 1]?.codigo
     const ehComeco = atualBloco?.codigo === 'D'
     const lembrete = (await read($, parado)) && !ocupado
     const nomeAprov = aprov?.arquivo ? nomeDoArquivo(aprov.arquivo) : null
+    const perguntaDaVez = ocupado ? null : await read($, pergunta)
 
     return (
       <Box {...fundo}>
         {marca}
         {titulo}
-        <Box flexDirection="column">
+        {comemoracao}
+        <Box flexDirection="column" gap={1} borderStyle="round" borderColor={TINTA} padding={1}>
           <Text color={TINTA} size="caption">
             {atualBloco
               ? atualBloco.codigo === 'D'
-                ? 'COMEÇO · CONTE DO SEU JEITO'
-                : `ETAPA ${atualBloco.codigo} DE 6 · ${atualBloco.nome.toUpperCase()}`
-              : 'A SUA SUBIDA'}
+                ? 'AGORA · O COMEÇO'
+                : `AGORA · ETAPA ${atualBloco.codigo} DE ${total} · ${atualBloco.nome.toUpperCase()}`
+              : 'AGORA'}
           </Text>
-          {atualBloco && PARA_QUE[atualBloco.codigo] && <Text color={CINZA} size="caption">{PARA_QUE[atualBloco.codigo]}</Text>}
-        </Box>
-        {comemoracao}
-        {vez}
-        {lembrete && <Text color={CINZA}>Sem pressa: responda do seu jeito, até por voz. Se travou, use o Travei.</Text>}
-        {aprov && !ocupado && (
-          <Box flexDirection="column" gap={1} borderStyle="round" borderColor={TINTA} padding={1}>
-            <Text bold color={ROCHA}>Esperando a sua aprovação</Text>
-            {aprov.arquivo && (
-              <Text color={CINZA}>
-                {nomeAprov ? `${nomeAprov.charAt(0).toUpperCase()}${nomeAprov.slice(1)} (${aprov.arquivo})` : aprov.arquivo}
-              </Text>
-            )}
-            {pendente ? aviso : (
-              <Box flexDirection="row" gap={1}>
+          {ocupado ? (
+            <Text color={TINTA}>● {agora ?? 'O sistema está trabalhando'}…</Text>
+          ) : aprov ? (
+            <Text bold color={ROCHA}>Sua vez: aprove ou corrija{nomeAprov ? ` ${nomeAprov}` : ''}.</Text>
+          ) : (
+            <Text bold color={ROCHA}>{perguntaDaVez ? `Sua vez: ${perguntaDaVez}` : 'Sua vez: responda na conversa.'}</Text>
+          )}
+          {atualBloco && PARA_QUE[atualBloco.codigo] && !aprov && <Text color={CINZA} size="caption">{PARA_QUE[atualBloco.codigo]}</Text>}
+          {pendente ? aviso : !ocupado && (
+            <Box flexDirection="row" gap={1}>
+              {aprov ? (
                 <Button key="aprovar" variant="primary" label="Aprovar" onPress={() => void enviar($, 'pode, aprovado')} />
-                <Button key="corrigir" label="Quero corrigir" onPress={() => void corrigir($)} />
-              </Box>
-            )}
-            {aprov.arquivo && (
-              <Button key="ver" dimColor label={ver ? 'Fechar o arquivo' : 'Ler o arquivo no painel'} onPress={() => void abrirArquivo($)} />
-            )}
-            {ver && textoArquivo && <Markdown text={textoArquivo} />}
-          </Box>
-        )}
+              ) : !perguntaDaVez && completo ? (
+                <Button key="continuar" variant="primary" label="Continuar" onPress={() => void enviar($, 'continuar')} />
+              ) : null}
+              <Button key="corrigir" label="Quero corrigir" onPress={() => void corrigir($)} />
+              <Button key="travei" label="Travei" onPress={() => void enviar($, 'travei')} />
+            </Box>
+          )}
+          {aprov && !ocupado && aprov.arquivo && (
+            <Button key="ver" dimColor label={ver ? 'Fechar o arquivo' : 'Ler o arquivo no painel'} onPress={() => void abrirArquivo($)} />
+          )}
+          {ver && textoArquivo && <Markdown text={textoArquivo} />}
+          {lembrete && <Text color={CINZA} size="caption">Sem pressa: responda do seu jeito, até por voz. Se travou, use o Travei.</Text>}
+        </Box>
         {dado.campos.length > 0 &&
           (sabidos === dado.campos.length ? (
             <Text color={TINTA}>
@@ -1165,7 +1151,7 @@ export const register: Register = on => {
           ) : (
             <Box flexDirection="column">
               <Text color={CINZA} size="caption">
-                {ehEntrega ? 'O QUE ESTA ETAPA ENTREGA' : ehComeco ? 'O SEU COMEÇO' : 'O QUE O SEU SISTEMA JÁ SABE'} · {sabidos} DE {dado.campos.length}
+                {ehEntrega ? 'O QUE ESTA ETAPA ENTREGA' : ehComeco ? 'O SEU COMEÇO' : 'O QUE ESTA ETAPA JÁ TEM'} · {sabidos} DE {dado.campos.length}
               </Text>
               {dado.campos.map(c => (
                 <Text key={`campo-${c.codigo}`} color={c.estado === 'falta' ? CINZA : ROCHA} dimColor={c.estado === 'falta'}>
@@ -1196,31 +1182,9 @@ export const register: Register = on => {
                 ))}
               </Box>
             )}
-            {!pendente && <Button key="corrigir-resumo" label="Quero corrigir algo" onPress={() => void corrigir($)} />}
           </Box>
         )}
         {progresso}
-        <Box flexDirection="column">
-          <Text color={CINZA} size="caption">O QUE JÁ ESTÁ MONTADO</Text>
-          {dado.montado.map(m => (
-            <Text key={`montado-${m.rotulo}`} color={m.ok ? ROCHA : CINZA} dimColor={!m.ok}>
-              {m.ok ? '✓' : '○'} {m.rotulo}
-            </Text>
-          ))}
-        </Box>
-        {dado.processo && (
-          <Box flexDirection="column">
-            <Text color={CINZA} size="caption">O PRIMEIRO WORKFLOW</Text>
-            <Text color={ROCHA}>{dado.processo}</Text>
-            {completo && dado.antes && <Text color={CINZA} size="caption">Hoje leva: {dado.antes}</Text>}
-          </Box>
-        )}
-        {pendente ? aviso : (
-          <Box flexDirection="row" gap={1}>
-            {completo && <Button key="continuar" variant="primary" label="Continuar" onPress={() => void enviar($, 'continuar')} />}
-            <Button key="travei" label="Travei" onPress={() => void enviar($, 'travei')} />
-          </Box>
-        )}
         {rodape}
       </Box>
     )

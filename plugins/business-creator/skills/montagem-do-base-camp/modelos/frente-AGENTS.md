@@ -29,7 +29,7 @@ Esta frente é um conjunto de workflows: cada um é o caminho de uma tarefa, do 
 | Workflow | Tipo | Estado | Do começo à entrega | Cartão |
 |---|---|---|---|---|
 | <nome> | <cíclico / pontual> | <incompleto: falta X / em andamento / completo, em <data>> | <X → Y> | `workflows/<nome>.md` |
-<Na etapa 2 fica "Nenhum ainda"; o primeiro entra na etapa 5.>
+<Na etapa 2 fica "Nenhum ainda"; o primeiro entra na etapa 3.>
 
 ## Palavras minhas
 - <Palavra ou apelido que ela usa com sentido próprio nesta frente, e o que quer dizer. Ex.: "banco de dados" = a planilha de controle. "Nenhuma ainda" se for o caso.>
@@ -44,4 +44,4 @@ Esta frente é um conjunto de workflows: cada um é o caminho de uma tarefa, do 
 - <Cada rotina gravada em `rotinas/` desta frente: o nome, o workflow e o passo a que serve, e o pedido que a chama. "Nenhuma ainda.">
 
 ## Modelos aprovados
-- <Cada texto ou arquivo que ela aprovou, guardado em `modelos/` desta frente. Na montagem, a primeira tarefa da 6.7 entra aqui, se for desta frente. "Nenhum ainda.">
+- <Cada texto ou arquivo que ela aprovou, guardado em `modelos/` desta frente. Na montagem, a primeira tarefa da 5.8 entra aqui, se for desta frente. "Nenhum ainda.">

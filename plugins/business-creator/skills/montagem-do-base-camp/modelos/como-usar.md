@@ -1,5 +1,5 @@
 <!--
-MODELO de como-usar.md (na raiz): o guia de bolso da pessoa. Escreva na etapa 6.6; a seção "O seu combinado" entra no fim da 6.7.
+MODELO de como-usar.md (na raiz): o guia de bolso da pessoa. Escreva na etapa 5.7; a seção "O seu combinado" entra no fim da 5.8.
 Para quem: a própria pessoa, não a IA. Em "você", com as frentes e as palavras dela. Uma página (até ~50 linhas), sem jargão (nada de "contexto", "skill", "prompt"). Os exemplos de pedido saem das frentes e do primeiro workflow dela.
 Tire estes comentários e as instruções entre <>.
 -->
@@ -13,7 +13,7 @@ Tire estes comentários e as instruções entre <>.
 3. **Corrija sem dó.** Quando algo vier errado, diga o que mudar e acrescente "daqui pra frente faça assim": vira regra no seu caderno de lições (`memoria.md`), e o sistema não repete o erro.
 
 ## O seu combinado
-<o combinado da 6.7, com as palavras dela. Ex.: Amanhã, às 8h, antes dos e-mails: abrir esta pasta e pedir a lista do fechamento.>
+<o combinado da 5.8, com as palavras dela. Ex.: Amanhã, às 8h, antes dos e-mails: abrir esta pasta e pedir a lista do fechamento.>
 
 ## Pedidos que já funcionam
 - <pedido 1, de uma frente dela>

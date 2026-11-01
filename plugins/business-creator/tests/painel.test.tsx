@@ -152,14 +152,15 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     // Em curso, a subida é uma linha só; o destaque é o andamento da etapa (0.2.7).
     expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toContain('● 2')
     expect(await ui.find({ type: 'Text', text: /3 · Como você trabalha/ })).toBeUndefined()
-    expect(await ui.find({ type: 'Text', text: /O QUE O SEU SISTEMA JÁ SABE · 1 DE 4/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /O QUE ESTA ETAPA JÁ TEM · 1 DE 4/ })).toBeDefined()
     expect((await ui.find({ type: 'Text', text: /Quem está em cada frente/ }))?.text).toContain('pulada')
     expect((await ui.find({ type: 'Text', text: /Os programas que você usa/ }))?.text).toContain('○')
-    expect((await ui.find({ type: 'Text', text: /A página sobre você/ }))?.text).toContain('✓')
-    expect((await ui.find({ type: 'Text', text: /Hoje leva/ }))?.text).toContain('3 horas')
-    // Continuar e Travei; o botão de ler em voz alta saiu na 0.2.3 (pedido do Arthur, 31/10).
-    expect(await ui.findAll({ type: 'Button' })).toHaveLength(2)
+    // A lista do que já está montado saiu do painel em andamento (0.2.11): a subida é uma linha só.
+    expect(await ui.find({ type: 'Text', text: /O QUE JÁ ESTÁ MONTADO/ })).toBeUndefined()
+    // O cartão Agora (0.2.11): Continuar, Quero corrigir e Travei; nada de ler em voz alta.
+    expect(await ui.findAll({ type: 'Button' })).toHaveLength(3)
     expect(await ui.find({ type: 'Button', key: 'voz' })).toBeUndefined()
+    expect(await ui.find({ type: 'Text', text: /AGORA · ETAPA 2 DE 6/ })).toBeDefined()
 
     await ui.press({ key: 'travei' })
     expect(enviados).toContain('travei')
@@ -198,7 +199,7 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     expect((await ui.find({ type: 'Text', text: /A consultoria de RH/ }))?.text).toContain('✓')
     expect((await ui.find({ type: 'Text', text: /Uma loja online parada/ }))?.text).toContain('ainda vale?')
     expect((await ui.find({ type: 'Text', text: /A sua última semana/ }))?.text).toContain('○')
-    expect(await ui.find({ type: 'Button', key: 'corrigir-resumo' })).toBeDefined()
+    expect(await ui.find({ type: 'Button', key: 'corrigir' })).toBeDefined()
     await ui.unmount()
   })
 
@@ -213,8 +214,8 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     expect(await ui.find({ type: 'Text', text: /^Business Creator powered by SEM IA™ · Um sistema, qualquer IA\.$/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /12 min/ })).toBeUndefined()
     expect(await ui.find({ type: 'Text', text: /O que está parado/ })).toBeUndefined()
-    expect(await ui.find({ type: 'Text', text: /JÁ SABE · 1 DE 3/ })).toBeDefined()
-    expect(await ui.findAll({ type: 'Button' })).toHaveLength(1)
+    expect(await ui.find({ type: 'Text', text: /JÁ TEM · 1 DE 3/ })).toBeDefined()
+    expect(await ui.findAll({ type: 'Button' })).toHaveLength(2)
     await ui.unmount()
   })
 
@@ -232,7 +233,6 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     })
 
     const ui = await $.ui.mount({ ...PANE, surface })
-    expect(await ui.find({ type: 'Text', text: /Esperando a sua aprovação/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /Sua vez: aprove ou corrija/ })).toBeDefined()
     await ui.press({ key: 'corrigir' })
     expect(enviados).toContain('[caixa] quero corrigir: ')
@@ -260,6 +260,8 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     expect(await ui.find({ type: 'Text', text: /O teste passou/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /amanhã, às 8h/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /Campo 1/ })).toBeDefined()
+    expect(await ui.find({ type: 'Button', key: 'rodar-workflow' })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /A proposta da consultoria/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /A proposta da consultoria/ })).toBeDefined()
     expect(await ui.find({ type: 'Button', key: 'tarefa-2' })).toBeDefined()
     expect(await ui.find({ type: 'Button', key: 'tarefa-3' })).toBeUndefined()

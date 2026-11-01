@@ -25,7 +25,7 @@
 ## Apareceu um aviso de limite de uso
 "O seu plano do Claude tem um limite de uso por período. Está tudo gravado: quando o limite voltar (o aviso diz o horário), abra uma conversa nesta pasta e escreva 'continuar'."
 
-## Conversa nova (para o teste da etapa 6, quando não houver o painel)
+## Conversa nova (para o teste da etapa 5, quando não houver o painel)
 "No app, use o botão de nova conversa (nova sessão) e escolha esta mesma pasta. No terminal, feche e abra de novo o Claude dentro da pasta. A conversa nova não sabe nada desta aqui: é por isso que ela serve de teste."
 
 ## O painel sumiu ou não apareceu
@@ -71,7 +71,7 @@
 - `frentes/`: uma pasta para cada coisa que você toca.
 - `memoria.md`: as lições que você ensina corrigindo.
 - `contexto/computador.md`: o que o seu computador tem (sistema, programas), para eu usar as ferramentas certas.
-- `frentes/<frente>/workflows/`: um cartão para cada workflow, o caminho de uma tarefa sua do começo à entrega. O primeiro nasce na etapa 5.
+- `frentes/<frente>/workflows/`: um cartão para cada workflow, o caminho de uma tarefa sua do começo à entrega. O primeiro nasce na etapa 3.
 - `frentes/<frente>/rotinas/` e `modelos/`: os passo a passos que o sistema guardou e os textos que você aprovou.
 - `como-usar.md`: o seu guia de bolso, com o combinado e os pedidos que já funcionam.
 - `resumo-para-o-arthur.md`: o resumo do seu Base Camp em uma página, para mandar ao Arthur se quiser.
