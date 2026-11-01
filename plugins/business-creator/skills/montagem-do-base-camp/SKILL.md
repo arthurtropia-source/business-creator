@@ -5,7 +5,7 @@ description: Conduz a Montagem do Base Camp, a entrevista guiada que monta o sis
 
 # Montagem do Base Camp
 
-> Kit de instalação guiada do SEM IA™, por Arthur Tropia. Versão 1.13 (31/10/2026), no plugin Business Creator 0.2.8.
+> Kit de instalação guiada do SEM IA™, por Arthur Tropia. Versão 1.14 (31/10/2026), no plugin Business Creator 0.2.9.
 
 Você vai montar, junto com a pessoa, o sistema de IA pessoal dela. Ela não sabe nada de IA, de pastas de configuração nem de skills, e não precisa saber. Ela só responde perguntas simples. Você escreve os arquivos, mostra cada um e só segue com a aprovação dela.
 
@@ -65,7 +65,7 @@ Ao abrir e ao fechar cada etapa, pegue a hora com o terminal que você tiver: `d
 - **Confirmar com as palavras dela:** quando resumir algo que ela disse, use o vocabulário dela, não o seu.
 
 ## Escolhas com clique
-**O mínimo de decisões para ela, o máximo de orientação** (decisão do Arthur, 31/10/2026). Não pergunte como ela prefere fazer, se quer seguir ou parar, nem por onde começar: diga o que fazer, com um exemplo. Ela só escolhe o que é dela de fato: a conferência do que veio da outra IA (D.2), o workflow candidato na 5.3 e a primeira tarefa na 6.7. Nessas, **se você tiver a ferramenta de pergunta com opções (AskUserQuestion), use-a**: a pessoa clica em vez de digitar. Opções curtas, no máximo 4, a recomendada primeiro. Sem a ferramenta, pergunte por texto, numerado. Nunca use a ferramenta para perguntas abertas (as de fato, as histórias) nem para a aprovação de arquivo, que pode pedir correção.
+**O mínimo de decisões para ela, o máximo de orientação** (decisão do Arthur, 31/10/2026). Não pergunte como ela prefere fazer, se quer seguir ou parar, nem por onde começar: diga o que fazer, com um exemplo. Ela só escolhe o que é dela de fato: o workflow candidato na 5.3 e a primeira tarefa na 6.7 (a conferência da D.2 é uma resposta só, por texto, nunca caixa de opções). Nessas, **se você tiver a ferramenta de pergunta com opções (AskUserQuestion), use-a**: a pessoa clica em vez de digitar. Opções curtas, no máximo 4, a recomendada primeiro. Sem a ferramenta, pergunte por texto, numerado. Nunca use a ferramenta para perguntas abertas (as de fato, as histórias) nem para a aprovação de arquivo, que pode pedir correção.
 
 ## "Uma resposta adianta outras"
 Antes de cada pergunta, confira os campos que ela alimenta, pelo que você já leu e gravou nesta conversa (`campos.md` e `respostas.md`; ao retomar numa conversa nova, leia os dois uma vez):

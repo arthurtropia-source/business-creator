@@ -510,7 +510,7 @@ async function carregar($: EngineInterface) {
       campos = [
         { codigo: 'D.1', rotulo: 'Pedido 1: o que a outra IA já sabe de você', estado: ok(/\[memória de outra IA/.test(r)) },
         { codigo: 'D.2', rotulo: 'Pedido 2: você, com as suas palavras', estado: ok(/\[despejo\]/.test(r)) },
-        { codigo: 'D.3', rotulo: 'A conferência do que veio da outra IA', estado: ok(/confirmado em/.test(r)) },
+        { codigo: 'D.3', rotulo: 'Você conferiu o resumo', estado: ok(/confirmado/.test(r)) },
       ]
     } else if (atual && !base.concluida) {
       const defs = lerDefinicoes(await lerTexto($, `${$.plugin.root}/skills/montagem-do-base-camp/campos.md`))

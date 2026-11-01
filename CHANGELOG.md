@@ -2,6 +2,11 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.2.9 (31/10/2026)
+Dois pontos do teste do Arthur na tentativa com a 0.2.8 (31/10).
+- **O texto para a outra IA pede a história, não a ficha:** a resposta tinha vindo "muito objetiva e pouco detalhada". Agora pede que a outra IA o apresente "como a um assistente novo que vai trabalhar com ele todos os dias", em parágrafos, com contexto, exemplos reais das conversas, detalhes e o porquê, em 8 seções (quem é; cada coisa que toca e como funciona; o dia e a semana; o que já pediu mais de uma vez, com exemplos; como trabalha e decide; como escreve e gosta de receber; as ferramentas e onde ficam os dados; o que quer). Cada fato com a data entre parênteses e "(deduzido)" quando for o caso. A montagem grava cada detalhe útil no campo certo.
+- **A conferência sem cliques:** sai a caixa com uma pergunta por item ("esse formato é péssimo"). No lugar, uma mensagem só: "Já sei isto", com os pontos em dúvida marcados no lugar deles ("veio da outra IA, de mar/2024: ainda vale?"), e "Falta isto". Ela corrige o que quiser numa resposta só, por escrito ou por voz, ou escreve **ok** (montagem 1.14, roteiro 1.12).
+
 ## 0.2.8 (31/10/2026)
 Da proposta "jornada de zero clique" (Arthur, 31/10, 12:33), o que entra agora, com a regra dele: "trazer o que é um sinal claro para a implementação do sistema", não ruído.
 - **O texto para a outra IA** junta o de 6 seções ao do item: 8 seções (quem é; o que toca; as tarefas que se repetem, inclusive o que já pediu mais de uma vez; o que trava; as ferramentas; como gosta de receber; as pessoas, só pelo papel; o que quer), no máximo 5 linhas cada, só o que serve ao sistema, a resposta num único bloco de código (que se copia de volta com um botão) e cada linha com a data [AAAA-MM] ou [?] e a marca [eu disse] ou [deduzido].

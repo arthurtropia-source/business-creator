@@ -1,6 +1,6 @@
 # Roteiro da Montagem do Base Camp
 
-> Versão 1.11 (31/10/2026), no plugin Business Creator 0.2.8. Cada pergunta diz os campos que alimenta (códigos de `campos.md`). **[leve]** = entra também no nível leve; sem a marca, só no completo. Antes de cada pergunta, confira os campos (regra "uma resposta adianta outras" da `SKILL.md`).
+> Versão 1.12 (31/10/2026), no plugin Business Creator 0.2.9. Cada pergunta diz os campos que alimenta (códigos de `campos.md`). **[leve]** = entra também no nível leve; sem a marca, só no completo. Antes de cada pergunta, confira os campos (regra "uma resposta adianta outras" da `SKILL.md`).
 > Para a pessoa, as partes da montagem se chamam **etapas** ("Etapa 2 de 6"); "bloco" é só o nome interno deste roteiro.
 > Tempo-alvo por etapa, para a pessoa que responde: entre parênteses. É alvo, não regra: nunca apresse ninguém.
 
@@ -18,20 +18,21 @@
 > **1. O que a IA que você mais usa já sabe sobre você.** Copie o texto abaixo (o botão de copiar fica no canto da caixa), cole no ChatGPT, no Gemini ou no Claude do navegador, e traga a resposta para cá:
 >
 > ```text
-> Estou montando um sistema de trabalho com IA e quero levar o que você já sabe sobre mim que sirva para isso. Use a sua memória e as nossas conversas. Só o que ajuda a montar o sistema: nada de traço de personalidade genérico, nada de assunto que apareceu uma vez só.
+> Estou montando um sistema de trabalho com IA e quero que ele me conheça tão bem quanto você. Conte a minha história como se estivesse me apresentando a um assistente novo que vai trabalhar comigo todos os dias: com contexto, exemplos reais das nossas conversas, detalhes, o porquê das coisas e como elas funcionam na prática. Use tudo o que está na sua memória e nas nossas conversas. Quanto mais detalhe útil, melhor; deixe de fora só o que não ajuda a trabalhar comigo.
 >
-> Responda num único bloco de código, com estas seções, nesta ordem, no máximo 5 linhas por seção (se não souber nada, escreva "nada"):
-> 1. Quem eu sou: nome, cidade, trabalho principal e o meu papel nele.
-> 2. O que eu toco hoje: trabalho, negócios, projetos, estudos, casa. Uma linha para cada, dizendo se anda ou está parado.
-> 3. As tarefas que se repetem: o que eu já te pedi mais de uma vez e o que eu contei que faço toda semana ou todo mês, da mais frequente para a menos, com o tempo que levam, se souber.
-> 4. O que dá errado ou me trava no dia a dia.
-> 5. As ferramentas que eu uso (e-mail, agenda, planilhas, sistemas, WhatsApp) e para quê.
-> 6. Como eu gosto de receber respostas: as regras que eu já te dei, com as minhas palavras.
-> 7. As pessoas com quem eu trabalho: só o papel (sócio, cliente, equipe), sem nomes.
-> 8. O que eu quero alcançar nos próximos meses.
+> Escreva em parágrafos, nestas seções:
+> 1. Quem eu sou: a minha trajetória, o que eu faço hoje, o meu papel e o que me move.
+> 2. Cada coisa que eu toco (trabalho, negócios, projetos, estudos, casa): o que é, como funciona, quem está envolvido (só o papel, sem nomes), em que pé está, o que anda, o que travou e por quê.
+> 3. Como são o meu dia e a minha semana: as rotinas, as tarefas que se repetem, quanto tempo elas tomam e onde eu perco tempo.
+> 4. O que eu já te pedi mais de uma vez: os pedidos que se repetem, com exemplos de como eu pedi e do que eu esperava receber.
+> 5. Como eu trabalho e decido: os meus critérios, os padrões que eu exijo, o que me irrita numa entrega e o que me agrada, com exemplos.
+> 6. Como eu escrevo e como gosto de receber respostas: as regras que eu já te dei, com as minhas palavras.
+> 7. As ferramentas e os dados que eu uso: programas, sistemas, planilhas, e onde ficam as informações de cada coisa.
+> 8. O que eu quero alcançar: metas, prazos e o que eu disse sobre o futuro.
 >
-> Comece cada linha com a data em que isso apareceu pela última vez, [AAAA-MM], ou [?] se não souber, e marque [eu disse] quando eu falei com todas as letras ou [deduzido] quando você concluiu. Coisas mudam: não apresente algo antigo como se ainda valesse.
-> Não invente. Deixe de fora saúde, finanças pessoais, senhas, documentos, números de conta, assuntos íntimos de família e dados de clientes ou da empresa onde eu trabalho (números, nomes de colegas e de clientes).
+> Depois de cada fato, ponha entre parênteses quando ele apareceu pela última vez (mês e ano, ou "sem data"), e marque "(deduzido)" no que você concluiu sem eu ter dito. Coisas mudam: se algo pode ter ficado para trás, diga. Não invente. Deixe de fora saúde, finanças pessoais, senhas, documentos, números de conta, assuntos íntimos de família e dados de clientes ou da empresa onde eu trabalho (números, nomes de colegas e de clientes).
+>
+> Entregue tudo num único bloco de código, para eu copiar com um clique.
 > ```
 >
 > **2. Enquanto a outra IA escreve, me conte com as suas palavras**, escrevendo ou por voz: quem você é, o que você faz e o que você pretende com o seu sistema.
@@ -51,19 +52,19 @@
 - Enquanto ela manda, **não pergunte nada**: grave em `respostas.md` e responda só "Anotado. Pode seguir; quando acabar, escreva terminei."
 - **O que ela fala ou escreve hoje vale mais que a memória da outra IA** (regra do Arthur, 31/10/2026: a fala dela "vai ser mais atual em relação ao momento e às intenções dela"; a outra IA "pode trazer coisas do passado que não se aplicam mais"). O que ela contar com as palavras dela entra como `[despejo]`. O que vier da outra IA entra como `[memória de outra IA, a confirmar]`, com a marca [eu disse] ou [deduzido] e a data que a outra IA deu. **Em conflito, ganha a fala dela**, sem perguntar: o item da outra IA sai.
 - Se ela mandar só um dos dois, siga com o que veio: não peça o outro.
-- **Sinal, não ruído** (regra do Arthur, 31/10/2026: "trazer o que é um sinal claro para a implementação do sistema"). Grave em `respostas.md` só o que preenche um campo de `campos.md`, com as palavras dela; o resto da resposta da outra IA fica de fora, sem guardar o texto inteiro. Na dúvida se algo serve, deixe de fora.
+- **Detalhe útil fica, ruído sai** (regras do Arthur, 31/10/2026: "trazer o que é um sinal claro para a implementação do sistema" e "aproveitar ao máximo os detalhes gravados na memória da IA", com "contexto, detalhes ricos que fazem o sistema ser muito mais assertivo"). Grave em `respostas.md`, no campo certo, cada detalhe que ajuda a trabalhar com ela: exemplos, critérios, o porquê, como funciona, números de tempo e frequência, com as palavras do texto. Fica de fora só o que não serve ao sistema: assunto pontual, traço genérico ("é dedicado"), o que é sigilo.
 
-D.2 **A conferência da outra IA** (só se veio a resposta da outra IA; logo depois do "terminei", antes de distribuir pelos campos). Separe os itens da outra IA que **não** foram confirmados pela fala dela e que estão em dúvida: os [deduzido], os com data de mais de 3 meses ou [?], e os que podem ter sido mal entendidos. No máximo 8, os que mais pesam no sistema dela (trabalho, frentes, o que quer) primeiro. Os que a fala dela já confirmou não entram; os que ela contradisse já saíram.
-- Diga em uma linha: "Antes de seguir, confira estes pontos que vieram da outra IA. Eles podem ser antigos."
-- **Com a ferramenta de pergunta com opções:** um item por pergunta, até 4 por caixa (até 2 caixas), com o item resumido em uma linha e as opções **Vale hoje**, **Não vale mais**, **Está errado** (ela corrige em "Outra").
-- **Sem a ferramenta:** os itens numerados, e o pedido: "Responda com os números que não valem mais ou estão errados, e o certo, se quiser (ex.: '2 e 5 não valem mais; 3: hoje eu faço X'). Se tudo vale, escreva **tudo certo**."
-- Grave: "Vale hoje" vira `[memória de outra IA, confirmado em <data>]`; "Não vale mais" sai de `respostas.md`; "Está errado" entra com a correção dela, como `[confirmado]`. O que não foi para a conferência segue `[memória de outra IA, a confirmar]` e é confirmado nas etapas, como antes.
+D.2 **Um resumo para ela conferir, de uma vez** (logo depois do "terminei"). Distribua tudo pelos campos de `campos.md` e mande **uma mensagem só**, com as palavras dela:
+> **Já sei isto:** o que ficou claro, agrupado por assunto (quem é, o que toca, as tarefas que se repetem, como trabalha e gosta de receber, o que quer), em frases completas, com os detalhes que importam. Os pontos da outra IA que estão em dúvida (os deduzidos, os com mais de 3 meses ou sem data, os que podem ter sido mal entendidos) vêm **no lugar deles, marcados** assim: "(veio da outra IA, de mar/2024: ainda vale?)".
+> **Falta isto:** até 6 linhas, o que as etapas ainda precisam saber, em palavras simples. Nada do que o sistema confere sozinho (o computador, na 6.0).
+> E o pedido: "Corrija ou complete o que quiser, escrevendo ou por voz, tudo numa resposta só. Se estiver tudo certo, escreva **ok**."
+- **Sem caixa de opções e sem pergunta item por item** (decisão do Arthur, 31/10/2026, depois de ver as perguntas uma a uma: "esse formato é péssimo"; "menos cliques e mais facilidade de resposta"). O que ela não corrigir vale.
+- Grave: o que ela corrigiu entra com a correção, como `[confirmado]`; o que ela disse que não vale mais sai; os pontos marcados que ela não tocou viram `[memória de outra IA, confirmado em <data>]`.
+- Os que a fala dela já confirmou não precisam de marca; os que ela contradisse já saíram, sem perguntar.
+- **Nenhum ponto da outra IA some sem ela ver**, a não ser o que a fala dela contradisse: ou entra no "Já sei isto", ou entra marcado (no pré-teste, um projeto antigo e sem data sumiu da lista sem ela saber).
 - **Não procure a pessoa na internet** (LinkedIn, Google) nem use ferramenta que ela não tenha pedido: o que entra é o que ela manda.
 
-**Ao terminar** (depois da conferência, se houve): distribua tudo pelos campos de `campos.md` e mostre, numa mensagem curta, duas listas com as palavras dela:
-> **Já sei isto:** até 6 linhas, uma por assunto (quem é, o que toca, as tarefas que se repetem, como gosta de receber...).
-> **Falta isto:** até 6 linhas, o que as etapas ainda precisam saber, em palavras simples (ex.: "como é um dia comum seu", "o que não pode passar de uma frente para outra").
-Nada de lista de campos nem de códigos. **Não prometa um número de perguntas** (no teste, a promessa de "4 perguntas" virou 7). Na mesma mensagem, abra a etapa 1 com a primeira pergunta do que falta (sem perguntar se ela quer seguir). Daí em diante, as etapas perguntam só o que está em "Falta isto". O que está em "Já sei isto" ela acabou de ler e aprovar: não pergunte de novo, nem como confirmação (no pré-teste, a etapa 1 abriu perguntando o nome e a cidade que já estavam na lista). As duas listas têm no máximo 6 linhas cada: junte assuntos se precisar.
+**Ao terminar** (depois do "ok" ou das correções dela): grave as correções e, na mesma mensagem, abra a etapa 1 com a primeira pergunta do que falta (sem perguntar se ela quer seguir). **Não prometa um número de perguntas.** Daí em diante, as etapas perguntam só o que está em "Falta isto". O que está em "Já sei isto" ela já leu e conferiu: não pergunte de novo, nem como confirmação.
 
 ---
 
