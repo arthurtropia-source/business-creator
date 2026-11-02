@@ -34,8 +34,8 @@ const CONCLUIDA = BASE_CAMP.replace('em andamento |', 'aprovado |')
       '- Escreva a mensagem de retorno para o cliente, no meu jeito',
       '- Monte a lista do que conferir no fechamento',
       '- Resuma o que está parado nas minhas frentes',
-      'Feita: a mensagem de retorno · ela gostou',
-      'Combinado: amanhã, às 8h, antes dos e-mails, abrir esta pasta e pedir a lista do fechamento.',
+      '**Feita:** a mensagem de retorno · ela gostou',
+      '**Combinado:** amanhã, às 8h, antes dos e-mails, abrir esta pasta e pedir a lista do fechamento.',
     ].join('\n'),
   )
 
@@ -143,10 +143,10 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     expect(await ui.find({ type: 'Text', text: /^Montagem do Base Camp$/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /^Business Creator powered by SEM IA™ · Um sistema, qualquer IA\.$/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /Base Camp by/ })).toBeUndefined()
-    expect(await ui.find({ type: 'Text', text: /PASSO 1 DE 2 · O RETRATO/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /PASSO 2 DE 3 · O RETRATO/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /você só confirma ou corrige/ })).toBeDefined()
     // Em curso, a subida é uma linha só; o destaque é o andamento da etapa (0.2.7).
-    expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toContain('● 1')
+    expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toContain('● O retrato')
     // O retrato: o painel mostra o que já foi montado (a página sobre você existe no fixture) e o teste.
     expect(await ui.find({ type: 'Text', text: /O QUE JÁ ESTÁ MONTADO · 2 DE 9/ })).toBeDefined()
     expect((await ui.find({ type: 'Text', text: /A página sobre você/ }))?.text).toContain('✓')
@@ -154,7 +154,7 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     // O cartão Agora (0.2.11): Continuar, Quero corrigir e Travei; nada de ler em voz alta.
     expect(await ui.findAll({ type: 'Button' })).toHaveLength(3)
     expect(await ui.find({ type: 'Button', key: 'voz' })).toBeUndefined()
-    expect(await ui.find({ type: 'Text', text: /AGORA · PASSO 1 DE 2/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /AGORA · PASSO 2 DE 3 · O RETRATO/ })).toBeDefined()
 
     await ui.press({ key: 'travei' })
     expect(enviados).toContain('travei')
@@ -341,7 +341,7 @@ for (const surface of ['desktop', 'terminal'] as const) {
       component: 'AbovePrompt',
       props: { hasSurvey: false, isWorking: false, maxRows: 10, bodyColumns: 80, scroll: { offset: 0, bodyRows: 10 }, view: {} },
     })
-    expect(await ui.find({ type: 'Text', text: /Passo 1 de 2 · O retrato/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /Passo 2 de 3 · O retrato/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /sua vez: responda acima/ })).toBeDefined()
     await ui.unmount()
   })

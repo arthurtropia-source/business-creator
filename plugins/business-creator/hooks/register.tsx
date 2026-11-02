@@ -207,12 +207,15 @@ function lerBaseCamp(texto: string) {
   const iniciada = !/\*\*Montagem:\*\*\s*não começou/i.test(texto) || blocos.some(b => b.status !== 'pendente')
   const linhas = secao(texto, 'Primeiras tarefas').split('\n').map(l => l.trim())
   const tarefas = linhas
-    .filter(l => /^- \S/.test(l) && !/^- (Feita|Combinado)\b/i.test(l))
+    .filter(l => /^- \S/.test(l) && !/^- \**(Feita|Combinado)\b/i.test(l))
     .map(l => l.slice(2).trim())
     .slice(0, 3)
-  const feita = linhas.some(l => /^(- )?Feita:/i.test(l))
+  // "Feita:" e "Combinado:" podem vir em negrito (**Feita:**), como o roteiro manda escrever.
+  const feita = linhas.some(l => /^(- )?\**Feita:?\**:?/i.test(l))
   const combinado =
-    linhas.map(l => /^(?:- )?Combinado:\s*(.+)/i.exec(l)?.[1]?.trim()).find((x): x is string => Boolean(x)) ?? null
+    linhas
+      .map(l => /^(?:- )?\**Combinado:?\**:?\s*(.+)/i.exec(l)?.[1]?.trim().replace(/^\*+|\*+$/g, ''))
+      .find((x): x is string => Boolean(x)) ?? null
   const testeOk = /\*\*Quem sou eu:\*\*\s*passou/i.test(texto)
   const separacaoOk = /\*\*Separação entre frentes:\*\*\s*passou/i.test(texto)
   // A etapa 5 grava aqui onde ficou o cartão do primeiro workflow.
@@ -895,9 +898,10 @@ export const register: Register = on => {
     const atual = p.blocos.find(b => b.status === 'em andamento') ?? p.blocos.find(b => b.status === 'pendente')
     if (!atual) return next(e)
     const { Box, Text } = $.ui.resolve(e)
-    const total = p.blocos.filter(b => b.codigo !== 'D').length
-    const palavra = p.blocos.length === 3 ? 'Passo' : 'Etapa'
-    const etapa = atual.codigo === 'D' ? 'Começo' : `${palavra} ${atual.codigo} de ${total} · ${atual.nome}`
+    const curto = p.blocos.length === 3
+    const total = curto ? 3 : p.blocos.filter(b => b.codigo !== 'D').length
+    const numero = curto ? p.blocos.findIndex(b => b.codigo === atual.codigo) + 1 : atual.codigo
+    const etapa = atual.codigo === 'D' && !curto ? 'Começo' : `${curto ? 'Passo' : 'Etapa'} ${numero} de ${total} · ${atual.nome}`
     const ocupado = e.props.isWorking || (await read($, trabalhando))
     const vez = ocupado
       ? 'o sistema está escrevendo…'
@@ -1010,7 +1014,7 @@ export const register: Register = on => {
         {dado.blocos
           .map(b => {
             const atual = !dado.concluida && atualBloco?.codigo === b.codigo
-            return `${atual ? '●' : b.status === 'aprovado' || b.status === 'pulado' ? '✓' : '○'} ${b.codigo === 'D' ? 'Começo' : b.codigo}`
+            return `${atual ? '●' : b.status === 'aprovado' || b.status === 'pulado' ? '✓' : '○'} ${b.codigo === 'D' ? 'Começo' : dado.blocos.length === 3 ? b.nome : b.codigo}`
           })
           .join('   ')}
       </Text>
@@ -1105,7 +1109,9 @@ export const register: Register = on => {
     const ver = await read($, verArquivo)
     const textoArquivo = await read($, arquivoTexto)
     const sabidos = dado.campos.filter(c => c.estado === 'ok').length
-    const total = dado.blocos.filter(b => b.codigo !== 'D').length
+    const curto = dado.blocos.length === 3
+    const total = curto ? 3 : dado.blocos.filter(b => b.codigo !== 'D').length
+    const numero = curto && atualBloco ? dado.blocos.findIndex(b => b.codigo === atualBloco.codigo) + 1 : atualBloco?.codigo
     const ehEntrega = atualBloco !== undefined && atualBloco.codigo === dado.blocos[dado.blocos.length - 1]?.codigo
     const ehComeco = atualBloco?.codigo === 'D'
     const lembrete = (await read($, parado)) && !ocupado
@@ -1120,9 +1126,9 @@ export const register: Register = on => {
         <Box flexDirection="column" gap={1} borderStyle="round" borderColor={TINTA} padding={1}>
           <Text color={TINTA} size="caption">
             {atualBloco
-              ? atualBloco.codigo === 'D'
+              ? atualBloco.codigo === 'D' && !curto
                 ? 'AGORA · O COMEÇO'
-                : `AGORA · ${dado.blocos.length === 3 ? 'PASSO' : 'ETAPA'} ${atualBloco.codigo} DE ${total} · ${atualBloco.nome.toUpperCase()}`
+                : `AGORA · ${curto ? 'PASSO' : 'ETAPA'} ${numero} DE ${total} · ${atualBloco.nome.toUpperCase()}`
               : 'AGORA'}
           </Text>
           {ocupado ? (

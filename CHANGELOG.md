@@ -2,6 +2,11 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.2.13 (02/11/2026)
+Dois defeitos do painel vistos no teste do Arthur com a 0.2.12 (02/11).
+- **"O que este passo entrega · 0 de 2" com a tarefa já feita:** o painel só reconhecia "Feita:" e "Combinado:" sem negrito, e o roteiro manda escrever em negrito. Agora lê os dois jeitos.
+- **A numeração dos passos:** o painel dizia "passo 2 de 2" e a conversa "passo 2 de 3". No Base Camp curto o começo é o passo 1 de 3; o painel, a faixa e a linha de progresso passam a contar assim, com o nome do passo.
+
 ## 0.2.12 (01/11/2026)
 **O Base Camp curto** (proposta `laboratorio-os/propostas/2026-11-01-base-camp-curto.md`, as 5 decisões aprovadas pelo Arthur em 01/11: "pode aprovar, gostei da visão"). A montagem pela regra padrão do onboarding: curta, com o valor na próxima coisa que a pessoa já ia fazer.
 - **3 passos e um "confirmo"** (montagem 3.0, roteiro 3.0): o começo (os 2 pedidos de sempre; quem não usa outra IA conta por voz em 4 tópicos); **o retrato, montado de uma vez** pelo sistema, sem perguntar (quem é, as frentes e fichas, como gosta de receber, as 7 regras, o computador, o arquivo principal e o primeiro workflow, escolhido pelo sistema pelos critérios de sempre), mostrado em cartões no painel e confirmado numa resposta só, com o teste "quem sou eu" rodando sozinho; **a primeira tarefa, proposta pelo sistema e já feita**, com o combinado proposto e preso ao gatilho do workflow.
