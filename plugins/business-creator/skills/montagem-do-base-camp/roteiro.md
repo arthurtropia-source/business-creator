@@ -1,6 +1,6 @@
 # Roteiro da Montagem do Base Camp
 
-> Versão 3.0 (01/11/2026), no plugin Business Creator 0.2.12: **o Base Camp curto**, em 3 passos e um "confirmo" (decisão do Arthur, 01/11/2026, pela regra padrão do onboarding: curto, com o valor na próxima coisa que a pessoa já ia fazer). As perguntas da montagem longa viraram a reserva do uso real: `perguntas-do-uso-real.md`.
+> Versão 3.1 (02/11/2026), no plugin Business Creator 0.2.14: **o Base Camp curto**, em 3 passos e um "confirmo" (decisão do Arthur, 01/11/2026, pela regra padrão do onboarding: curto, com o valor na próxima coisa que a pessoa já ia fazer). As perguntas da montagem longa viraram a reserva do uso real: `perguntas-do-uso-real.md`.
 > Para a pessoa, as partes são **passos** ("passo 2 de 3"). Os códigos internos: **D** (o começo), **1** (o retrato), **2** (a primeira tarefa). Tempo-alvo total: 20 a 35 minutos, dos quais 5 a 15 são dela no começo.
 > **[leve]** = vale também no nível leve. No curto, a diferença entre os níveis é só o mapa das frentes: no leve, até 2 frentes e sem pasta por frente.
 
@@ -110,14 +110,21 @@ Os pontos em dúvida são os deduzidos pela outra IA, os com mais de 3 meses ou 
 ## Passo 2: a primeira tarefa feita, e o combinado (5 a 10 min) [leve]
 **Arquivos:** o resultado da tarefa em `frentes/<frente>/modelos/` (no leve, `modelos/`), `como-usar.md` (modelo `como-usar.md`), `resumo-para-o-arthur.md` (modelo `resumo-para-o-arthur.md`), `base-camp.md` concluído.
 
-2.1 [leve] **Uma tarefa, proposta por você, e já feita** (decisão do Arthur, 01/11/2026: "o sistema propõe uma e já faz"). Escolha a menor tarefa real que cabe em 5 minutos e mostra o sistema trabalhando do jeito dela: de preferência um passo do primeiro workflow com um caso real que ela citou, ou o que ela mais pediu à outra IA. Nada que mande algo para fora do computador nem que use dados da empresa sem autorização. Faça, seguindo as regras dela (o formato, o sigilo, o rascunho em vez do envio; se mexer em arquivo ou planilha, a skill `rotinas-e-computador`). Na conversa:
-> "Fiz a sua primeira tarefa: <o quê, em uma linha>, do seu jeito.
+2.1 [leve] **As opções da primeira tarefa, todas de uma vez, com uma recomendada** (decisão do Arthur, 02/11/2026, depois do teste: "era melhor que já viessem todas essas sugestões, uma recomendada e outras adicionais"; substitui o "o sistema propõe uma e já faz" de 01/11). Escolha **3 tarefas reais e pequenas** (cabem em 5 minutos), tiradas do que ela contou: de preferência um passo do primeiro workflow com um caso real que ela citou, o que ela mais pediu à outra IA, ou algo de outra frente que ela toca. **Critério que não se negocia: a tarefa tem de sair pronta de verdade, com o que está na pasta e na conversa.** Nada de modelo com campos em branco, nada que precise de dado que não está aqui (planilha, sistema, BI), nada que mande algo para fora do computador nem use dados da empresa sem autorização. A recomendada é a que mais mostra o sistema trabalhando do jeito dela, com o menor risco de errar.
+- **Antes de falar, grave as 3 no `base-camp.md`**, em "Primeiras tarefas", uma por linha, começando com "- ", a recomendada primeiro, cada uma com até 70 caracteres e começando pelo verbo ("Escrever a mensagem de retorno para o cliente de ontem"). O painel mostra cada uma como um botão, a primeira em destaque.
+- Na conversa:
+> "Para a sua primeira tarefa, três opções do que você me contou. A que eu recomendo é a primeira: <por quê, em uma linha>.
+> ---
+> **Clique no painel na tarefa que você quer, ou diga qual.**"
+- Sem o painel (celular, terminal), liste as 3 numeradas antes do `---` e peça o número.
+- **Ao clique ou à escolha, faça na hora**, seguindo as regras dela (o formato, o sigilo, o rascunho em vez do envio; se mexer em arquivo, a skill `rotinas-e-computador`). Se ela pedir uma tarefa que não está na lista, faça essa. Na conversa:
+> "Feita: <o quê, em uma linha>, do seu jeito.
 > <o resultado, inteiro se couber em 15 linhas; senão, o começo e onde ficou>
 > Guardei como modelo. **Combinado:** quando <o começo do workflow> chegar, abra esta pasta e escreva **<o pedido curto>**.
 > ---
-> **Ficou bom? Se preferir outra tarefa, diga qual.**"
-- Grave a tarefa e o combinado no `base-camp.md`, em "Primeiras tarefas": a linha "- <a tarefa>", a linha **Feita:** (sem traço) e a linha **Combinado:** (sem traço). O combinado é proposto por você, preso ao gatilho do workflow (quando a tarefa chegar), com o pedido curto que ela vai escrever; ela só corrige se quiser.
-- Se ela pedir outra tarefa, faça a outra e troque a linha. Se ela corrigir o resultado, corrija, mostre o trecho e grave a correção como regra no `memoria.md` e no cartão do workflow, em "O que o sistema aprendeu".
+> **Ficou bom?**"
+- Grave no `base-camp.md`, em "Primeiras tarefas", a linha **Feita:** (sem traço) com qual foi e o que ela achou, e a linha **Combinado:** (sem traço). O combinado é proposto por você, preso ao gatilho do workflow, com o pedido curto que ela vai escrever; ela só corrige se quiser. As outras duas tarefas ficam na lista: o painel as mostra depois como "Peça ao seu sistema".
+- Se ela corrigir o resultado, corrija, mostre o trecho e grave a correção como regra no `memoria.md` e no cartão do workflow, em "O que o sistema aprendeu". Se não gostar da tarefa, faça outra da lista.
 
 2.2 [leve] **Sem perguntar, na mesma resposta do "ficou bom":** escreva `como-usar.md` (com o combinado e o pedido curto em "Pedidos que já funcionam") e `resumo-para-o-arthur.md`; tire do `AGENTS.md` da raiz a seção "Montagem em andamento"; marque tudo como concluído no `base-camp.md`, com a soma dos tempos; e mande:
 > "**Base Camp montado**, em <n> minutos. O seu sistema já sabe quem você é, o que você toca e como você trabalha, e já fez a primeira tarefa para você. O guia de bolso e o resumo para o Arthur estão no painel.

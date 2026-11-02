@@ -2,6 +2,12 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.2.14 (02/11/2026)
+A primeira tarefa com opções, todas de uma vez (correção do Arthur no teste de 02/11: a tarefa única "não foi muito assertiva"; "era melhor que já viessem todas essas sugestões, uma recomendada e outras adicionais"; substitui a decisão 3 de 01/11).
+- **No passo 2, o sistema grava 3 tarefas no `base-camp.md` e o painel as mostra como botões no cartão Agora**, a recomendada em destaque; a conversa diz por que recomenda a primeira e pede o clique. Ao clique, a tarefa é feita na hora (montagem 3.1, roteiro 3.1).
+- **Critério novo para as tarefas:** têm de sair prontas de verdade com o que está na pasta e na conversa; nada de modelo com campos em branco nem de tarefa que dependa de dado que não está ali (no teste, a tarefa única saiu como modelo vazio porque o dado do BI não está na pasta).
+- Regra geral da montagem: opções, quando houver, vêm todas de uma vez, a recomendada primeiro; nunca uma proposta por vez.
+
 ## 0.2.13 (02/11/2026)
 Dois defeitos do painel vistos no teste do Arthur com a 0.2.12 (02/11).
 - **"O que este passo entrega · 0 de 2" com a tarefa já feita:** o painel só reconhecia "Feita:" e "Combinado:" sem negrito, e o roteiro manda escrever em negrito. Agora lê os dois jeitos.

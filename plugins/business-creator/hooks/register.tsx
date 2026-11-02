@@ -1139,6 +1139,19 @@ export const register: Register = on => {
             <Text bold color={ROCHA}>{perguntaDaVez ? `Sua vez: ${perguntaDaVez}` : 'Sua vez: responda na conversa.'}</Text>
           )}
           {atualBloco && PARA_QUE[atualBloco.codigo] && !aprov && <Text color={CINZA} size="caption">{PARA_QUE[atualBloco.codigo]}</Text>}
+          {curto && ehEntrega && !dado.feita && dado.tarefas.length > 0 && !ocupado && !pendente && (
+            <Box flexDirection="column" gap={1}>
+              <Text color={CINZA} size="caption">A PRIMEIRA TAREFA · ESCOLHA UMA (A PRIMEIRA É A RECOMENDADA)</Text>
+              {dado.tarefas.map((t, i) => (
+                <Button
+                  key={`escolha-${i}`}
+                  variant={i === 0 ? 'primary' : undefined}
+                  label={t.length > 70 ? `${t.slice(0, 67)}…` : t}
+                  onPress={() => void enviar($, `primeira tarefa: ${t}`)}
+                />
+              ))}
+            </Box>
+          )}
           {pendente ? aviso : !ocupado && (
             <Box flexDirection="row" gap={1}>
               {aprov ? (
