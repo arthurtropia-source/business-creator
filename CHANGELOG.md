@@ -2,6 +2,12 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.2.15 (02/11/2026)
+Erro do teste do Arthur (02/11): ele escolheu outro workflow, disse para rodar, e o Campo 1 abriu o sugerido.
+- **O Campo 1 abre só o workflow da linha "Primeiro workflow" do `base-camp.md`**, nunca o que a conversa ou o resumo diziam antes; se a pessoa nomear outro no pedido, a linha troca antes de abrir.
+- **A última escolha dela manda e vira arquivo na hora:** ao trocar o workflow (ou a tarefa, o combinado, um dado), tudo que o cita muda junto antes da resposta (o `base-camp.md`, o cartão, a ficha da frente, o `resumo.md`).
+- **As alternativas de workflow vêm junto com o retrato**, como botões no painel (duas linhas "Alternativa:" no cartão do resumo); o clique troca o primeiro workflow (montagem 3.2, roteiro 3.2).
+
 ## 0.2.14 (02/11/2026)
 A primeira tarefa com opções, todas de uma vez (correção do Arthur no teste de 02/11: a tarefa única "não foi muito assertiva"; "era melhor que já viessem todas essas sugestões, uma recomendada e outras adicionais"; substitui a decisão 3 de 01/11).
 - **No passo 2, o sistema grava 3 tarefas no `base-camp.md` e o painel as mostra como botões no cartão Agora**, a recomendada em destaque; a conversa diz por que recomenda a primeira e pede o clique. Ao clique, a tarefa é feita na hora (montagem 3.1, roteiro 3.1).

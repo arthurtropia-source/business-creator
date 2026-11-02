@@ -1117,6 +1117,11 @@ export const register: Register = on => {
     const lembrete = (await read($, parado)) && !ocupado
     const nomeAprov = aprov?.arquivo ? nomeDoArquivo(aprov.arquivo) : null
     const perguntaDaVez = ocupado ? null : await read($, pergunta)
+    // As alternativas de workflow do cartão do resumo (linhas "Alternativa: …"), para o clique no passo 1.
+    const cartaoWorkflow = dado.resumo?.cartoes.find(c => /primeiro workflow/i.test(c.titulo))
+    const alternativas = (cartaoWorkflow?.linhas ?? [])
+      .map(l => /^Alternativa:\s*(.+)$/i.exec(l.texto)?.[1]?.trim())
+      .filter((x): x is string => Boolean(x))
 
     return (
       <Box {...fundo}>
@@ -1139,6 +1144,14 @@ export const register: Register = on => {
             <Text bold color={ROCHA}>{perguntaDaVez ? `Sua vez: ${perguntaDaVez}` : 'Sua vez: responda na conversa.'}</Text>
           )}
           {atualBloco && PARA_QUE[atualBloco.codigo] && !aprov && <Text color={CINZA} size="caption">{PARA_QUE[atualBloco.codigo]}</Text>}
+          {curto && atualBloco?.codigo === '1' && !ocupado && !pendente && alternativas.length > 0 && (
+            <Box flexDirection="column" gap={1}>
+              <Text color={CINZA} size="caption">PREFERE OUTRO PRIMEIRO WORKFLOW? CLIQUE NELE</Text>
+              {alternativas.map((t, i) => (
+                <Button key={`alternativa-${i}`} label={t.length > 70 ? `${t.slice(0, 67)}…` : t} onPress={() => void enviar($, `primeiro workflow: ${t}`)} />
+              ))}
+            </Box>
+          )}
           {curto && ehEntrega && !dado.feita && dado.tarefas.length > 0 && !ocupado && !pendente && (
             <Box flexDirection="column" gap={1}>
               <Text color={CINZA} size="caption">A PRIMEIRA TAREFA · ESCOLHA UMA (A PRIMEIRA É A RECOMENDADA)</Text>

@@ -1,6 +1,6 @@
 # Roteiro da Montagem do Base Camp
 
-> Versão 3.1 (02/11/2026), no plugin Business Creator 0.2.14: **o Base Camp curto**, em 3 passos e um "confirmo" (decisão do Arthur, 01/11/2026, pela regra padrão do onboarding: curto, com o valor na próxima coisa que a pessoa já ia fazer). As perguntas da montagem longa viraram a reserva do uso real: `perguntas-do-uso-real.md`.
+> Versão 3.2 (02/11/2026), no plugin Business Creator 0.2.15: **o Base Camp curto**, em 3 passos e um "confirmo" (decisão do Arthur, 01/11/2026, pela regra padrão do onboarding: curto, com o valor na próxima coisa que a pessoa já ia fazer). As perguntas da montagem longa viraram a reserva do uso real: `perguntas-do-uso-real.md`.
 > Para a pessoa, as partes são **passos** ("passo 2 de 3"). Os códigos internos: **D** (o começo), **1** (o retrato), **2** (a primeira tarefa). Tempo-alvo total: 20 a 35 minutos, dos quais 5 a 15 são dela no começo.
 > **[leve]** = vale também no nível leve. No curto, a diferença entre os níveis é só o mapa das frentes: no leve, até 2 frentes e sem pasta por frente.
 
@@ -89,6 +89,8 @@ Grave no `base-camp.md`, logo abaixo da linha **Montagem:**, a linha `- **Primei
 ### O primeiro workflow (sugerido)
 - <o nome; do começo à entrega em uma linha; por que este>
 - <"hoje leva <antes>, <vezes> por mês (estimativa)">
+- Alternativa: <o nome de outra candidata, em uma linha>
+- Alternativa: <mais uma, se houver>
 ### Aonde quer chegar
 
 ## Falta isto
@@ -102,6 +104,7 @@ Os pontos em dúvida são os deduzidos pela outra IA, os com mais de 3 meses ou 
 > **Corrija o que quiser, numa resposta só, escrevendo ou por voz. Se estiver tudo certo, escreva confirmo.**"
 - Sem o painel (celular, terminal), mande antes do `---` os cartões em até 10 linhas.
 - **Sem caixa de opções e sem pergunta item por item** (decisão do Arthur, 31/10/2026). O que ela não corrigir vale.
+- **As alternativas de workflow vêm junto, não depois** (regra do Arthur, 02/11/2026: opções todas de uma vez, a recomendada primeiro): as duas linhas "Alternativa:" do cartão viram botões no painel; o clique manda "primeiro workflow: <nome>". **Se ela escolher outro workflow** (pelo botão, nas correções ou a qualquer momento depois), o escolhido por ela passa a ser o primeiro, e tudo muda junto, antes de qualquer outra coisa: grave o cartão dele (modelo `workflow.md`), troque a linha **Primeiro workflow** do `base-camp.md`, ponha o sugerido como "o próximo" na tabela "Workflows" da ficha da frente e refaça o cartão "O primeiro workflow" do `resumo.md`. A última escolha dela manda; nunca volte ao sugerido (no teste de 02/11, o Campo 1 abriu o sugerido depois de ela escolher outro).
 
 **Ao "confirmo" ou às correções:** grave as correções nos arquivos e no `resumo.md` (tire o `(?)` do que ela confirmou; apague o que não vale mais; o que ela corrigiu entra como `[confirmado]`); o que ela não tocou vira `[memória de outra IA, confirmado em <data>]`. Marque o passo 1 "aprovado" e abra o passo 2 na mesma resposta. Se ela aprovar sem ler ("confirmo" em menos de um minuto, ou dizendo que não leu), anote em "Pedidos sobre o kit": "retrato confirmado sem ler".
 

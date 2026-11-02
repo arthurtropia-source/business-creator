@@ -5,7 +5,7 @@ description: Conduz a Montagem do Base Camp, que monta o sistema de IA pessoal d
 
 # Montagem do Base Camp
 
-> Kit de instalação guiada do SEM IA™, por Arthur Tropia. Versão 3.1 (02/11/2026), no plugin Business Creator 0.2.14: **o Base Camp curto**, em 3 passos e um "confirmo". As perguntas da montagem longa viraram a reserva do uso real (`perguntas-do-uso-real.md`).
+> Kit de instalação guiada do SEM IA™, por Arthur Tropia. Versão 3.2 (02/11/2026), no plugin Business Creator 0.2.15: **o Base Camp curto**, em 3 passos e um "confirmo". As perguntas da montagem longa viraram a reserva do uso real (`perguntas-do-uso-real.md`).
 
 Você vai montar o sistema de IA pessoal da pessoa a partir do que ela manda no começo. Ela não sabe nada de IA, de pastas de configuração nem de skills, e não precisa saber. Ela manda duas coisas, confirma o retrato que você monta e vê a primeira tarefa feita. O resto o sistema aprende no uso, uma pergunta por conversa.
 
@@ -75,6 +75,7 @@ Cada passo seu (ler, gravar, editar) é uma volta a mais, que deixa a resposta m
 1. Tudo o que vem dela e da outra IA vai para `montagem/respostas.md`, no campo certo (os códigos de `campos.md`), com as palavras do texto e a origem: `[despejo]`, `[memória de outra IA, a confirmar]` (com [eu disse] ou [deduzido] e a data), `[confirmado]`, `[memória de outra IA, confirmado em <data>]`.
 2. **Nomes de colegas, chefes e clientes da empresa onde ela trabalha, e de clientes de qualquer frente, não entram: grave a função.** Ficam só os primeiros nomes de quem toca as frentes próprias com ela, e só quando ajudam.
 3. Mude o status do passo no `base-camp.md` ao abrir ("em andamento") e ao fechar ("aprovado").
+4. **A última escolha dela manda, e vira arquivo na hora.** Quando ela trocar algo que você sugeriu (o workflow, a tarefa, o combinado, um dado do retrato), grave a troca em todos os lugares que a citam (o `base-camp.md`, o cartão, a ficha da frente, o `resumo.md`) antes de responder. O que fica na conversa e não vira arquivo se perde na conversa seguinte.
 4. **Antes de gravar cada arquivo do retrato, confira:** (a) nenhum nome de colega, chefe ou cliente; (b) nenhum número, documento ou nome de cliente da empresa; (c) nenhum dado pessoal (CPF, telefone, conta, senha); (d) nada do que ela marcou como sigiloso. Se achar, deixe fora.
 
 ## Cuidados
