@@ -3,7 +3,7 @@ import type { EngineInterface, Register, RenderSurface } from 'claude-code'
 
 import type { Bloco, Campo, Festa, Montado, Nivel, Painel, Resumo, Status } from '../types'
 
-// Painel da Montagem do Base Camp (v0.5.1). Veste a montagem com a marca e tira a
+// Painel da Montagem do Base Camp (v0.6, plugin 0.2.16). Veste a montagem com a marca e tira a
 // barreira técnica: mostra a subida, de quem é a vez e o que o sistema já sabe,
 // dá os botões de aprovar e corrigir e troca as linhas técnicas do app por
 // frases simples. Lê os arquivos da pasta da pessoa e não grava nada nela.
@@ -28,6 +28,8 @@ const turno = atom({ plugin: 'business-creator', key: 'turno' } as const, null)
 const trabalhando = atom({ plugin: 'business-creator', key: 'trabalhando' } as const, false)
 const atividade = atom({ plugin: 'business-creator', key: 'atividade' } as const, null)
 const palavra = atom({ plugin: 'business-creator', key: 'palavra' } as const, null)
+// A última coisa que a montagem fez, com a hora: a pessoa sabe o que acabou de acontecer (0.2.16).
+const ultimaAcao = atom({ plugin: 'business-creator', key: 'ultimaAcao' } as const, null)
 // A resposta terminou pedindo aprovação, e o último arquivo do sistema gravado nela.
 const aprovacao = atom({ plugin: 'business-creator', key: 'aprovacao' } as const, null)
 const ultimo = atom({ plugin: 'business-creator', key: 'ultimo' } as const, null)
@@ -212,15 +214,33 @@ function lerBaseCamp(texto: string) {
     .slice(0, 3)
   // "Feita:" e "Combinado:" podem vir em negrito (**Feita:**), como o roteiro manda escrever.
   const feita = linhas.some(l => /^(- )?\**Feita:?\**:?/i.test(l))
+  // A linha "Feita:" começa pelo texto da tarefa (roteiro 3.3): essa sai de "Peça ao seu sistema".
+  // Com uma tarefa só, não sobra nenhuma; sem casar com nenhuma das três, ficam todas (como antes).
+  const linhaFeita = linhas
+    .map(l => /^(?:- )?\**Feita:?\**:?\s*(.+)/i.exec(l)?.[1]?.toLowerCase() ?? '')
+    .find(Boolean) ?? ''
+  const chaveFeita = linhaFeita.split(/ · | em \d|;|\(/)[0]?.trim() ?? ''
+  const restantes = !feita
+    ? tarefas
+    : tarefas.length === 1
+      ? []
+      : tarefas.filter(t => {
+          const tarefa = t.toLowerCase()
+          const casa = (chaveFeita.length >= 8 && tarefa.includes(chaveFeita)) || linhaFeita.includes(tarefa.slice(0, 25))
+          return !casa
+        })
   const combinado =
     linhas
       .map(l => /^(?:- )?\**Combinado:?\**:?\s*(.+)/i.exec(l)?.[1]?.trim().replace(/^\*+|\*+$/g, ''))
       .find((x): x is string => Boolean(x)) ?? null
   const testeOk = /\*\*Quem sou eu:\*\*\s*passou/i.test(texto)
+  // O teste que não passou: o roteiro grava "não passou: <o motivo>" (0.2.16); sem o motivo, fica só "não passou".
+  const falha = /\*\*Quem sou eu:\*\*\s*n[ãa]o passou:?[ \t]*(.*)/i.exec(texto)
+  const testeFalhou = falha ? (falha[1] ?? '').trim() : null
   const separacaoOk = /\*\*Separação entre frentes:\*\*\s*passou/i.test(texto)
   // A etapa 5 grava aqui onde ficou o cartão do primeiro workflow.
   const workflow = /\*\*Primeiro workflow:\*\*\s*`?([^`\n]+?)`?\s*$/m.exec(texto)?.[1]?.trim() || null
-  return { nivel, iniciada, concluida, blocos, tarefas, feita, combinado, testeOk, separacaoOk, workflow }
+  return { nivel, iniciada, concluida, blocos, tarefas, restantes, feita, combinado, testeOk, testeFalhou, separacaoOk, workflow }
 }
 
 // O resumo do que o sistema já sabe (montagem/resumo.md): cartões por assunto e o que falta (0.2.10).
@@ -244,6 +264,16 @@ function lerResumo(texto: string): Resumo | null {
     }
   }
   return cartoes.length || falta.length ? { cartoes, falta } : null
+}
+
+// O primeiro nome da pessoa, pela primeira linha do cartão "Quem você é" do resumo (0.2.16): o que vem
+// antes da vírgula, sem o "você é a" que a frase pode trazer, só a primeira palavra. Se não parecer um
+// nome (minúscula, uma letra), o painel diz "O seu sistema".
+function primeiroNome(r: Resumo | null): string | null {
+  const linha = r?.cartoes.find(c => /quem voc[êe] [ée]/i.test(c.titulo))?.linhas[0]?.texto ?? ''
+  const antes = linha.split(/[,;:·(]/)[0] ?? ''
+  const nome = antes.replace(/^(voc[êe] [ée]|eu sou|sou)\s+(a|o)?\s*/i, '').trim().split(/\s+/)[0] ?? ''
+  return /^[A-ZÀ-Ý][A-Za-zÀ-ÿ'-]+$/.test(nome) ? nome : null
 }
 
 // A pergunta da vez, tirada da resposta: o que vem depois do último separador, a última frase com "?".
@@ -413,11 +443,14 @@ function naRota(t: number): [number, number] {
   return [x, y]
 }
 
+// A trilha conta a base (a pasta aberta e o kit no lugar) como o primeiro ponto, já feito (0.2.16):
+// ninguém começa do zero. Os passos vêm depois dela.
 function progresso(p: Painel): number {
   if (p.concluida) return 1
-  if (!p.iniciada) return 0
+  const pontos = marcas(p.blocos.length + 1)
+  if (!p.iniciada) return pontos[0] ?? 0
   const i = p.blocos.findIndex(b => b.status === 'em andamento' || b.status === 'pendente')
-  return marcas(p.blocos.length)[Math.max(0, i)] ?? 0
+  return pontos[Math.max(0, i) + 1] ?? 0
 }
 
 function quadrado(x: number, y: number, lado: number, extra: string): string {
@@ -426,7 +459,8 @@ function quadrado(x: number, y: number, lado: number, extra: string): string {
 
 function trilhaSvg(p: Painel, f: Festa | null): string {
   const prog = progresso(p)
-  const atual = p.concluida ? -1 : Math.max(0, p.blocos.findIndex(b => b.status === 'em andamento' || b.status === 'pendente'))
+  // O ponto 0 é a base; o passo i da tabela é o ponto i + 1.
+  const atual = p.concluida ? -1 : Math.max(0, p.blocos.findIndex(b => b.status === 'em andamento' || b.status === 'pendente')) + 1
   const caminho = `M${APROX[0].join(' ')} C${APROX[1].join(' ')} ${APROX[2].join(' ')} ${APROX[3].join(' ')}`
   const rota = `M${ROTA[0].join(' ')} Q${ROTA[1].join(' ')} ${ROTA[2].join(' ')}`
   const de = f ? (100 - f.anterior * 100).toFixed(1) : '100'
@@ -456,10 +490,10 @@ function trilhaSvg(p: Painel, f: Festa | null): string {
     const fim = (100 - prog * 100).toFixed(1)
     s += `<path d="${caminho}" pathLength="100" fill="none" stroke="${TINTA}" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="100" stroke-dashoffset="${fim}"${f ? ' class="anda"' : ''}/>`
   }
-  marcas(p.blocos.length).forEach((t, i) => {
+  marcas(p.blocos.length + 1).forEach((t, i) => {
     const [x, y] = ponto(t)
-    const b = p.blocos[i]
-    const feito = p.concluida || (b !== undefined && (b.status === 'aprovado' || b.status === 'pulado'))
+    const b = i === 0 ? undefined : p.blocos[i - 1]
+    const feito = i === 0 || p.concluida || (b !== undefined && (b.status === 'aprovado' || b.status === 'pulado'))
     if (i === atual) {
       s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="none" stroke="${TINTA}" stroke-width="1.4" opacity=".25"${f ? ' class="pulso"' : ''}/>`
       s += quadrado(x, y, 10, `fill="${PAPEL}" stroke="${TINTA}" stroke-width="2.4"`)
@@ -523,28 +557,31 @@ async function carregar($: EngineInterface) {
     let campos: Campo[] = []
     const ultima = base.blocos[base.blocos.length - 1]?.codigo
     const curto = base.blocos.length === 3
+    const ok = (x: boolean): Campo['estado'] => (x ? 'ok' : 'falta')
+    // O teste "quem sou eu": passou, falta, ou não passou com o motivo (0.2.16).
+    const teste = (codigo: string): Campo =>
+      base.testeFalhou !== null
+        ? { codigo, rotulo: 'O teste: quem sou eu', estado: 'falhou', motivo: base.testeFalhou }
+        : { codigo, rotulo: 'O teste: quem sou eu', estado: ok(base.testeOk) }
     if (curto && atual?.codigo === '1' && !base.concluida) {
       // O retrato (0.2.12): o painel mostra o que já foi montado e o teste.
-      const ok = (x: boolean): Campo['estado'] => (x ? 'ok' : 'falta')
       campos = [
         ...montado.map(m => ({ codigo: `1.${m.rotulo}`, rotulo: m.rotulo, estado: ok(m.ok) })),
         { codigo: '1.computador', rotulo: 'O seu computador, conferido', estado: ok(await existe($, `${dir}/contexto/computador.md`)) },
-        { codigo: '1.teste', rotulo: 'O teste: quem sou eu', estado: ok(base.testeOk) },
+        teste('1.teste'),
       ]
     } else if (curto && atual?.codigo === '2' && !base.concluida) {
-      const ok = (x: boolean): Campo['estado'] => (x ? 'ok' : 'falta')
       campos = [
         { codigo: '2.tarefa', rotulo: 'A primeira tarefa feita', estado: ok(base.feita) },
         { codigo: '2.combinado', rotulo: 'O combinado', estado: ok(Boolean(base.combinado)) },
       ]
     } else if (atual && atual.codigo === ultima && !base.concluida) {
       // A última etapa não pergunta: entrega. O painel mostra o que falta entregar.
-      const ok = (x: boolean): Campo['estado'] => (x ? 'ok' : 'falta')
       const e = atual.codigo
       campos = [
         { codigo: `${e}.1`, rotulo: 'As regras da casa', estado: ok(await existe($, `${dir}/memoria.md`)) },
         { codigo: `${e}.2`, rotulo: 'O arquivo principal', estado: ok(principal) },
-        { codigo: `${e}.3`, rotulo: 'O teste: quem sou eu', estado: ok(base.testeOk) },
+        teste(`${e}.3`),
         ...(base.nivel === 'completo'
           ? [{ codigo: `${e}.4`, rotulo: 'O teste: as frentes não se misturam', estado: ok(base.separacaoOk) }]
           : []),
@@ -555,7 +592,6 @@ async function carregar($: EngineInterface) {
     } else if (atual?.codigo === 'D' && !base.concluida) {
       // O começo não tem campos: o painel mostra os 2 pedidos da abertura e a conferência (0.2.7).
       const r = await lerTexto($, `${dir}/montagem/respostas.md`)
-      const ok = (x: boolean): Campo['estado'] => (x ? 'ok' : 'falta')
       campos = [
         { codigo: 'D.1', rotulo: 'Pedido 1: o que a outra IA já sabe de você', estado: ok(/\[memória de outra IA/.test(r)) },
         { codigo: 'D.2', rotulo: 'Pedido 2: você, com as suas palavras', estado: ok(/\[despejo\]/.test(r)) },
@@ -566,7 +602,7 @@ async function carregar($: EngineInterface) {
       campos = lerCampos(defs, await lerTexto($, `${dir}/montagem/respostas.md`), atual.codigo, base.nivel)
     }
     const sabido = lerResumo(await lerTexto($, `${dir}/montagem/resumo.md`))
-    novo = { ...base, ...proc, campos, montado, resumo: sabido }
+    novo = { ...base, ...proc, campos, montado, resumo: sabido, nome: primeiroNome(sabido) }
   }
   const anterior = await read($, painel)
   if (JSON.stringify(anterior) === JSON.stringify(novo)) return novo
@@ -595,11 +631,27 @@ async function celebrar($: EngineInterface, antes: Painel, depois: Painel) {
   $.clock.after(9000, () => void update($, festa, () => null))
 }
 
-// Parada há 4 minutos esperando a resposta dela: o painel lembra, sem pressa, do Travei e da voz.
+// A hora pelo relógio do app (nos testes, um relógio que o teste move); se ele não responder, a do sistema.
+async function agoraMs($: EngineInterface): Promise<number> {
+  try {
+    const t = await $.clock.now()
+    return typeof t === 'number' && Number.isFinite(t) && t > 0 ? t : Date.now()
+  } catch {
+    return Date.now()
+  }
+}
+
+function horaLocal(ms: number): string {
+  const d = new Date(ms)
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+}
+
+// Parada há 4 minutos esperando a resposta dela: pode ser o app que travou. O painel avisa e dá o
+// Tente novamente ao lado do Travei (0.2.16).
 async function vigiar($: EngineInterface) {
   const quando = await read($, fim)
   if (!quando || (await read($, parado)) || (await read($, trabalhando)) || !(await emMontagem($))) return
-  if (Date.now() - quando > 240000) await update($, parado, () => true)
+  if ((await agoraMs($)) - quando > 240000) await update($, parado, () => true)
 }
 
 async function enviar($: EngineInterface, texto: string) {
@@ -742,6 +794,7 @@ export const register: Register = on => {
     await limpar($)
     await update($, trabalhando, () => false)
     await update($, atividade, () => null)
+    await update($, ultimaAcao, () => null)
     const dado = await carregar($)
     if (dado) void $.ui.open({ id: PANE, title: TITULO })
     if (await existe($, `${e.cwd}/base-camp.md`)) {
@@ -787,8 +840,11 @@ export const register: Register = on => {
         ? entrada.pergunta.trim()
         : 'quem sou eu e quais são as minhas frentes?'
     await update($, atividade, () => 'Rodando o teste do Base Camp')
+    const resultado = await testar($, pergunta)
+    const hora = horaLocal(await agoraMs($))
+    await update($, ultimaAcao, () => ({ texto: 'Rodei o teste do Base Camp', hora }))
 
-    return { result: await testar($, pergunta) }
+    return { result: resultado }
   }).catch(() => ({ result: 'O teste não rodou. Use a conversa nova, como diz o roteiro.' }))
 
   // Observa (sem mudar nada) o que a montagem faz, para dizer na tela o que está
@@ -800,6 +856,11 @@ export const register: Register = on => {
     const f = frase(String(e.tool), entrada, dir)
     if (f) await update($, atividade, () => f.fazendo)
     const resultado = await next(e)
+    if (f) {
+      // O que acabou de acontecer, para o cartão Agora (0.2.16).
+      const hora = horaLocal(await agoraMs($))
+      await update($, ultimaAcao, () => ({ texto: f.feito, hora }))
+    }
     const caminho = typeof entrada.file_path === 'string' ? entrada.file_path : null
     if ((e.tool === 'Write' || e.tool === 'Edit') && caminho) {
       const rel = relativo(dir, caminho)
@@ -832,7 +893,8 @@ export const register: Register = on => {
     if (!(await naPastaDaSessao($))) return r
     await update($, trabalhando, () => false)
     await update($, atividade, () => null)
-    await update($, fim, () => Date.now())
+    const terminou = await agoraMs($)
+    await update($, fim, () => terminou)
     await update($, parado, () => false)
     const resposta = e.reason === 'answer' ? e.answer || r.text : ''
     const pede = resposta.toLowerCase().includes('está certo? pode corrigir')
@@ -947,12 +1009,19 @@ export const register: Register = on => {
         <Text color={ROCHA}>powered by SEM IA™</Text>
       </Box>
     )
-    const titulo = <Text bold color={TINTA} size="heading">Montagem do Base Camp</Text>
+    // Dois tamanhos só (0.2.16): a etiqueta e o texto. O título fica no tamanho do texto, em peso forte e na
+    // tinta. Depois do retrato confirmado, o painel passa a ser o sistema dela, pelo nome.
+    const retratoConfirmado = dado?.blocos.some(b => b.codigo === '1' && b.status === 'aprovado') ?? false
+    const nomeDoPainel = retratoConfirmado ? (dado?.nome ? `O sistema de ${dado.nome}` : 'O seu sistema') : 'Montagem do Base Camp'
+    const titulo = <Text bold color={TINTA}>{nomeDoPainel}</Text>
     const rodape = <Text color={CINZA} size="caption">{ASSINATURA} · Um sistema, qualquer IA.</Text>
+    // Espaço por relação (0.2.16): dentro de um cartão as linhas ficam coladas (sem gap); entre os itens de
+    // uma zona, 1; entre as zonas do painel, o dobro.
+    const ENTRE_ZONAS = 2
     const fundo = {
       flexDirection: 'column' as const,
       padding: 1,
-      gap: 1,
+      gap: ENTRE_ZONAS,
       backgroundColor: PAPEL,
       minHeight: e.surface === 'terminal' ? undefined : '100%',
     }
@@ -974,11 +1043,24 @@ export const register: Register = on => {
     const aprov = await read($, aprovacao)
     const fest = await read($, festa)
     const ic = await read($, icones)
+    const acao = await read($, ultimaAcao)
     const aberto = await read($, doc)
     const textoDoc = await read($, docTexto)
     const trilha = figura(trilhaSvg(dado, fest), 'A sua subida até o Base Camp', 300, Boolean(fest))
     const aviso = <Text color={CINZA} size="caption">Enviado: "{pendente}". Espere a resposta.</Text>
     const comemoracao = fest ? <Text bold color={TINTA}>✓ {fest.texto}</Text> : null
+    // Em cima, a marca de quem entrega e, colado, o título; a comemoração de uma etapa, quando há.
+    const cabecalho = (
+      <Box flexDirection="column">
+        {marca}
+        {titulo}
+        {comemoracao}
+      </Box>
+    )
+    // O que acabou de acontecer, com a hora (0.2.16).
+    const ultima = acao ? <Text color={CINZA} size="caption">Última ação: {acao.texto} · {acao.hora}</Text> : null
+    // O "Quero corrigir" fica em todos os estados do cartão Agora (0.2.16): só põe a frase na caixa, nunca envia.
+    const corrigirBotao = <Button key="corrigir" label="Quero corrigir" onPress={() => void corrigir($)} />
 
     const vez = ocupado ? (
       <Text color={TINTA}>● {agora ?? 'O sistema está trabalhando'}…</Text>
@@ -1008,21 +1090,22 @@ export const register: Register = on => {
       </Box>
     )
 
-    // Em curso, a subida vira uma linha só; o destaque é o andamento da etapa atual (pedido do Arthur, 31/10).
+    // A subida em uma linha (pedido do Arthur, 31/10), com a base como o primeiro ponto já feito (0.2.16).
     const progresso = (
       <Text color={CINZA} size="caption">
-        {dado.blocos
-          .map(b => {
+        {[
+          '✓ Base',
+          ...dado.blocos.map(b => {
             const atual = !dado.concluida && atualBloco?.codigo === b.codigo
             return `${atual ? '●' : b.status === 'aprovado' || b.status === 'pulado' ? '✓' : '○'} ${b.codigo === 'D' ? 'Começo' : dado.blocos.length === 3 ? b.nome : b.codigo}`
-          })
-          .join('   ')}
+          }),
+        ].join('   ')}
       </Text>
     )
 
     const docAberto =
       aberto && textoDoc ? (
-        <Box flexDirection="column" gap={1} borderStyle="round" borderColor={TINTA} padding={1}>
+        <Box flexDirection="column" borderStyle="round" borderColor={TINTA} padding={1}>
           <Markdown text={textoDoc} />
         </Box>
       ) : null
@@ -1031,81 +1114,96 @@ export const register: Register = on => {
     if (!dado.iniciada) {
       return (
         <Box {...fundo}>
-          {marca}
-          {titulo}
-          <Text color={CINZA}>Onde todo sistema começa: uma pasta, um arquivo e qualquer IA.</Text>
-          {trilha}
-          <Text bold color={ROCHA}>{dado.blocos.length === 3 ? '3 passos, uns 30 minutos: você manda, confirma e vê a primeira tarefa feita.' : `${dado.blocos.filter(b => b.codigo !== 'D').length} etapas, uma tarde, com parada no fim de cada uma.`}</Text>
-          <Text color={ROCHA}>
-            Você responde do seu jeito, até por voz. O sistema escreve cada arquivo e mostra para você aprovar. No fim, ele já faz a primeira tarefa para você.
-          </Text>
-          {vez}
-          {subida}
-          {pendente ? aviso : (
-            <Box flexDirection="row" gap={1}>
-              <Button key="travei" label="Travei" onPress={() => void enviar($, 'travei')} />
-            </Box>
-          )}
+          {cabecalho}
+          <Box flexDirection="column">
+            <Text color={CINZA}>Onde todo sistema começa: uma pasta, um arquivo e qualquer IA.</Text>
+            {trilha}
+            <Text bold color={ROCHA}>{dado.blocos.length === 3 ? '3 passos, uns 30 minutos: você manda, confirma e vê a primeira tarefa feita.' : `${dado.blocos.filter(b => b.codigo !== 'D').length} etapas, uma tarde, com parada no fim de cada uma.`}</Text>
+            <Text color={ROCHA}>
+              Você responde do seu jeito, até por voz. O sistema escreve cada arquivo e mostra para você aprovar. No fim, ele já faz a primeira tarefa para você.
+            </Text>
+          </Box>
+          <Box flexDirection="column">
+            {vez}
+            {subida}
+            {pendente ? aviso : (
+              <Box flexDirection="row" gap={1}>
+                <Button key="travei" label="Travei" onPress={() => void enviar($, 'travei')} />
+              </Box>
+            )}
+          </Box>
           {rodape}
         </Box>
       )
     }
 
-    // ----- Base Camp montado
+    // ----- Base Camp montado: o mesmo cartão Agora, com um botão principal; o resto numa zona só, discreta (0.2.16).
     if (dado.concluida) {
+      const proximo =
+        [
+          'O próximo passo é o Campo 1: detalhar e rodar o seu primeiro workflow de ponta a ponta',
+          dado.processo,
+          completo && dado.antes ? `hoje leva ${dado.antes}` : null,
+        ]
+          .filter((x): x is string => Boolean(x))
+          .join(' · ') + '.'
       return (
         <Box {...fundo}>
-          {marca}
-          <Text bold color={TINTA} size="heading">Base Camp montado.</Text>
-          <Text color={ROCHA}>O seu sistema já sabe quem você é, o que você toca e como você trabalha.</Text>
-          {comemoracao}
-          {trilha}
-          {dado.testeOk && <Text color={TINTA}>✓ O teste passou: o sistema já sabe quem você é.</Text>}
-          {dado.combinado && (
-            <Box flexDirection="column">
-              <Text color={CINZA} size="caption">O SEU COMBINADO</Text>
-              <Text color={ROCHA}>{dado.combinado}</Text>
+          {cabecalho}
+          <Box flexDirection="column" borderStyle="round" borderColor={TINTA} padding={1}>
+            <Text color={TINTA} size="caption">AGORA · BASE CAMP MONTADO</Text>
+            <Text bold color={TINTA}>O seu Base Camp está montado.</Text>
+            <Text color={ROCHA}>{proximo}</Text>
+            <Box flexDirection="row" flexWrap="wrap" gap={1}>
+              {!pendente && (
+                <Button key="rodar-workflow" variant="primary" label="Rodar o meu primeiro workflow" onPress={() => void enviar($, 'vamos rodar o primeiro workflow')} />
+              )}
+              {corrigirBotao}
             </Box>
-          )}
-          {dado.tarefas.length > 0 && (
-            <Box flexDirection="column" gap={1}>
-              <Text color={CINZA} size="caption">PEÇA AO SEU SISTEMA</Text>
-              {pendente ? aviso : dado.tarefas.map((t, i) => (
-                <Button key={`tarefa-${i}`} label={t.length > 70 ? `${t.slice(0, 67)}…` : t} onPress={() => void enviar($, t)} />
-              ))}
-            </Box>
-          )}
-          <Box flexDirection="column" gap={1}>
-            <Text color={CINZA} size="caption">PARA O ARTHUR</Text>
+            {pendente && aviso}
+            {ultima}
+          </Box>
+          <Box flexDirection="column">
+            <Text color={CINZA} size="caption">O QUE FICOU PRONTO</Text>
+            {dado.testeOk && <Text color={TINTA}>✓ O teste passou: o sistema já sabe quem você é.</Text>}
+            {dado.testeFalhou !== null && (
+              <Text color={SINAL}>✕ O teste: quem sou eu não passou{dado.testeFalhou ? `: ${dado.testeFalhou}` : ''}</Text>
+            )}
+            {dado.combinado && <Text color={ROCHA}>✓ O combinado: {dado.combinado}</Text>}
+            {dado.restantes.length > 0 && !pendente && (
+              <Box flexDirection="column">
+                <Text color={ROCHA}>Peça ao seu sistema:</Text>
+                <Box flexDirection="row" flexWrap="wrap" gap={1}>
+                  {dado.restantes.map((t, i) => (
+                    <Button key={`tarefa-${i}`} label={t.length > 70 ? `${t.slice(0, 67)}…` : t} onPress={() => void enviar($, t)} />
+                  ))}
+                </Box>
+              </Box>
+            )}
             <Text color={ROCHA}>
               {completo
-                ? 'Mande o resumo do seu Base Camp para o Arthur revisar e dar robustez ao seu sistema.'
-                : 'Se quiser que o Arthur dê uma olhada no seu Base Camp, mande o resumo para ele.'}
+                ? 'Para o Arthur: mande o resumo do seu Base Camp para ele revisar e dar robustez ao seu sistema.'
+                : 'Para o Arthur: se quiser que ele dê uma olhada no seu Base Camp, mande o resumo.'}
             </Text>
-            <Box flexDirection="row" gap={1}>
+            <Box flexDirection="row" flexWrap="wrap" gap={1}>
               <Button key="copiar-resumo" label="Copiar o resumo" onPress={press => void copiarResumo($, press.surface)} />
-              <Button key="ver-resumo" label={aberto === 'resumo' ? 'Fechar' : 'Ver o resumo'} onPress={() => void abrirDoc($, 'resumo')} />
+              <Button key="ver-resumo" label={aberto === 'resumo' ? 'Fechar o resumo' : 'Ver o resumo'} onPress={() => void abrirDoc($, 'resumo')} />
+              <Button key="guia" label={aberto === 'guia' ? 'Fechar o guia de bolso' : 'Ver o guia de bolso'} onPress={() => void abrirDoc($, 'guia')} />
             </Box>
-            {aberto === 'resumo' && docAberto}
-          </Box>
-          <Box flexDirection="column" gap={1} borderStyle="round" borderColor={TINTA} padding={1}>
-            <Text color={CINZA} size="caption">O PRÓXIMO PASSO · A MERA, A PRIMEIRA MONTANHA</Text>
-            <Text bold color={ROCHA}>Campo 1: detalhar e aprender o seu primeiro workflow, de ponta a ponta.</Text>
-            {dado.processo && <Text color={ROCHA}>{dado.processo}{completo && dado.antes ? ` · hoje leva ${dado.antes}` : ''}</Text>}
-            {pendente ? aviso : (
-              <Button key="rodar-workflow" variant="primary" label="Rodar o meu primeiro workflow" onPress={() => void enviar($, 'vamos rodar o primeiro workflow')} />
-            )}
+            {docAberto}
             <Text color={CINZA} size="caption">Depois: Campo 2, sair pronto com um pedido seu · Campo 3, chegar sozinho · Cume, medir as horas que voltaram.</Text>
             {!completo && <Text color={CINZA} size="caption">No programa, o Arthur sobe a Mera com você.</Text>}
           </Box>
-          <Button key="guia" label={aberto === 'guia' ? 'Fechar o guia de bolso' : 'Ver o guia de bolso'} onPress={() => void abrirDoc($, 'guia')} />
-          {aberto === 'guia' && docAberto}
+          <Box flexDirection="column">
+            {trilha}
+            {progresso}
+          </Box>
           {rodape}
         </Box>
       )
     }
 
-    // ----- Em andamento: três zonas (Agora; o que esta etapa já tem e o que o sistema sabe; a subida em uma linha).
+    // ----- Em andamento: três zonas (Agora; o que este passo já tem e o que o sistema sabe; a subida em uma linha).
     const ver = await read($, verArquivo)
     const textoArquivo = await read($, arquivoTexto)
     const sabidos = dado.campos.filter(c => c.estado === 'ok').length
@@ -1122,13 +1220,27 @@ export const register: Register = on => {
     const alternativas = (cartaoWorkflow?.linhas ?? [])
       .map(l => /^Alternativa:\s*(.+)$/i.exec(l.texto)?.[1]?.trim())
       .filter((x): x is string => Boolean(x))
+    const testeFalhou = dado.campos.some(c => c.estado === 'falhou')
+    // No curto, o retrato montado pede o confirmo e a tarefa feita pede o "ficou bom": o botão principal
+    // aparece nesses dois momentos mesmo sem a frase de aprovação, e manda o "pode, aprovado" de sempre.
+    const retratoMontado = curto && atualBloco?.codigo === '1' && dado.campos.length > 0 && sabidos === dado.campos.length
+    const tarefaFeita = curto && ehEntrega && dado.feita
+    const materialChegou = ehComeco && dado.campos.some(c => c.codigo === 'D.2' && c.estado === 'ok')
+    // Os botões dizem o resultado, não a ação (0.2.16); as frases que eles mandam não mudam.
+    const rotuloAprovar = curto && atualBloco?.codigo === '1' ? 'Confirmar o retrato' : tarefaFeita ? 'Fechar o Base Camp' : 'Aprovar'
+    const rotuloContinuar = curto && materialChegou ? 'Montar o meu retrato' : 'Continuar'
+    const principal =
+      aprov || retratoMontado || tarefaFeita ? (
+        <Button key="aprovar" variant="primary" label={rotuloAprovar} onPress={() => void enviar($, 'pode, aprovado')} />
+      ) : !perguntaDaVez && completo ? (
+        <Button key="continuar" variant="primary" label={rotuloContinuar} onPress={() => void enviar($, 'continuar')} />
+      ) : null
+    const etiquetaCampos = ehEntrega ? 'O QUE ESTE PASSO ENTREGA' : ehComeco ? 'O SEU COMEÇO' : curto ? 'O QUE JÁ ESTÁ MONTADO' : 'O QUE ESTA ETAPA JÁ TEM'
 
     return (
       <Box {...fundo}>
-        {marca}
-        {titulo}
-        {comemoracao}
-        <Box flexDirection="column" gap={1} borderStyle="round" borderColor={TINTA} padding={1}>
+        {cabecalho}
+        <Box flexDirection="column" borderStyle="round" borderColor={TINTA} padding={1}>
           <Text color={TINTA} size="caption">
             {atualBloco
               ? atualBloco.codigo === 'D' && !curto
@@ -1159,66 +1271,83 @@ export const register: Register = on => {
                 <Button
                   key={`escolha-${i}`}
                   variant={i === 0 ? 'primary' : undefined}
-                  label={t.length > 70 ? `${t.slice(0, 67)}…` : t}
+                  label={`Fazer: ${t.length > 63 ? `${t.slice(0, 60)}…` : t}`}
                   onPress={() => void enviar($, `primeira tarefa: ${t}`)}
                 />
               ))}
             </Box>
           )}
-          {pendente ? aviso : !ocupado && (
-            <Box flexDirection="row" gap={1}>
-              {aprov ? (
-                <Button key="aprovar" variant="primary" label="Aprovar" onPress={() => void enviar($, 'pode, aprovado')} />
-              ) : !perguntaDaVez && completo ? (
-                <Button key="continuar" variant="primary" label="Continuar" onPress={() => void enviar($, 'continuar')} />
-              ) : null}
-              <Button key="corrigir" label="Quero corrigir" onPress={() => void corrigir($)} />
-              <Button key="travei" label="Travei" onPress={() => void enviar($, 'travei')} />
-            </Box>
-          )}
+          <Box flexDirection="row" flexWrap="wrap" gap={1}>
+            {!ocupado && !pendente && principal}
+            {corrigirBotao}
+            {!ocupado && !pendente && <Button key="travei" label="Travei" onPress={() => void enviar($, 'travei')} />}
+            {lembrete && !pendente && (
+              <Button key="tentar-novamente" label="Tente novamente" onPress={() => void enviar($, 'tente novamente')} />
+            )}
+          </Box>
+          {pendente && aviso}
           {aprov && !ocupado && aprov.arquivo && (
             <Button key="ver" dimColor label={ver ? 'Fechar o arquivo' : 'Ler o arquivo no painel'} onPress={() => void abrirArquivo($)} />
           )}
           {ver && textoArquivo && <Markdown text={textoArquivo} />}
-          {lembrete && <Text color={CINZA} size="caption">Sem pressa: responda do seu jeito, até por voz. Se travou, use o Travei.</Text>}
+          {lembrete && <Text color={SINAL}>Parado há 4 min? Pode ser o app.</Text>}
+          {ultima}
         </Box>
-        {dado.campos.length > 0 &&
-          (sabidos === dado.campos.length ? (
-            <Text color={TINTA}>
-              ✓ {ehEntrega ? 'Tudo o que este passo entrega já está pronto.' : ehComeco ? 'O começo está completo.' : dado.blocos.length === 3 ? 'O retrato está montado: é só confirmar.' : 'Tudo o que esta etapa precisa já está anotado.'}
-            </Text>
-          ) : (
-            <Box flexDirection="column">
-              <Text color={CINZA} size="caption">
-                {ehEntrega ? 'O QUE ESTE PASSO ENTREGA' : ehComeco ? 'O SEU COMEÇO' : dado.blocos.length === 3 ? 'O QUE JÁ ESTÁ MONTADO' : 'O QUE ESTA ETAPA JÁ TEM'} · {sabidos} DE {dado.campos.length}
-              </Text>
-              {dado.campos.map(c => (
-                <Text key={`campo-${c.codigo}`} color={c.estado === 'falta' ? CINZA : ROCHA} dimColor={c.estado === 'falta'}>
-                  {c.estado === 'ok' ? '✓' : c.estado === 'pulada' ? '–' : '○'} {c.rotulo}
-                  {c.estado === 'pulada' ? ' (pulada, fica para depois)' : ''}
-                </Text>
-              ))}
-            </Box>
-          ))}
-        {dado.resumo && dado.resumo.cartoes.length > 0 && (
+        {(dado.campos.length > 0 || (dado.resumo && dado.resumo.cartoes.length > 0)) && (
           <Box flexDirection="column" gap={1}>
-            <Text color={CINZA} size="caption">O QUE EU JÁ SEI DE VOCÊ</Text>
-            {dado.resumo.cartoes.map((c, i) => (
-              <Box key={`cartao-${i}`} flexDirection="column" borderStyle="round" borderColor={CINZA} paddingX={1}>
-                <Text bold color={ROCHA}>{c.titulo}</Text>
-                {c.linhas.map((l, j) => (
-                  <Text key={`cartao-${i}-${j}`} color={l.duvida ? SINAL : ROCHA}>
-                    {l.duvida ? '? ' : '✓ '}{l.texto}{l.duvida ? ' (ainda vale?)' : ''}
+            {dado.campos.length > 0 &&
+              (sabidos === dado.campos.length ? (
+                <Text color={TINTA}>
+                  ✓ {ehEntrega ? 'Tudo o que este passo entrega já está pronto.' : ehComeco ? 'O começo está completo.' : curto ? 'O retrato está montado: é só confirmar.' : 'Tudo o que esta etapa precisa já está anotado.'}
+                </Text>
+              ) : (
+                <Box flexDirection="column">
+                  <Text color={CINZA} size="caption">
+                    {etiquetaCampos} · {sabidos} DE {dado.campos.length}
                   </Text>
-                ))}
-              </Box>
-            ))}
-            {ehComeco && dado.resumo.falta.length > 0 && (
-              <Box flexDirection="column" borderStyle="round" borderColor={CINZA} paddingX={1}>
-                <Text bold color={ROCHA}>Falta isto</Text>
-                {dado.resumo.falta.map((f, j) => (
-                  <Text key={`falta-${j}`} color={CINZA}>○ {f}</Text>
-                ))}
+                  {dado.campos.map(c =>
+                    c.estado === 'falhou' ? (
+                      <Text key={`campo-${c.codigo}`} color={SINAL}>
+                        ✕ {c.rotulo} não passou{c.motivo ? `: ${c.motivo}` : ''}
+                      </Text>
+                    ) : (
+                      <Text key={`campo-${c.codigo}`} color={c.estado === 'falta' ? CINZA : ROCHA} dimColor={c.estado === 'falta'}>
+                        {c.estado === 'ok' ? '✓' : c.estado === 'pulada' ? '–' : '○'} {c.rotulo}
+                        {c.estado === 'pulada' ? ' (pulada, fica para depois)' : ''}
+                      </Text>
+                    ),
+                  )}
+                  {testeFalhou && !ocupado && !pendente && (
+                    <Button key="testar-de-novo" label="Corrigir e testar de novo" onPress={() => void enviar($, 'corrigir e testar de novo')} />
+                  )}
+                </Box>
+              ))}
+            {dado.resumo && dado.resumo.cartoes.length > 0 && (
+              <Box flexDirection="column">
+                <Text color={CINZA} size="caption">O QUE EU JÁ SEI DE VOCÊ</Text>
+                <Box flexDirection="column" gap={1}>
+                  {dado.resumo.cartoes.map((c, i) => (
+                    <Box key={`cartao-${i}`} flexDirection="column" borderStyle="round" borderColor={CINZA} paddingX={1}>
+                      <Text bold color={ROCHA}>{c.titulo}</Text>
+                      {c.linhas.map((l, j) => (
+                        <Text key={`cartao-${i}-${j}`} color={l.duvida ? SINAL : ROCHA}>
+                          {l.duvida ? '? ' : '✓ '}{l.texto}{l.duvida ? ' (ainda vale?)' : ''}
+                        </Text>
+                      ))}
+                    </Box>
+                  ))}
+                  {dado.resumo.falta.length > 0 ? (
+                    <Box flexDirection="column" borderStyle="round" borderColor={CINZA} paddingX={1}>
+                      <Text bold color={ROCHA}>Falta isto</Text>
+                      {dado.resumo.falta.map((f, j) => (
+                        <Text key={`falta-${j}`} color={CINZA}>○ {f}</Text>
+                      ))}
+                    </Box>
+                  ) : (
+                    // "Falta isto" vazio não some: diz que nada falta (0.2.16).
+                    <Text color={CINZA}>Nada falta: o retrato está completo com o que você mandou.</Text>
+                  )}
+                </Box>
               </Box>
             )}
           </Box>

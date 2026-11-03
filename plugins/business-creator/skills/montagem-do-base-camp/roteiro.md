@@ -1,6 +1,6 @@
 # Roteiro da Montagem do Base Camp
 
-> Versão 3.2 (02/11/2026), no plugin Business Creator 0.2.15: **o Base Camp curto**, em 3 passos e um "confirmo" (decisão do Arthur, 01/11/2026, pela regra padrão do onboarding: curto, com o valor na próxima coisa que a pessoa já ia fazer). As perguntas da montagem longa viraram a reserva do uso real: `perguntas-do-uso-real.md`.
+> Versão 3.3 (02/11/2026), no plugin Business Creator 0.2.16: **o Base Camp curto**, em 3 passos e um "confirmo" (decisão do Arthur, 01/11/2026, pela regra padrão do onboarding: curto, com o valor na próxima coisa que a pessoa já ia fazer). As perguntas da montagem longa viraram a reserva do uso real: `perguntas-do-uso-real.md`.
 > Para a pessoa, as partes são **passos** ("passo 2 de 3"). Os códigos internos: **D** (o começo), **1** (o retrato), **2** (a primeira tarefa). Tempo-alvo total: 20 a 35 minutos, dos quais 5 a 15 são dela no começo.
 > **[leve]** = vale também no nível leve. No curto, a diferença entre os níveis é só o mapa das frentes: no leve, até 2 frentes e sem pasta por frente.
 
@@ -79,7 +79,7 @@ Grave no `base-camp.md`, logo abaixo da linha **Montagem:**, a linha `- **Primei
 
 ## Já sei isto
 ### Quem você é
-- <frase completa, com os detalhes que importam>
+- <o primeiro nome dela, vírgula, e a frase completa com os detalhes que importam: o painel tira o nome daqui>
 - (?) <ponto da outra IA em dúvida> · da outra IA, de <mês/ano ou sem data>
 ### O que você toca
 ### O que se repete
@@ -126,7 +126,7 @@ Os pontos em dúvida são os deduzidos pela outra IA, os com mais de 3 meses ou 
 > Guardei como modelo. **Combinado:** quando <o começo do workflow> chegar, abra esta pasta e escreva **<o pedido curto>**.
 > ---
 > **Ficou bom?**"
-- Grave no `base-camp.md`, em "Primeiras tarefas", a linha **Feita:** (sem traço) com qual foi e o que ela achou, e a linha **Combinado:** (sem traço). O combinado é proposto por você, preso ao gatilho do workflow, com o pedido curto que ela vai escrever; ela só corrige se quiser. As outras duas tarefas ficam na lista: o painel as mostra depois como "Peça ao seu sistema".
+- Grave no `base-camp.md`, em "Primeiras tarefas", a linha **Feita:** (sem traço) **começando pelo texto da tarefa, igual ao da linha dela** ("**Feita:** Escrever a mensagem de retorno para o cliente de ontem · em <data>; ela achou <o quê>"): é por esse texto que o painel sabe qual das três saiu da lista "Peça ao seu sistema". Depois, a linha **Combinado:** (sem traço). O combinado é proposto por você, preso ao gatilho do workflow, com o pedido curto que ela vai escrever; ela só corrige se quiser. As outras duas tarefas ficam na lista: o painel as mostra depois como "Peça ao seu sistema".
 - Se ela corrigir o resultado, corrija, mostre o trecho e grave a correção como regra no `memoria.md` e no cartão do workflow, em "O que o sistema aprendeu". Se não gostar da tarefa, faça outra da lista.
 
 2.2 [leve] **Sem perguntar, na mesma resposta do "ficou bom":** escreva `como-usar.md` (com o combinado e o pedido curto em "Pedidos que já funcionam") e `resumo-para-o-arthur.md`; tire do `AGENTS.md` da raiz a seção "Montagem em andamento"; marque tudo como concluído no `base-camp.md`, com a soma dos tempos; e mande:

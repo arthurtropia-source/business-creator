@@ -2,6 +2,18 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.2.16 (02/11/2026)
+A revisão do painel pelos vídeos de 02/11 (`laboratorio-os/radar/tim-gabe/2026-11-02-revisao-do-painel.md`, as 7 mudanças): os estados ruins, a hierarquia do texto e dois detalhes de motivação. Só o painel muda; as frases que os botões mandam ficam as mesmas.
+- **Os estados ruins:** a parada de 4 min vira "Parado há 4 min? Pode ser o app.", em laranja, com o botão **Tente novamente** (manda "tente novamente") ao lado do Travei; o teste "quem sou eu" que não passou aparece na lista do que está montado, em laranja, com o motivo que o roteiro gravou e o botão **Corrigir e testar de novo** (manda "corrigir e testar de novo"); "Falta isto" vazio vira a linha "Nada falta: o retrato está completo com o que você mandou", e a seção passa a aparecer sempre que há cartões, não só no começo.
+- **Nunca do zero:** a linha de progresso e o desenho da trilha começam por "✓ Base" (a pasta aberta e o kit no lugar), antes do Começo.
+- **Dois tamanhos e espaço por relação:** o título do painel sai do tamanho grande (fica no do texto, em negrito e na tinta); dentro de um cartão as linhas ficam coladas e, entre as zonas, o dobro do espaço.
+- **Botões com o resultado:** "Montar o meu retrato" (no começo, com as palavras dela já na pasta), "Confirmar o retrato" (no retrato), "Fazer: <tarefa>" (as opções do passo 2) e "Fechar o Base Camp" (com a tarefa feita; manda o "pode, aprovado" de sempre, que o roteiro já aceita como confirmação). "Quero corrigir" e "Travei" ficam.
+- **A última ação no cartão Agora** ("Última ação: Anotei a sua resposta · 14:21") e o "Quero corrigir" em todos os estados, inclusive no final.
+- **O estado final no mesmo cartão Agora:** "AGORA · BASE CAMP MONTADO", "O seu Base Camp está montado.", a linha do próximo passo e o botão "Rodar o meu primeiro workflow"; o resto (o teste, o combinado, peça ao seu sistema, o resumo para o Arthur, o guia de bolso) numa zona só, discreta, sem caixas empilhadas.
+- **O nome dela no painel:** depois do retrato confirmado, o título passa a "O sistema de <nome>" (o primeiro nome da primeira linha do cartão "Quem você é" do `resumo.md`); sem nome, "O seu sistema".
+- **A tarefa feita sai de "Peça ao seu sistema"** (no teste de 02/11 ela aparecia como botão depois de feita): o roteiro (3.3) passa a começar a linha **Feita:** pelo texto da tarefa, e o painel tira essa da lista; com uma tarefa só, a lista some. A primeira linha de "Quem você é" do `resumo.md` começa pelo primeiro nome, que é de onde o painel o tira.
+- A skill (3.3) lista as duas frases novas dos botões; a ajuda cita os rótulos novos. Ficam de fora, de propósito: a animação de abertura (para a 0.3, se tiver função) e a aversão à perda.
+
 ## 0.2.15 (02/11/2026)
 Erro do teste do Arthur (02/11): ele escolheu outro workflow, disse para rodar, e o Campo 1 abriu o sugerido.
 - **O Campo 1 abre só o workflow da linha "Primeiro workflow" do `base-camp.md`**, nunca o que a conversa ou o resumo diziam antes; se a pessoa nomear outro no pedido, a linha troca antes de abrir.

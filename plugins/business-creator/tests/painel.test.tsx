@@ -1,4 +1,4 @@
-import { expect, test } from 'claude-code/testing'
+import { expect, mock, test } from 'claude-code/testing'
 
 // Uma pasta de Base Camp no meio da montagem: o começo e a etapa 1 aprovados, a
 // etapa 2 em andamento. Nada aqui lê o disco: os hooks abaixo fazem as vezes do
@@ -69,6 +69,23 @@ const RESPOSTAS = `# As suas respostas
 `
 
 const RESUMO = '# Resumo para o Arthur\n\n<!-- instrução -->\nA Ana toca duas frentes.'
+
+// O retrato confirmado e o passo 2 em andamento, com as 3 tarefas propostas (0.2.14) e ainda nenhuma feita.
+const PASSO_2 = BASE_CAMP.replace('NIVEL', 'completo')
+  .replace('| 1 · O retrato | em andamento | 23/10/2026 17:36 | |', '| 1 · O retrato | aprovado | 23/10/2026 17:36 | 23/10/2026 17:41 |')
+  .replace('| 2 · A primeira tarefa | pendente | | |', '| 2 · A primeira tarefa | em andamento | 23/10/2026 17:41 | |')
+  .replace('**Quem sou eu:** não feito', '**Quem sou eu:** passou')
+  .replace(
+    '<!-- comentário do modelo -->',
+    [
+      '- Escreva a mensagem de retorno para o cliente, no meu jeito',
+      '- Monte a lista do que conferir no fechamento',
+      '- Resuma o que está parado nas minhas frentes',
+    ].join('\n'),
+  )
+
+// O que o sistema já sabe, com o nome dela no cartão "Quem você é" e nada em "Falta isto".
+const SABIDO = '# O que o sistema já sabe\n\n## Já sei isto\n### Quem você é\n- Ana Souza, de Recife, consultora de RH\n### O que você toca\n- A consultoria de RH, sozinha\n\n## Falta isto\n'
 
 const PANE = {
   plugin: 'business-creator',
@@ -145,16 +162,22 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     expect(await ui.find({ type: 'Text', text: /Base Camp by/ })).toBeUndefined()
     expect(await ui.find({ type: 'Text', text: /PASSO 2 DE 3 · O RETRATO/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /você só confirma ou corrige/ })).toBeDefined()
-    // Em curso, a subida é uma linha só; o destaque é o andamento da etapa (0.2.7).
+    // Em curso, a subida é uma linha só; o destaque é o andamento da etapa (0.2.7). A base, a pasta
+    // aberta e o kit no lugar, é o primeiro ponto, já feito (0.2.16): ninguém começa do zero.
     expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toContain('● O retrato')
+    expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toContain('✓ Base   ✓ Começo')
     // O retrato: o painel mostra o que já foi montado (a página sobre você existe no fixture) e o teste.
     expect(await ui.find({ type: 'Text', text: /O QUE JÁ ESTÁ MONTADO · 2 DE 9/ })).toBeDefined()
     expect((await ui.find({ type: 'Text', text: /A página sobre você/ }))?.text).toContain('✓')
     expect((await ui.find({ type: 'Text', text: /O teste: quem sou eu/ }))?.text).toContain('○')
     // O cartão Agora (0.2.11): Continuar, Quero corrigir e Travei; nada de ler em voz alta.
     expect(await ui.findAll({ type: 'Button' })).toHaveLength(3)
+    expect((await ui.find({ type: 'Button', key: 'continuar' }))?.props.label).toBe('Continuar')
     expect(await ui.find({ type: 'Button', key: 'voz' })).toBeUndefined()
     expect(await ui.find({ type: 'Text', text: /AGORA · PASSO 2 DE 3 · O RETRATO/ })).toBeDefined()
+    // Sem parada e sem ação feita, nem o Tente novamente nem a linha da última ação (0.2.16).
+    expect(await ui.find({ type: 'Button', key: 'tentar-novamente' })).toBeUndefined()
+    expect(await ui.find({ type: 'Text', text: /Última ação/ })).toBeUndefined()
 
     await ui.press({ key: 'travei' })
     expect(enviados).toContain('travei')
@@ -168,7 +191,9 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
 
     const ui = await $.ui.mount({ ...PANE, surface })
     await ui.press({ key: 'continuar' })
-    expect(await ui.findAll({ type: 'Button' })).toHaveLength(0)
+    // Enquanto a resposta não vem, só o Quero corrigir fica (0.2.16): ele não envia nada, só preenche a caixa.
+    expect(await ui.findAll({ type: 'Button' })).toHaveLength(1)
+    expect(await ui.find({ type: 'Button', key: 'corrigir' })).toBeDefined()
     expect((await ui.find({ type: 'Text', text: /Espere a resposta/ }))?.text).toContain('continuar')
     expect(enviados).toEqual(['continuar'])
     await ui.unmount()
@@ -193,6 +218,9 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     expect((await ui.find({ type: 'Text', text: /Uma loja online parada/ }))?.text).toContain('ainda vale?')
     expect((await ui.find({ type: 'Text', text: /A sua última semana/ }))?.text).toContain('○')
     expect(await ui.find({ type: 'Button', key: 'corrigir' })).toBeDefined()
+    // O botão diz o resultado (0.2.16): com as palavras dela já na pasta, o Continuar vira "Montar o meu retrato".
+    expect((await ui.find({ type: 'Button', key: 'continuar' }))?.props.label).toBe('Montar o meu retrato')
+    expect(await ui.find({ type: 'Text', text: /^Montagem do Base Camp$/ })).toBeDefined()
     await ui.unmount()
   })
 
@@ -227,6 +255,8 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
 
     const ui = await $.ui.mount({ ...PANE, surface })
     expect(await ui.find({ type: 'Text', text: /Sua vez: aprove ou corrija/ })).toBeDefined()
+    // No passo do retrato, o botão principal diz o resultado (0.2.16) e manda a mesma frase de sempre.
+    expect((await ui.find({ type: 'Button', key: 'aprovar' }))?.props.label).toBe('Confirmar o retrato')
     await ui.press({ key: 'corrigir' })
     expect(enviados).toContain('[caixa] quero corrigir: ')
     await ui.press({ key: 'aprovar' })
@@ -248,17 +278,24 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     await $.session.start({ cwd: '/os', surface, isInteractive: true })
 
     const ui = await $.ui.mount({ ...PANE, surface })
-    expect(await ui.find({ type: 'Text', text: /Base Camp montado/ })).toBeDefined()
+    // O estado final mora no mesmo cartão Agora (0.2.16): a etiqueta, o título, um botão principal e o
+    // Quero corrigir. O título do painel é o sistema dela (sem o nome no resumo, "O seu sistema").
+    expect(await ui.find({ type: 'Text', text: /AGORA · BASE CAMP MONTADO/ })).toBeDefined()
+    expect((await ui.find({ type: 'Text', text: /^O seu Base Camp está montado\.$/ }))?.props.bold).toBe(true)
+    expect(await ui.find({ type: 'Text', text: /^O seu sistema$/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /^Montagem do Base Camp$/ })).toBeUndefined()
+    expect(await ui.find({ type: 'Button', key: 'corrigir' })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /O teste passou/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /amanhã, às 8h/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /Campo 1/ })).toBeDefined()
-    expect(await ui.find({ type: 'Button', key: 'rodar-workflow' })).toBeDefined()
+    expect((await ui.find({ type: 'Button', key: 'rodar-workflow' }))?.props.variant).toBe('primary')
     expect(await ui.find({ type: 'Text', text: /A proposta da consultoria/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /A proposta da consultoria/ })).toBeDefined()
-    expect(await ui.find({ type: 'Button', key: 'tarefa-2' })).toBeDefined()
-    expect(await ui.find({ type: 'Button', key: 'tarefa-3' })).toBeUndefined()
-    await ui.press({ key: 'tarefa-1' })
+    expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toContain('✓ Base   ✓ Começo   ✓ O retrato   ✓ A primeira tarefa')
+    // A tarefa feita (a mensagem de retorno) sai de "Peça ao seu sistema": sobram as outras duas (0.2.16).
+    expect((await ui.find({ type: 'Button', key: 'tarefa-0' }))?.props.label).toBe('Monte a lista do que conferir no fechamento')
+    expect(await ui.find({ type: 'Button', key: 'tarefa-1' })).toBeDefined()
+    expect(await ui.find({ type: 'Button', key: 'tarefa-2' })).toBeUndefined()
+    await ui.press({ key: 'tarefa-0' })
     expect(enviados).toContain('Monte a lista do que conferir no fechamento')
     await ui.unmount()
   })
@@ -347,10 +384,122 @@ for (const surface of ['desktop', 'terminal'] as const) {
   })
 }
 
+// ----- 0.2.16: a revisão pelos vídeos de 02/11 (os estados ruins, nunca do zero, os botões com o resultado,
+// a última ação, o nome dela, o estado final no cartão Agora).
+
+test('parada de 4 minutos: o aviso em laranja e o Tente novamente ao lado do Travei', async ($, on) => {
+  const enviados: string[] = []
+  // O relógio do app, que só anda quando o teste manda: a vigia de 4 segundos roda nele.
+  const relogio = mock.clock(on, { now: 1_762_100_000_000 })
+  const resposta = 'Anotado.\n\n---\n**Como foi a sua última semana?**'
+  pasta(on, MEIO('completo'), enviados, resposta)
+  await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
+  await $.turn.start({ text: 'oi', turnId: 't1' })
+  await $.turn.complete({ answer: resposta, durationMs: 1000, isAborted: false, turnId: 't1', reason: 'answer' })
+
+  const antes = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await antes.find({ type: 'Button', key: 'tentar-novamente' })).toBeUndefined()
+  await antes.unmount()
+
+  await relogio.advance(250_000)
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect((await ui.find({ type: 'Text', text: /^Parado há 4 min\? Pode ser o app\.$/ }))?.props.color).toBe('#FF6F1A')
+  expect(await ui.find({ type: 'Button', key: 'travei' })).toBeDefined()
+  await ui.press({ key: 'tentar-novamente' })
+  expect(enviados).toContain('tente novamente')
+  await ui.unmount()
+})
+
+test('o teste que não passou aparece com o motivo e o botão de repetir', async ($, on) => {
+  const enviados: string[] = []
+  pasta(on, {
+    ...MEIO('completo'),
+    '/os/base-camp.md': BASE_CAMP.replace('NIVEL', 'completo').replace('**Quem sou eu:** não feito', '**Quem sou eu:** não passou: inventou uma frente'),
+  }, enviados)
+  await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
+
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  const linha = await ui.find({ type: 'Text', text: /O teste: quem sou eu não passou: inventou uma frente/ })
+  expect(linha?.text).toContain('✕')
+  expect(linha?.props.color).toBe('#FF6F1A')
+  expect(await ui.find({ type: 'Text', text: /O QUE JÁ ESTÁ MONTADO · 2 DE 9/ })).toBeDefined()
+  await ui.press({ key: 'testar-de-novo' })
+  expect(enviados).toContain('corrigir e testar de novo')
+  await ui.unmount()
+})
+
+test('a última ação feita fica no cartão Agora, com a hora', async ($, on) => {
+  pasta(on, MEIO('completo'), [])
+  await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
+  await $.tool.call({ tool: 'Write', file_path: '/os/montagem/respostas.md', content: '## QUEM.nome\n- Ana [despejo]' })
+
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await ui.find({ type: 'Text', text: /^Última ação: Anotei a sua resposta · \d{2}:\d{2}$/ })).toBeDefined()
+  await ui.unmount()
+})
+
+for (const surface of ['desktop', 'terminal'] as const) {
+  test(`depois do retrato confirmado, o painel leva o nome dela e as tarefas dizem "Fazer:" (${surface})`, async ($, on) => {
+    const enviados: string[] = []
+    pasta(on, { '/os/base-camp.md': PASSO_2, '/os/montagem/respostas.md': RESPOSTAS, '/os/montagem/resumo.md': SABIDO }, enviados)
+    await $.session.start({ cwd: '/os', surface, isInteractive: true })
+
+    const ui = await $.ui.mount({ ...PANE, surface })
+    expect((await ui.find({ type: 'Text', text: /^O sistema de Ana$/ }))?.props.bold).toBe(true)
+    expect(await ui.find({ type: 'Text', text: /^Montagem do Base Camp$/ })).toBeUndefined()
+    expect((await ui.find({ type: 'Button', key: 'escolha-0' }))?.props.label).toBe('Fazer: Escreva a mensagem de retorno para o cliente, no meu jeito')
+    // "Falta isto" vazio não some: o painel diz que nada falta (0.2.16).
+    expect(await ui.find({ type: 'Text', text: /^Nada falta: o retrato está completo com o que você mandou\.$/ })).toBeDefined()
+    await ui.press({ key: 'escolha-1' })
+    expect(enviados).toContain('primeira tarefa: Monte a lista do que conferir no fechamento')
+    await ui.unmount()
+  })
+}
+
+test('com a tarefa feita, o botão principal fecha o Base Camp e manda a frase de sempre', async ($, on) => {
+  const enviados: string[] = []
+  const feita = PASSO_2.replace(
+    '- Resuma o que está parado nas minhas frentes',
+    '- Resuma o que está parado nas minhas frentes\n**Feita:** a mensagem de retorno · ela gostou\n**Combinado:** amanhã, às 8h, abrir esta pasta e pedir a lista.',
+  )
+  pasta(on, { '/os/base-camp.md': feita, '/os/montagem/respostas.md': RESPOSTAS }, enviados)
+  await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
+
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await ui.find({ type: 'Text', text: /Tudo o que este passo entrega já está pronto/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^O seu sistema$/ })).toBeDefined()
+  expect((await ui.find({ type: 'Button', key: 'aprovar' }))?.props.label).toBe('Fechar o Base Camp')
+  expect(await ui.find({ type: 'Button', key: 'escolha-0' })).toBeUndefined()
+  await ui.press({ key: 'aprovar' })
+  expect(enviados).toContain('pode, aprovado')
+  await ui.unmount()
+})
+
 test('o teste do Base Camp responde só com os arquivos da pasta', async ($, on) => {
   pasta(on, { ...MEIO('completo'), '/os/AGENTS.md': '# Ana\n@contexto/sobre-mim.md' }, [])
   await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
 
   const r = await $.tool.call({ tool: 'mcp__business-creator__teste_do_base_camp', pergunta: 'quem sou eu?' })
   expect(JSON.stringify(r)).toContain('Você é a Ana')
+})
+
+test('no fim, com uma tarefa só e feita, "Peça ao seu sistema" some', async ($, on) => {
+  const umaSo = CONCLUIDA
+    .replace('- Monte a lista do que conferir no fechamento\n', '')
+    .replace('- Resuma o que está parado nas minhas frentes\n', '')
+  pasta(on, {
+    '/os/base-camp.md': umaSo.replace('NIVEL', 'completo').replace(
+      '**Montagem:** concluída',
+      '**Montagem:** concluída\n- **Primeiro workflow:** `frentes/consultoria/workflows/proposta.md`',
+    ),
+    '/os/frentes/consultoria/workflows/proposta.md': PROCESSO,
+    '/os/resumo-para-o-arthur.md': RESUMO,
+  }, [])
+  await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
+
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await ui.find({ type: 'Text', text: /AGORA · BASE CAMP MONTADO/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /Peça ao seu sistema/ })).toBeUndefined()
+  expect(await ui.find({ type: 'Button', key: 'tarefa-0' })).toBeUndefined()
+  await ui.unmount()
 })

@@ -10,7 +10,9 @@ export type Bloco = {
 export type Campo = {
   codigo: string
   rotulo: string
-  estado: 'ok' | 'pulada' | 'falta'
+  // "falhou": o teste que não passou, com o motivo que o roteiro gravou (0.2.16).
+  estado: 'ok' | 'pulada' | 'falta' | 'falhou'
+  motivo?: string
 }
 
 export type Montado = {
@@ -28,13 +30,19 @@ export type Painel = {
   processo: string | null
   antes: string | null
   tarefas: string[]
+  // As tarefas que ainda não foram feitas: o painel as oferece em "Peça ao seu sistema" (0.2.16).
+  restantes: string[]
   feita: boolean
   combinado: string | null
   testeOk: boolean
+  // O motivo gravado em "não passou: <motivo>" ('' sem motivo); null quando o teste não falhou.
+  testeFalhou: string | null
   separacaoOk: boolean
   campos: Campo[]
   montado: Montado[]
   resumo: Resumo | null
+  // O primeiro nome da pessoa, pelo cartão "Quem você é" do resumo; null sem ele.
+  nome: string | null
 }
 
 export type Resumo = {
@@ -50,6 +58,12 @@ export type Aprovacao = {
 export type Festa = {
   texto: string
   anterior: number
+}
+
+// A última coisa que a montagem fez (a frase de ToolUse) e a hora local, HH:MM.
+export type UltimaAcao = {
+  texto: string
+  hora: string
 }
 
 declare module 'claude-code' {
@@ -70,6 +84,7 @@ declare module 'claude-code' {
       trabalhando: boolean
       atividade: string | null
       palavra: string | null
+      ultimaAcao: UltimaAcao | null
       aprovacao: Aprovacao | null
       ultimo: string | null
       festa: Festa | null

@@ -5,7 +5,7 @@ description: Conduz a Montagem do Base Camp, que monta o sistema de IA pessoal d
 
 # Montagem do Base Camp
 
-> Kit de instalação guiada do SEM IA™, por Arthur Tropia. Versão 3.2 (02/11/2026), no plugin Business Creator 0.2.15: **o Base Camp curto**, em 3 passos e um "confirmo". As perguntas da montagem longa viraram a reserva do uso real (`perguntas-do-uso-real.md`).
+> Kit de instalação guiada do SEM IA™, por Arthur Tropia. Versão 3.3 (02/11/2026), no plugin Business Creator 0.2.16: **o Base Camp curto**, em 3 passos e um "confirmo"; os botões do painel com o resultado e as frases "tente novamente" e "corrigir e testar de novo". As perguntas da montagem longa viraram a reserva do uso real (`perguntas-do-uso-real.md`).
 
 Você vai montar o sistema de IA pessoal da pessoa a partir do que ela manda no começo. Ela não sabe nada de IA, de pastas de configuração nem de skills, e não precisa saber. Ela manda duas coisas, confirma o retrato que você monta e vê a primeira tarefa feita. O resto o sistema aprende no uso, uma pergunta por conversa.
 
@@ -90,7 +90,7 @@ Cada passo seu (ler, gravar, editar) é uma volta a mais, que deixa a resposta m
 Se ela perguntar, explique em uma linha. Não troque o nível sem ela pedir.
 
 ## O painel do Base Camp (quando a pasta tem o painel)
-- **Os botões do painel mandam mensagens no lugar da pessoa:** "continuar" (retome do ponto onde parou), "travei" (siga "Quando ela travar"), "confirmo" e "pode, aprovado" (a confirmação do retrato ou do que está esperando), "quero corrigir: …" (ela completa), "primeira tarefa: <a tarefa>" (a escolha no passo 2: faça essa) e "vamos rodar o primeiro workflow" (o Campo 1). São cliques dela; trate como se ela tivesse escrito.
+- **Os botões do painel mandam mensagens no lugar da pessoa:** "continuar" (retome do ponto onde parou), "travei" (siga "Quando ela travar"), "tente novamente" (a conversa parou: retome do último passo, sem refazer nada), "confirmo" e "pode, aprovado" (a confirmação do retrato ou do que está esperando: no retrato, o botão se chama "Confirmar o retrato"; com a tarefa feita, "Fechar o Base Camp"), "quero corrigir: …" (ela completa), "primeira tarefa: <a tarefa>" (a escolha no passo 2: faça essa), "corrigir e testar de novo" (o teste "quem sou eu" não passou: corrija o arquivo que causou e repita o teste) e "vamos rodar o primeiro workflow" (o Campo 1). São cliques dela; trate como se ela tivesse escrito.
 - **A ferramenta `teste_do_base_camp`:** pergunta a uma IA que só conhece os arquivos da pasta e devolve a resposta. Use no teste do passo 1, sozinho.
 - **O painel lê, não escreve:** a subida pelo `base-camp.md`; os cartões pelo `montagem/resumo.md`; a primeira tarefa e o combinado pela seção "Primeiras tarefas" do `base-camp.md`. Mantenha esses arquivos no formato dos modelos.
 - **Pedido de confirmação sempre com a mesma frase do roteiro**, para o painel mostrar o botão certo.

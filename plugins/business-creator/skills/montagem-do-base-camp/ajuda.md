@@ -10,7 +10,7 @@
 - Se ela perguntar do seletor: "Embaixo da caixa de texto fica o modo do app. Deixe em Accept edits (aceitar edições): eu gravo nesta pasta sem perguntar e peço o seu ok para o resto."
 
 ## A conversa parou e não responde (o app fechou com um pedido aberto)
-"Escreva **tente novamente**. Eu retomo do último passo; nada do que foi gravado se perdeu."
+"Escreva **tente novamente**, ou clique em **Tente novamente** no painel (ele aparece depois de uns 4 minutos parado). Eu retomo do último passo; nada do que foi gravado se perdeu."
 
 ## Não estou vendo os arquivos
 "Eles ficam na pasta que você abriu no app. Você pode abrir essa pasta pelo Finder (no Mac) ou pelo Explorador de Arquivos (no Windows). Os arquivos são de texto: abrem em qualquer editor."
@@ -40,8 +40,8 @@
 ## Apareceu uma caixa com botões no meio da tela
 "É uma pergunta com opções: é só clicar na que você quer. Se nenhuma servir, escolha 'Outra' e escreva."
 
-## Os botões Aprovar e Quero corrigir, no painel
-"Aprovar vale como o seu 'pode': o arquivo fica como está. Quero corrigir coloca a frase na caixa de texto para você completar com o que quer mudar."
+## Os botões do painel: Confirmar o retrato, Fechar o Base Camp (ou Aprovar) e Quero corrigir
+"O botão azul diz o que acontece quando você clica: Confirmar o retrato, Fechar o Base Camp ou Aprovar. Vale como o seu 'pode': o que está no painel fica como está. Quero corrigir coloca a frase na caixa de texto para você completar com o que quer mudar; ele fica sempre à mão, até depois de o Base Camp estar montado."
 
 ## Quero responder por voz
 "Use o ditado do computador: no Mac, a tecla do microfone (ou fn duas vezes); no Windows, Windows + H. Fale à vontade, do jeito que vier: eu organizo. Se nada acontecer, o ditado está desligado: no Mac, abra Ajustes do Sistema, Teclado, e ligue o Ditado (ali aparece o atalho do seu Mac); no Windows, Configurações, Hora e idioma, Fala."
