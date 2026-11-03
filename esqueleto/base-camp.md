@@ -11,7 +11,7 @@
 |---|---|---|---|
 | D · O começo | pendente | | |
 | 1 · O retrato | pendente | | |
-| 2 · A primeira tarefa | pendente | | |
+| 2 · O primeiro workflow | pendente | | |
 
 <!-- Status possíveis: pendente, em andamento, aprovado, pulado. Horários no formato DD/MM/AAAA HH:MM. -->
 
@@ -19,8 +19,8 @@
 - **Quem sou eu:** não feito
 - **Separação entre frentes:** não feito
 
-## Primeiras tarefas
-<!-- A primeira tarefa que o sistema propôs e fez no passo 2, uma por linha, começando com "- "; depois, qual foi feita e o que ela achou. O painel mostra estas linhas como botões. -->
+## O primeiro workflow
+<!-- As 3 opções que o sistema propôs no passo 3, uma por linha: "- <pedido>: <a primeira entrega, em uma linha>", a recomendada primeiro. Depois, as linhas Escolhido, Rodada 1 e Combinado. O painel mostra as opções como botões e lê as linhas em negrito. -->
 
 ## Em aberto
 <!-- Pergunta que ficou sem resposta quando a conversa parou ou trocou. A próxima conversa começa por aqui e apaga o item quando ele for respondido. -->

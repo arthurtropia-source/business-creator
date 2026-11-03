@@ -22,6 +22,24 @@ export type Montado = {
 
 export type Nivel = 'leve' | 'completo'
 
+// Uma das opções de primeiro workflow do passo 2 (0.2.17): a linha "- <pedido>: <entrega>" do base-camp.md.
+// O pedido é o que a pessoa vai escrever ("fechar o dia"); a entrega é a primeira entrega, em uma linha ('' no formato antigo).
+export type Opcao = {
+  pedido: string
+  entrega: string
+}
+
+// Uma linha da tabela "As rodadas" do cartão do workflow (0.2.17).
+export type Rodada = {
+  data: string
+  tempo: string
+  // O primeiro inteiro da coluna "Pedidos dela até a entrega"; null quando a coluna não tem número.
+  pedidos: number | null
+  // "sim" ou "não" na coluna "Entrega aprovada?"; "pendente" para o resto (vazio, "a conferir").
+  aprovada: 'sim' | 'nao' | 'pendente'
+  obs: string
+}
+
 export type Painel = {
   nivel: Nivel
   iniciada: boolean
@@ -29,9 +47,20 @@ export type Painel = {
   blocos: Bloco[]
   processo: string | null
   antes: string | null
-  tarefas: string[]
-  // As tarefas que ainda não foram feitas: o painel as oferece em "Peça ao seu sistema" (0.2.16).
-  restantes: string[]
+  // O primeiro workflow (0.2.17): as opções do passo 2, a escolhida (pelo pedido), as não escolhidas e o tempo da montagem.
+  opcoes: Opcao[]
+  escolhido: string | null
+  proximos: string[]
+  tempoTotal: string | null
+  // O cartão do workflow (0.2.17): o nome do H1, o pedido, o combinado do cartão, o estado e as tabelas.
+  workflowNome: string | null
+  pedido: string | null
+  combinadoCartao: string | null
+  estado: 'incompleto' | 'em andamento' | 'completo'
+  estadoTexto: string | null
+  passos: number
+  passosSistema: number
+  rodadas: Rodada[]
   feita: boolean
   combinado: string | null
   testeOk: boolean

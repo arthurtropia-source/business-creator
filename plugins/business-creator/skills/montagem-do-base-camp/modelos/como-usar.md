@@ -1,6 +1,7 @@
 <!--
-MODELO de como-usar.md (na raiz): o guia de bolso da pessoa. Escreva no passo 2, depois do "ficou bom", com o combinado.
-Para quem: a própria pessoa, não a IA. Em "você", com as frentes e as palavras dela. Uma página (até ~50 linhas), sem jargão (nada de "contexto", "skill", "prompt"). Os exemplos de pedido saem das frentes e do primeiro workflow dela.
+MODELO de como-usar.md (na raiz): o guia de bolso da pessoa. Nasce no passo 1 (o retrato), como rascunho, com tudo o que o retrato sabe; no fim do passo 2 entram só o workflow e o combinado.
+Para quem: a própria pessoa, não a IA. Em "você", com as frentes e as palavras dela. Uma página (até ~50 linhas), sem jargão (nada de "contexto", "skill", "prompt"). Os exemplos de pedido saem das frentes dela.
+A frase do workflow é uma só, o pedido: a mesma do botão do painel, do cartão e do combinado. Não invente uma segunda.
 Tire estes comentários e as instruções entre <>.
 -->
 # Como usar o seu sistema
@@ -12,12 +13,13 @@ Tire estes comentários e as instruções entre <>.
 2. **Diga o que você quer e o que é "pronto".** Ex.: "<um pedido da frente prioritária dela, com o formato de pronto; ex.: escreva a proposta para o cliente novo, em Word, com o resumo dos problemas no começo>".
 3. **Corrija sem dó.** Quando algo vier errado, diga o que mudar e acrescente "daqui pra frente faça assim": vira regra no seu caderno de lições (`memoria.md`), e o sistema não repete o erro.
 
-## O seu combinado
-<o combinado do passo 2, com as palavras dela. Ex.: Amanhã, às 8h, antes dos e-mails: abrir esta pasta e pedir a lista do fechamento.>
+## O seu primeiro workflow: <o nome, como no cartão>
+<No passo 1: "Se escolhe no passo 3: você clica num dos três que o sistema propõe, e ele roda na hora." No fim do passo 2:>
+Quando <o gatilho, com as palavras dela>, abra esta pasta e escreva **<pedido>**. O sistema <a entrega, em meia linha>. Cada vez que rodar, corrija o que não ficou do seu jeito: ele aprende, e quando sair pronto com um pedido só seu, o workflow está completo. Os próximos da fila: <as outras duas opções, pelo pedido>.
 
 ## Pedidos que já funcionam
-- <pedido 1, de uma frente dela>
-- <pedido 2, de outra frente>
+- **<pedido>** (<a frente>): <a entrega, em meia linha>. <No passo 1, esta linha fica fora; entra no fim do passo 2.>
+- <pedido 2, de outra frente dela>
 - <pedido 3: "o que está parado nas minhas frentes e qual o próximo passo de cada uma?">
 
 ## Uma conversa por assunto
@@ -25,9 +27,6 @@ Para cada assunto novo, abra uma conversa nova nesta pasta. O sistema já sabe q
 
 ## O que nunca acontece sem você
 Nada sai do computador sem o seu ok: e-mail, mensagem, publicação, compra, dinheiro. Na dúvida, o sistema entrega como rascunho.
-
-## O próximo passo: o Campo 1
-O seu primeiro workflow é **<PROC.escolhido>**: o caminho de <o ponto de partida> até <a entrega>. Quando for a hora, abra uma conversa nesta pasta e escreva: **"vamos rodar o primeiro workflow"**. O sistema detalha cada passo com você e faz junto, de ponta a ponta, aprendendo o seu jeito. O alvo: ele sair pronto com um pedido seu.
 
 ## Onde fica cada coisa
 - `AGENTS.md`: o arquivo principal, que o sistema lê no começo de toda conversa.

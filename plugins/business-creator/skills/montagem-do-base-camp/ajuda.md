@@ -40,8 +40,8 @@
 ## Apareceu uma caixa com botões no meio da tela
 "É uma pergunta com opções: é só clicar na que você quer. Se nenhuma servir, escolha 'Outra' e escreva."
 
-## Os botões do painel: Confirmar o retrato, Fechar o Base Camp (ou Aprovar) e Quero corrigir
-"O botão azul diz o que acontece quando você clica: Confirmar o retrato, Fechar o Base Camp ou Aprovar. Vale como o seu 'pode': o que está no painel fica como está. Quero corrigir coloca a frase na caixa de texto para você completar com o que quer mudar; ele fica sempre à mão, até depois de o Base Camp estar montado."
+## Os botões do painel: Confirmar o retrato, os três workflows, Aprovar a entrega, o botão com o seu pedido e Quero corrigir
+"O botão azul diz o que acontece quando você clica. Confirmar o retrato vale como o seu 'pode': o que está no painel fica como está. No passo 3, os três botões são os workflows que o sistema propôs, o primeiro é o recomendado: o clique escolhe e já roda a primeira vez. Depois, Aprovar a entrega diz que o resultado ficou do seu jeito, e o botão com o seu pedido (as palavras que você vai escrever toda vez, como 'fechar o dia') roda o workflow de novo. Quero corrigir coloca a frase na caixa de texto para você completar com o que quer mudar; ele fica sempre à mão, até depois de o Base Camp estar montado."
 
 ## Quero responder por voz
 "Use o ditado do computador: no Mac, a tecla do microfone (ou fn duas vezes); no Windows, Windows + H. Fale à vontade, do jeito que vier: eu organizo. Se nada acontecer, o ditado está desligado: no Mac, abra Ajustes do Sistema, Teclado, e ligue o Ditado (ali aparece o atalho do seu Mac); no Windows, Configurações, Hora e idioma, Fala."
@@ -74,7 +74,7 @@
 - `frentes/`: uma pasta para cada coisa que você toca.
 - `memoria.md`: as lições que você ensina corrigindo.
 - `contexto/computador.md`: o que o seu computador tem (sistema, programas), para eu usar as ferramentas certas.
-- `frentes/<frente>/workflows/`: um cartão para cada workflow, o caminho de uma tarefa sua do começo à entrega. O primeiro nasce na etapa 3.
+- `frentes/<frente>/workflows/`: um cartão para cada workflow, o caminho de uma tarefa sua do começo à entrega. O primeiro você escolhe no fim do Base Camp, e ele roda na hora.
 - `frentes/<frente>/rotinas/` e `modelos/`: os passo a passos que o sistema guardou e os textos que você aprovou.
 - `como-usar.md`: o seu guia de bolso, com o combinado e os pedidos que já funcionam.
 - `resumo-para-o-arthur.md`: o resumo do seu Base Camp em uma página, para mandar ao Arthur se quiser.

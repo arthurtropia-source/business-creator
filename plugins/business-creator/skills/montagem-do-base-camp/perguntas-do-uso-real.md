@@ -18,11 +18,11 @@
 - "O que está parado ou atrasado nela, e o que está segurando?" → `FRENTE.<nome>.parado`.
 - "Quem mais está nela com você, e qual é o seu papel?" (só o papel, sem nomes de colegas ou clientes) → `FRENTE.<nome>.pessoas`.
 
-## No Campo 1, o primeiro workflow (a skill `campo-1` faz estas)
-- "Quando essa tarefa estiver pronta, como você sabe que ficou certa? O que não pode faltar?" → `PROC.pronto`.
-- "O que pode travar: depende de alguém aprovar, de um acesso, de uma informação que não está com você?" → `PROC.dependencias`.
-- "Quanto tempo levou da última vez, e quando foi? Se puder, cronometre a próxima." → `PROC.antes` (medido, no lugar da estimativa).
-- Cada passo detalhado: o que entra, o que ela olha, o critério, as exceções, o que sai (na skill `campo-1`).
+## Nas rodadas do workflow (a skill `campo-1` faz estas, uma por vez, e só quando a rodada precisa)
+- "Quanto tempo isso te tomava antes?" → `PROC.antes` (uma vez, no fim da rodada 1; a montagem já pergunta na mensagem final. Depois, se puder: "cronometre a próxima", para o medido no lugar da estimativa).
+- Só quando a entrega não dá para conferir: "O que não pode faltar para você dar por pronto?" → `PROC.pronto` (de preferência, o sistema escreve o "Pronto quando" pelo que a rodada mostrou, e ela corrige).
+- Só quando um passo não dá para fazer: a pergunta daquele passo, uma ("Cola aqui a mensagem dele?", "Qual dos dois fornecedores?"), na hora → `PROC.dependencias`, se for uma trava que se repete.
+- O detalhamento de um passo (o que entra, o critério, as exceções, o que sai) **não se pergunta**: entra pelas correções dela, rodada a rodada. A exceção é o plano B da skill `campo-1`: o passo que falhou duas vezes, com até 3 perguntas, uma por vez.
 
 ## Quando o sistema for decidir algo por ela, ou propor opções
 - "Quando você decide algo importante, como faz? Sozinho, conversa com alguém, pede opções, dorme em cima?" → `JEITO.decide`.

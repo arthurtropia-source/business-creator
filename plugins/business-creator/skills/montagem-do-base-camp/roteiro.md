@@ -1,8 +1,9 @@
 # Roteiro da Montagem do Base Camp
 
-> Versão 3.3 (02/11/2026), no plugin Business Creator 0.2.16: **o Base Camp curto**, em 3 passos e um "confirmo" (decisão do Arthur, 01/11/2026, pela regra padrão do onboarding: curto, com o valor na próxima coisa que a pessoa já ia fazer). As perguntas da montagem longa viraram a reserva do uso real: `perguntas-do-uso-real.md`.
-> Para a pessoa, as partes são **passos** ("passo 2 de 3"). Os códigos internos: **D** (o começo), **1** (o retrato), **2** (a primeira tarefa). Tempo-alvo total: 20 a 35 minutos, dos quais 5 a 15 são dela no começo.
+> Versão 4.0 (02/11/2026), no plugin Business Creator 0.2.17: **o Base Camp curto, com um workflow, uma escolha e uma frase** (decisão do Arthur, 02/11/2026, depois do teste dele: a primeira tarefa e o primeiro workflow eram dois objetos, com três frases para um caminho só, e a pessoa se confundia). Em 3 passos: o começo, o retrato confirmado numa resposta só, e **o primeiro workflow, que ela escolhe entre 3 e o sistema roda na hora**. As perguntas da montagem longa são a reserva do uso real: `perguntas-do-uso-real.md`.
+> Para a pessoa, as partes são **passos** ("passo 2 de 3"). Os códigos internos: **D** (o começo), **1** (o retrato), **2** (o primeiro workflow). Tempo-alvo total: 20 a 35 minutos, dos quais 5 a 15 são dela no começo.
 > **[leve]** = vale também no nível leve. No curto, a diferença entre os níveis é só o mapa das frentes: no leve, até 2 frentes e sem pasta por frente.
+> **A frase do workflow é uma só: o pedido** (as 2 a 5 palavras que ela vai escrever toda vez, com as palavras dela: "fechar o dia"). Ele aparece no botão do painel, no cartão, no combinado e no guia de bolso. Nunca invente uma segunda frase para o mesmo caminho.
 
 ---
 
@@ -11,7 +12,7 @@
 > **Boas-vindas ao seu Base Camp.**
 > Antes de subir qualquer montanha, a gente monta o acampamento. É aqui que o seu sistema passa a saber quem você é, o que você toca e como você trabalha, para parar de te pedir as mesmas explicações.
 >
-> São 3 passos, uns 30 minutos, e você só responde. Eu monto o seu sistema, te mostro para você confirmar e, no fim, ele já faz a primeira tarefa para você. Pode responder por voz (o ditado do computador: no Mac, a tecla do microfone; no Windows, Windows + H), solto, do jeito que vier. Dá para parar quando quiser: eu guardo onde paramos.
+> São 3 passos, uns 30 minutos, e você só responde. Eu monto o seu sistema, te mostro para você confirmar e, no fim, ele já roda o seu primeiro workflow para você. Pode responder por voz (o ditado do computador: no Mac, a tecla do microfone; no Windows, Windows + H), solto, do jeito que vier. Dá para parar quando quiser: eu guardo onde paramos.
 >
 > **Para começar, são só 2 pedidos.**
 >
@@ -63,13 +64,14 @@
 **Arquivos:** todos os do sistema dela, escritos de uma vez a partir de `respostas.md`, pelos modelos de `modelos/`:
 - `contexto/sobre-mim.md` (modelo `sobre-mim.md`): só o que veio; o que não veio fica fora, sem "a completar" na cara dela;
 - `contexto/como-trabalhar-comigo.md` (modelo `como-trabalhar-comigo.md`): o formato inferido do que ela escreveu, de como ela escreveu e do que a outra IA registrou;
-- o mapa das frentes e as ferramentas (`montagem/mapa-das-frentes.md`, seções do modelo `AGENTS-raiz.md`) e, no completo, `frentes/<nome>/AGENTS.md` de cada frente (modelo `frente-AGENTS.md`), com `CLAUDE.md` de uma linha ao lado; nomes curtos de pasta, sem espaço nem acento; no leve, até 2 frentes, só no mapa;
+- o mapa das frentes e as ferramentas (`montagem/mapa-das-frentes.md`, seções do modelo `AGENTS-raiz.md`) e, no completo, `frentes/<nome>/AGENTS.md` de cada frente (modelo `frente-AGENTS.md`), com `CLAUDE.md` de uma linha ao lado; nomes curtos de pasta, sem espaço nem acento; no leve, até 2 frentes, só no mapa. A tabela "Workflows" de cada ficha nasce vazia ("o primeiro se escolhe no fim do Base Camp"): o cartão do workflow só existe depois que ela escolher, no passo 2;
 - `memoria.md` (modelo `memoria.md`) e `montagem/regras.md` com as 7 regras da casa padrão, a regra do formato tirada do que ela disse, e o sigilo que ela citou (a regra 7, dos dados da empresa, só se ela trabalha numa empresa de outra pessoa);
 - `contexto/computador.md`: o inventário pela skill `rotinas-e-computador` (seção 5), um comando de cada vez, sem pergunta;
-- **o cartão do primeiro workflow**, em `frentes/<frente>/workflows/<nome-curto>.md` (no leve, `workflows/`), modelo `workflow.md`: **você escolhe** a tarefa entre as que se repetem (`PROC.candidatas`, o que ela pediu mais de uma vez à outra IA, onde perde tempo), pelos critérios: gera ou poupa dinheiro; repete pelo menos uma vez por semana ou por mês; as informações estão no computador ou num lugar que ela acessa; o resultado dá para conferir; não depende de outra pessoa aprovar; não usa dados da empresa sem autorização. O começo, a entrega e os passos como ela contou; o "antes" estimado (marcado "estimativa, pela outra IA" ou "pela fala dela"); o que não veio fica "a completar no Campo 1";
-- o `AGENTS.md` da raiz, final, pelo modelo `AGENTS-raiz.md`, **com a seção temporária "Montagem em andamento"** (sai no fim do passo 2);
+- o `AGENTS.md` da raiz, final, pelo modelo `AGENTS-raiz.md`, **com a seção temporária "Montagem em andamento"** (sai no fim do passo 2). Na seção "Como este sistema cresce", a linha do primeiro workflow fica "O primeiro se escolhe no fim do Base Camp" até o passo 2;
+- `como-usar.md` (modelo `como-usar.md`) e `resumo-para-o-arthur.md` (modelo `resumo-para-o-arthur.md`), **já aqui, como rascunho**: tudo o que o retrato sabe entra; as seções do workflow e do combinado ficam "se decide no passo 3". No fim do passo 2, só essas seções mudam: segundos, não minutos;
 - `montagem/resumo.md`, no formato abaixo, que o painel mostra em cartões.
-Grave no `base-camp.md`, logo abaixo da linha **Montagem:**, a linha `- **Primeiro workflow:** \`<caminho do cartão>\`` (é assim que o painel o encontra).
+
+**Nada de escolher o workflow aqui.** O retrato é sobre ela; o cartão "O que se repete" lista as candidatas (as tarefas que ela repete, com a frequência e, quando ela disse, o tempo), sem eleger nenhuma. A escolha é dela, no passo 2, entre 3 botões.
 
 **O teste "quem sou eu", sozinho:** com a ferramenta `teste_do_base_camp`, pergunte "quem sou eu e quais são as minhas frentes?" e, no completo, "escreva uma mensagem curta apresentando o meu trabalho em <a frente prioritária>". Passa se acertar o nome, o trabalho principal e as frentes, sem inventar, e se nada de outra frente ou do sigilo aparecer. Marque no `base-camp.md`, em Testes, "passou" ou "não passou: <o motivo>"; se não passou, corrija o arquivo que causou e repita, antes de mostrar o retrato. Sem a ferramenta, marque "não feito" e siga.
 
@@ -83,14 +85,10 @@ Grave no `base-camp.md`, logo abaixo da linha **Montagem:**, a linha `- **Primei
 - (?) <ponto da outra IA em dúvida> · da outra IA, de <mês/ano ou sem data>
 ### O que você toca
 ### O que se repete
+- <cada tarefa que se repete, em uma linha: o que é, quantas vezes por semana ou por mês e, se ela disse, quanto tempo leva>
 ### Como você trabalha e gosta de receber
 ### As regras da casa
 - <as 7 regras numa linha: "as 7 regras padrão; nada sai do computador sem o seu ok; <o sigilo que ela citou>">
-### O primeiro workflow (sugerido)
-- <o nome; do começo à entrega em uma linha; por que este>
-- <"hoje leva <antes>, <vezes> por mês (estimativa)">
-- Alternativa: <o nome de outra candidata, em uma linha>
-- Alternativa: <mais uma, se houver>
 ### Aonde quer chegar
 
 ## Falta isto
@@ -99,42 +97,53 @@ Grave no `base-camp.md`, logo abaixo da linha **Montagem:**, a linha `- **Primei
 Os pontos em dúvida são os deduzidos pela outra IA, os com mais de 3 meses ou sem data, e os que podem ter sido mal entendidos. **Nenhum ponto da outra IA some sem ela ver**, a não ser o que a fala dela contradisse.
 
 **Na conversa, uma mensagem só**, depois de tudo gravado:
-> "Montei o seu retrato com o que você mandou. Está no painel ao lado, em cartões; os pontos com ? vieram da outra IA e podem ser antigos. O primeiro workflow que eu sugiro é <o nome>: <por quê, em uma linha, com os números dela>.
+> "Montei o seu retrato com o que você mandou. Está no painel ao lado, em cartões; os pontos com ? vieram da outra IA e podem ser antigos.
 > ---
 > **Corrija o que quiser, numa resposta só, escrevendo ou por voz. Se estiver tudo certo, escreva confirmo.**"
 - Sem o painel (celular, terminal), mande antes do `---` os cartões em até 10 linhas.
 - **Sem caixa de opções e sem pergunta item por item** (decisão do Arthur, 31/10/2026). O que ela não corrigir vale.
-- **As alternativas de workflow vêm junto, não depois** (regra do Arthur, 02/11/2026: opções todas de uma vez, a recomendada primeiro): as duas linhas "Alternativa:" do cartão viram botões no painel; o clique manda "primeiro workflow: <nome>". **Se ela escolher outro workflow** (pelo botão, nas correções ou a qualquer momento depois), o escolhido por ela passa a ser o primeiro, e tudo muda junto, antes de qualquer outra coisa: grave o cartão dele (modelo `workflow.md`), troque a linha **Primeiro workflow** do `base-camp.md`, ponha o sugerido como "o próximo" na tabela "Workflows" da ficha da frente e refaça o cartão "O primeiro workflow" do `resumo.md`. A última escolha dela manda; nunca volte ao sugerido (no teste de 02/11, o Campo 1 abriu o sugerido depois de ela escolher outro).
 
 **Ao "confirmo" ou às correções:** grave as correções nos arquivos e no `resumo.md` (tire o `(?)` do que ela confirmou; apague o que não vale mais; o que ela corrigiu entra como `[confirmado]`); o que ela não tocou vira `[memória de outra IA, confirmado em <data>]`. Marque o passo 1 "aprovado" e abra o passo 2 na mesma resposta. Se ela aprovar sem ler ("confirmo" em menos de um minuto, ou dizendo que não leu), anote em "Pedidos sobre o kit": "retrato confirmado sem ler".
 
 ---
 
-## Passo 2: a primeira tarefa feita, e o combinado (5 a 10 min) [leve]
-**Arquivos:** o resultado da tarefa em `frentes/<frente>/modelos/` (no leve, `modelos/`), `como-usar.md` (modelo `como-usar.md`), `resumo-para-o-arthur.md` (modelo `resumo-para-o-arthur.md`), `base-camp.md` concluído.
+## Passo 2: o primeiro workflow, escolhido por ela e rodado na hora (5 a 10 min) [leve]
+**Arquivos:** o cartão do workflow em `frentes/<frente>/workflows/<nome-curto>.md` (no leve, `workflows/`), o resultado da rodada 1 onde ele mora (a entrega dela: um arquivo em `frentes/<frente>/modelos/` ou na frente, ou o texto na conversa), `como-usar.md` e `resumo-para-o-arthur.md` completados, `base-camp.md` concluído.
 
-2.1 [leve] **As opções da primeira tarefa, todas de uma vez, com uma recomendada** (decisão do Arthur, 02/11/2026, depois do teste: "era melhor que já viessem todas essas sugestões, uma recomendada e outras adicionais"; substitui o "o sistema propõe uma e já faz" de 01/11). Escolha **3 tarefas reais e pequenas** (cabem em 5 minutos), tiradas do que ela contou: de preferência um passo do primeiro workflow com um caso real que ela citou, o que ela mais pediu à outra IA, ou algo de outra frente que ela toca. **Critério que não se negocia: a tarefa tem de sair pronta de verdade, com o que está na pasta e na conversa.** Nada de modelo com campos em branco, nada que precise de dado que não está aqui (planilha, sistema, BI), nada que mande algo para fora do computador nem use dados da empresa sem autorização. A recomendada é a que mais mostra o sistema trabalhando do jeito dela, com o menor risco de errar.
-- **Antes de falar, grave as 3 no `base-camp.md`**, em "Primeiras tarefas", uma por linha, começando com "- ", a recomendada primeiro, cada uma com até 70 caracteres e começando pelo verbo ("Escrever a mensagem de retorno para o cliente de ontem"). O painel mostra cada uma como um botão, a primeira em destaque.
+2.1 [leve] **As 3 opções de workflow, todas de uma vez, com uma recomendada** (regra do Arthur, 02/11/2026: opções vêm todas de uma vez, a recomendada primeiro). Escolha **3 tarefas que se repetem**, tiradas do que ela contou (`PROC.candidatas`, o que ela pediu mais de uma vez à outra IA, onde perde tempo), pelos critérios: gera ou poupa dinheiro, ou devolve tempo; repete pelo menos uma vez por semana ou por mês; **a rodada 1 roda agora, com o que ela tem**: o que está na cabeça dela (o dia de hoje), uma mensagem que ela cola, um arquivo que ela manda, ou o que já está na pasta; o resultado dá para conferir; não depende de outra pessoa aprovar; não usa dados da empresa sem autorização. **Critério que não se negocia: a rodada 1 tem de entregar algo de verdade.** Nada de modelo com campos em branco, nada que precise de dado que não está aqui nem com ela (planilha de outra pessoa, sistema, BI), nada que mande algo para fora do computador. Tarefa que depende de sistema ou de dado de terceiro não entra nas 3: fica anotada como "o próximo", dito assim, na tabela "Workflows" da ficha da frente. A recomendada é a que mais mostra o sistema trabalhando do jeito dela, com o menor risco de errar.
+- **Cada opção é um pedido e uma entrega.** O **pedido** são as 2 a 5 palavras que ela vai escrever toda vez, com as palavras dela, em minúsculas ("fechar o dia", "monitor de preço de ontem"); a **entrega** é o que ela recebe no fim da rodada 1, em uma linha ("o quadro dos seus projetos atualizado com o que andou hoje e a lista de amanhã").
+- **Antes de falar, grave as 3 no `base-camp.md`**, na seção "O primeiro workflow" (numa pasta antiga, a seção se chama "Primeiras tarefas": use essa), uma por linha, começando com "- ", a recomendada primeiro, no formato `- <pedido>: <a entrega, em uma linha>`. O painel mostra cada uma como um botão com o pedido, a primeira em destaque, e a entrega embaixo.
 - Na conversa:
-> "Para a sua primeira tarefa, três opções do que você me contou. A que eu recomendo é a primeira: <por quê, em uma linha>.
+> "Para o seu primeiro workflow, três opções do que você me contou, com o que você recebe logo na primeira vez. A que eu recomendo é a primeira: <por quê, em uma linha>.
 > ---
-> **Clique no painel na tarefa que você quer, ou diga qual.**"
-- Sem o painel (celular, terminal), liste as 3 numeradas antes do `---` e peça o número.
-- **Ao clique ou à escolha, faça na hora**, seguindo as regras dela (o formato, o sigilo, o rascunho em vez do envio; se mexer em arquivo, a skill `rotinas-e-computador`). Se ela pedir uma tarefa que não está na lista, faça essa. Na conversa:
-> "Feita: <o quê, em uma linha>, do seu jeito.
-> <o resultado, inteiro se couber em 15 linhas; senão, o começo e onde ficou>
-> Guardei como modelo. **Combinado:** quando <o começo do workflow> chegar, abra esta pasta e escreva **<o pedido curto>**.
-> ---
-> **Ficou bom?**"
-- Grave no `base-camp.md`, em "Primeiras tarefas", a linha **Feita:** (sem traço) **começando pelo texto da tarefa, igual ao da linha dela** ("**Feita:** Escrever a mensagem de retorno para o cliente de ontem · em <data>; ela achou <o quê>"): é por esse texto que o painel sabe qual das três saiu da lista "Peça ao seu sistema". Depois, a linha **Combinado:** (sem traço). O combinado é proposto por você, preso ao gatilho do workflow, com o pedido curto que ela vai escrever; ela só corrige se quiser. As outras duas tarefas ficam na lista: o painel as mostra depois como "Peça ao seu sistema".
-- Se ela corrigir o resultado, corrija, mostre o trecho e grave a correção como regra no `memoria.md` e no cartão do workflow, em "O que o sistema aprendeu". Se não gostar da tarefa, faça outra da lista.
+> **Clique no painel no workflow que você quer, ou escreva o nome dele.**"
+- Sem o painel (celular, terminal), liste as 3 numeradas antes do `---` (o pedido em negrito e a entrega ao lado) e peça o número.
 
-2.2 [leve] **Sem perguntar, na mesma resposta do "ficou bom":** escreva `como-usar.md` (com o combinado e o pedido curto em "Pedidos que já funcionam") e `resumo-para-o-arthur.md`; tire do `AGENTS.md` da raiz a seção "Montagem em andamento"; marque tudo como concluído no `base-camp.md`, com a soma dos tempos; e mande:
-> "**Base Camp montado**, em <n> minutos. O seu sistema já sabe quem você é, o que você toca e como você trabalha, e já fez a primeira tarefa para você. O guia de bolso e o resumo para o Arthur estão no painel.
-> O próximo passo é o Campo 1: detalhar o seu primeiro workflow passo a passo e rodá-lo de ponta a ponta comigo. É só clicar em **Rodar o meu primeiro workflow** no painel, ou escrever **vamos rodar o primeiro workflow**.
-> Business Creator powered by SEM IA™. Um sistema, qualquer IA."
+2.2 [leve] **Ao clique ("primeiro workflow: <pedido>") ou ao nome, antes de qualquer resposta, grave a escolha em todos os lugares** (a última escolha dela manda; se ela pedir um workflow fora da lista, é esse):
+- o cartão do workflow, pelo modelo `workflow.md`, **com as linhas Pedido e Combinado preenchidas**: o começo, a entrega e os passos como ela contou (quem faz: ela, como é hoje); o "antes" como estimativa, marcado "pela fala dela" ou "pela outra IA", ou "a medir" se ela não disse; o que não veio fica "a completar nas rodadas";
+- a linha `- **Primeiro workflow:** \`<caminho do cartão>\`` no `base-camp.md`, logo abaixo da linha **Montagem:** (é assim que o painel e o Campo 1 o encontram), e, na seção "O primeiro workflow", a linha **Escolhido:** (sem traço): `**Escolhido:** <pedido> · em <data hora>`;
+- a tabela "Workflows" da ficha da frente (no leve, do `AGENTS.md`): o escolhido como o primeiro, "incompleto: rodada 1 em andamento"; as outras duas opções como os próximos, "na fila: só abre quando o primeiro estiver completo";
+- no `AGENTS.md` da raiz, a linha do primeiro workflow com o caminho do cartão.
+
+**Em seguida, na mesma resposta, a rodada 1.** O sistema roda o workflow pelo cartão, passo a passo, com o que já está na pasta e na conversa:
+- se o primeiro passo precisar de uma coisa que só ela tem (o que andou hoje, a mensagem do cliente, o arquivo), peça **uma coisa só**, em uma linha, com as palavras dela ("Me conte o seu dia: o que andou e o que travou em cada projeto. Solto, por voz se quiser."), e espere. Uma pergunta, não um questionário: nada de "quem coletou, em que formato, onde guardou";
+- senão, faça direto, sem perguntar;
+- nos passos que são dela (uma decisão de julgamento, a aprovação de outra pessoa, um contato), diga em uma linha o que ela faz agora e siga com o resto;
+- siga as regras dela (o formato, o sigilo, o rascunho em vez do envio; se mexer em arquivo, a skill `rotinas-e-computador`); nada sai do computador;
+- **conte os pedidos dela**: cada mensagem dela que pediu, respondeu, corrigiu ou destravou algo nesta rodada (o clique conta como o primeiro).
+
+**A entrega e o "Base Camp montado", numa mensagem só.** Antes de falar: grave a linha da rodada 1 em "As rodadas" do cartão (a data, o tempo do clique à entrega, os pedidos dela, "Entrega aprovada?" = "a conferir") e atualize a coluna "Quem faz" com o que aconteceu de fato; grave no `base-camp.md`, na seção "O primeiro workflow", as linhas **Rodada 1:** (sem traço: `**Rodada 1:** <a entrega, em uma linha> · em <data hora>; <n> pedidos até a entrega`) e **Combinado:** (sem traço: `**Combinado:** quando <o gatilho, com as palavras dela>, abra esta pasta e escreva **<pedido>**`); complete em `como-usar.md` as seções do workflow e do combinado e, em "Pedidos que já funcionam", o pedido; complete no `resumo-para-o-arthur.md` as seções do workflow e da rodada 1; tire do `AGENTS.md` da raiz a seção "Montagem em andamento"; marque o passo 2 "aprovado" e a montagem concluída no `base-camp.md`, com o tempo total. Então:
+> "<Feito: a entrega, inteira se couber em 15 linhas; senão, o começo e onde ficou>
+> **Base Camp montado**, em <n> minutos. O seu sistema já sabe quem você é, o que você toca e como você trabalha, e o seu primeiro workflow, **<pedido>**, acabou de rodar pela primeira vez.
+> Daqui para frente, quando <o gatilho, com as palavras dela>, abra esta pasta e escreva **<pedido>**. Cada vez que rodar, corrija o que não ficou do seu jeito: o sistema aprende, e quando sair pronto com um pedido só, o workflow está completo. Uma pergunta só, para medir o que ele te devolve: quanto tempo isso te tomava antes? (Pode responder depois.)
+> Business Creator powered by SEM IA™. Um sistema, qualquer IA.
+> ---
+> **Confira a entrega: se ficou do seu jeito, clique em Aprovar a entrega (ou escreva aprovado); se não, diga o que mudar.**"
+- **Sem "ficou bom" antes do "montado"**: a entrega e o Base Camp pronto vêm juntos. O que ela corrigir depois entra como lição no cartão ("O que o sistema aprendeu") e, se valer para tudo, no `memoria.md`; o resultado é refeito e mostrado de novo. Ao "aprovado" (ou "pode", "ok", "ficou bom"), marque "sim" em "Entrega aprovada?" da rodada 1. A pergunta do "antes" não trava nada: se ela responder, grave em "O antes" do cartão (com a data e "pela fala dela") e tire de "Falta isto"; se não, fica para o uso real.
+- **O tempo da montagem é sem as pausas** (correção do Arthur, 02/11/2026: a mensagem final dele disse "374 minutos" contando uma pausa de 5 horas). Some os passos pelo relógio da tabela; se num passo a pessoa sumiu por mais de 15 minutos (você vê pela hora das respostas), tire a pausa da conta e diga à parte. Grave no `base-camp.md`: `**Tempo total:** <n> min (com uma pausa de <x> fora da conta)`, e na mensagem: "em <n> minutos (fora uma pausa de <x>)".
+- **O painel, depois disso, é o do workflow:** o botão principal passa a ser o pedido dela, e as outras duas opções ficam listadas como os próximos. Não há mais "tarefa" separada do workflow: a rodada 2 é "o próximo passo", pela skill `campo-1`.
 
 ---
 
 ## O que não está aqui
-As perguntas da montagem longa (quem é você, as frentes, como você trabalha, o estilo de escrita, o detalhe do workflow) estão em `perguntas-do-uso-real.md`, com o momento em que cada uma aparece. **Na montagem, não as faça.** No uso real, uma por conversa, só quando a tarefa precisar.
+As perguntas da montagem longa (quem é você, as frentes, como você trabalha, o estilo de escrita, o detalhe do workflow) estão em `perguntas-do-uso-real.md`, com o momento em que cada uma aparece. **Na montagem, não as faça.** No uso real, uma por conversa, só quando a tarefa precisar. O detalhamento do workflow passo a passo (o que entra, o critério, as exceções) também não se pergunta: entra pelas correções dela, rodada a rodada (skill `campo-1`).

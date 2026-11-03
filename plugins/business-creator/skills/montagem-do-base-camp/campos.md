@@ -1,6 +1,6 @@
 # Mapa de campos
 
-> O que cada arquivo final precisa saber. Cada campo tem um código, o arquivo onde entra e o que conta como "preenchido". **Desde o Base Camp curto (01/11/2026), todos os campos são preenchidos no passo 1 (o retrato) a partir dos 2 pedidos do começo; a coluna "Vem de" diz de que pergunta da montagem longa o campo vinha, e hoje aponta para `perguntas-do-uso-real.md`**, onde essas perguntas moram, para o uso real. O que o retrato não conseguir preencher fica fora do arquivo (ou "a completar no Campo 1", no cartão do workflow) e entra em "Falta isto" do `montagem/resumo.md`.
+> O que cada arquivo final precisa saber. Cada campo tem um código, o arquivo onde entra e o que conta como "preenchido". **Desde o Base Camp curto (01/11/2026), todos os campos são preenchidos no passo 1 (o retrato) a partir dos 2 pedidos do começo; a coluna "Vem de" diz de que pergunta da montagem longa o campo vinha, e hoje aponta para `perguntas-do-uso-real.md`**, onde essas perguntas moram, para o uso real. O que o retrato não conseguir preencher fica fora do arquivo (ou "a completar nas rodadas", no cartão do workflow) e entra em "Falta isto" do `montagem/resumo.md`.
 > Em `montagem/respostas.md`, cada campo é uma seção com o código no título (`## QUEM.trabalho`), e embaixo as respostas com a origem.
 > **[leve]** = o campo também entra no nível leve.
 
@@ -51,7 +51,7 @@
 |---|---|---|---|
 | `PROC.candidatas` [leve] | até 5 tarefas repetidas, com o tempo de cada | há pelo menos 2 | 1.5, 3.1 |
 | `PROC.dinheiro` [leve] | quais geram ou poupam dinheiro | há resposta | 3.2, 2.3 |
-| `PROC.escolhido` [leve] | a tarefa escolhida e por quê | ela escolheu | 3.3 |
+| `PROC.escolhido` [leve] | o workflow que ela escolheu entre as 3 opções do passo 2, com o pedido (a frase que ela escreve para rodar) | ela clicou ou nomeou | passo 2 |
 | `PROC.entrada` [leve] | de onde vêm as informações | há a fonte | 3.4 |
 | `PROC.saida` [leve] | o que sai no fim | há o formato do resultado | 3.4 |
 | `PROC.para-quem` [leve] | quem recebe | há uma pessoa ou "eu mesma" | 3.4 |
@@ -60,10 +60,10 @@
 | `PROC.pronto` | como ela sabe que ficou certa | há pelo menos 1 critério | 3.6 |
 | `PROC.dependencias` [leve] | o que pode travar a tarefa (aprovação de alguém, acesso, informação que não está com ela) e o que fazer antes do Campo 1 | há resposta (pode ser "nada") | 3.7 |
 
-## base-camp.md (as primeiras tarefas) e como-usar.md
+## base-camp.md (o primeiro workflow) e como-usar.md
 | Código | O que é | Preenchido quando | Vem de |
 |---|---|---|---|
-| `PRIMEIRA.tarefas` [leve] | as 3 primeiras tarefas propostas, a escolhida e o que ela achou | há as 3 e a escolhida foi feita | 5.8 |
+| `PRIMEIRA.workflows` [leve] | as 3 opções de workflow (pedido e primeira entrega), o escolhido, a rodada 1 e o combinado | há as 3, o escolhido rodou a rodada 1 e o combinado está gravado | passo 2 |
 
 ## Lista de arquivos por nível
 | Arquivo | Leve | Completo |

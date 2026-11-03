@@ -1,5 +1,5 @@
 <!--
-MODELO de resumo-para-o-arthur.md (na raiz). Escreva no bloco 6.
+MODELO de resumo-para-o-arthur.md (na raiz). Nasce no passo 1 (o retrato), como rascunho; no fim do passo 2 entram o workflow, a rodada 1 e os tempos.
 Para quem: o Arthur, que vai revisar o Base Camp e dar robustez a ele (o "feito para você"). Ele lê antes da call de planejamento.
 Regras: uma página (até ~50 linhas); fatos, com as palavras dela; nada de assunto pessoal nem de dados da empresa; as lacunas ditas com clareza; a pessoa lê e decide se manda. O tempo de cada bloco sai do base-camp.md.
 Tire estes comentários e as instruções entre <>.
@@ -25,11 +25,12 @@ Tire estes comentários e as instruções entre <>.
 - <O que é, a frente, a frequência; do ponto de partida à entrega, em uma linha; quantos passos hoje; o caminho do cartão.>
 - **Tem hora certa?** <sim, e quando / não: acontece quando aparece>.
 - **O antes:** <tempo>, <vezes por mês>, <horas por mês>, <data>, <medido / lembrança / estimativa>.
-- **Por que este:** <em uma linha.>
+- **Pedido:** <a frase que ela escreve para rodar.>
+- **Por que ela escolheu este:** <em uma linha, se ela disse; e qual era o recomendado.>
 - **O que pode travar:** <PROC.dependencias, em uma linha.>
 
-## A primeira tarefa
-- <Qual das 3 ela escolheu, o que o sistema entregou (em uma linha) e o que ela achou.>
+## A rodada 1
+- <Qual das 3 opções ela escolheu, o que o sistema entregou na rodada 1 (em uma linha), quantos pedidos dela foram precisos e se ela aprovou. Os outros dois, na fila.>
 
 ## Como gosta de trabalhar
 - <2 ou 3 linhas do como-trabalhar-comigo.md.>
@@ -42,7 +43,7 @@ Tire estes comentários e as instruções entre <>.
 - <Perguntas puladas, campos "a completar", dúvidas que apareceram.>
 - <Pedidos sobre o kit, se houver.>
 
-## Tempo de cada etapa
-| D | 1 | 2 | 3 | 4 | 5 | 6 | Total |
-|---|---|---|---|---|---|---|---|
-| <min> | <min> | <min> | <min> | <min> | <min> | <min> | <min> |
+## Tempo de cada passo (sem as pausas; a pausa dita à parte)
+| D | 1 | 2 | Total |
+|---|---|---|---|
+| <min> | <min> | <min> | <min> (<com uma pausa de x fora da conta, se houve>) |

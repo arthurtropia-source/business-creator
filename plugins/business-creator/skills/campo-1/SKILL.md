@@ -1,63 +1,52 @@
 ---
 name: campo-1
-description: Conduz o Campo 1 da primeira montanha, depois do Base Camp - detalhar e aprender um workflow da pessoa, passo a passo, e rodá-lo de ponta a ponta com ela, do ponto de partida até a entrega, gravando no cartão do workflow o que o sistema aprendeu. Use quando a pessoa escrever "vamos rodar o primeiro workflow", "Campo 1", "vamos detalhar o workflow X", "rodar o workflow X pela primeira vez", ou quando ela pedir uma tarefa que tem cartão em workflows/ com estado incompleto ou em andamento.
+description: Conduz o Campo 1 da primeira montanha, depois do Base Camp - rodar o primeiro workflow da pessoa, rodada a rodada, corrigindo até ele sair pronto com um pedido só dela, e gravar no cartão do workflow o que o sistema aprendeu. Use quando a pessoa escrever o pedido de um workflow que tem cartão em workflows/ com estado incompleto ou em andamento (o pedido está na linha Pedido do cartão: "fechar o dia", "monitor de preço de ontem"), ou "vamos rodar o primeiro workflow", "Campo 1", "rodar o workflow X", "aprovado" ou "quero corrigir" logo depois de uma rodada.
 ---
 
-# Campo 1: detalhar e aprender o workflow
+# Campo 1: rodar até sair com um pedido só
 
-> Plugin Business Creator 0.2.1 (30/10/2026). O Campo 2 (os passos que se repetem viram skills) e o Campo 3 (chegar sozinho) vêm na 0.3.
+> Plugin Business Creator 0.2.17 (02/11/2026), versão 2 desta skill: **rodadas com correção, sem questionário** (decisão do Arthur, 02/11/2026: no teste dele o Campo 1 abriu com perguntas que o Base Camp tinha prometido não fazer, e ele preferiu aprender rodando). O Campo 2 (os passos que se repetem viram skills) e o Campo 3 (chegar sozinho) vêm na 0.3.
 
-Um workflow é o caminho de uma tarefa da pessoa, do ponto de partida até a entrega. Cada frente dela é um conjunto de workflows. O primeiro foi desenhado no retrato do Base Camp, escolhido pelo sistema, como é hoje, com os passos que ela contou. **O Campo 1 é onde o sistema aprende esse workflow:** cada passo detalhado, com os critérios e as exceções dela, quem passa a fazer cada um, e uma rodada inteira com dado real, do começo à entrega.
+Um workflow é o caminho de uma tarefa da pessoa, do ponto de partida até a entrega. Cada frente dela é um conjunto de workflows. O primeiro foi escolhido por ela no fim do Base Camp e já rodou uma vez (a rodada 1). **O Campo 1 é rodar de novo, cada vez que a tarefa chegar, corrigindo:** ela escreve o pedido, o sistema roda o cartão passo a passo, entrega, ela aprova ou corrige, e cada correção vira regra. Está pronto quando sair do começo à entrega com um pedido só dela, e ela aprovar.
 
 ## Linha de chegada do Campo 1
-1. todos os passos do cartão estão **detalhados** (o que entra, o que se faz, o critério de cada decisão, as exceções, o que sai) e cada um tem **quem faz**: ela, o sistema (com rotina gravada ou modelo) ou "ainda não dá" (com a pendência);
-2. o workflow **rodou do começo à entrega** pelo menos uma vez, com dado real, e ela **aprovou a entrega**;
-3. as rotinas e os modelos dessa rodada estão gravados na pasta e o cartão aponta para cada um, no passo dele;
-4. "O que o sistema aprendeu" e "As rodadas" estão preenchidos, com o tempo da rodada contra o "antes";
-5. a tabela "Workflows" da ficha da frente mostra o estado novo.
+1. o workflow **rodou do começo à entrega com um pedido só dela**, e ela **aprovou a entrega**: o Estado do cartão vira "completo, em <data>", e a tabela "Workflows" da ficha da frente mostra o mesmo;
+2. cada passo do cartão tem **quem faz** de fato (ela, o sistema ou "ainda não dá", com a pendência), tirado do que aconteceu nas rodadas, não de uma entrevista;
+3. as rotinas e os modelos que as rodadas criaram estão gravados na pasta, e o cartão aponta para cada um, no passo dele;
+4. "O que o sistema aprendeu" tem as regras das correções dela, com a data; "As rodadas" tem uma linha por rodada, com o tempo contra o "antes".
 
-## Antes de começar
-- **O workflow é o da linha "Primeiro workflow" do `base-camp.md`, e só ele.** Leia essa linha primeiro e abra exatamente esse cartão. Não use o que a conversa, o `resumo.md` ou a ficha da frente diziam antes: a pessoa pode ter trocado o workflow depois (no teste de 02/11, ela escolheu outro e o Campo 1 abriu o sugerido). Se ela nomear outro workflow no pedido ("vamos rodar o de projetos"), troque a linha do `base-camp.md` e, se o cartão não existir, crie-o pelo modelo antes de abrir. Em dúvida sobre qual, pergunte em uma linha; nunca escolha por ela.
-- Leia com a ferramenta de leitura de arquivos, nunca por comando (cada comando pode virar um pedido de permissão na tela dela): o cartão do workflow (o caminho está no `base-camp.md`, na linha **Primeiro workflow**, ou na tabela "Workflows" da ficha da frente), o `contexto/computador.md` e a ficha da frente.
-- **Retomada:** se o cartão já tem passos detalhados, diga em uma linha onde vocês pararam ("Já detalhamos os passos 1 a 3. Vamos para o 4?") e siga dali. Nunca refaça o que está no cartão.
-- **Abra com o caminho em duas linhas**, com as palavras dela: "Campo 1: o seu workflow <nome>. Ele começa quando <X> e termina com <Y>, <para quem>. Hoje são <n> passos e leva <antes>. Agora eu aprendo cada passo com você e, no fim, a gente roda inteiro, com um caso de verdade." Se o cartão disser algo em "O que pode travar", resolva ou confirme isso primeiro.
+## Antes de rodar
+- **Ache o cartão pelo pedido.** O pedido que ela escreveu é a linha **Pedido** de um cartão em `workflows/` (na frente, ou na raiz no nível leve). Se ela escreveu "vamos rodar o primeiro workflow" ou "Campo 1", o cartão é o da linha **Primeiro workflow** do `base-camp.md`, e só ele. Se ela nomear outro ("vamos rodar o de projetos"), é esse; se o cartão não existir, crie pelo modelo `workflow.md` da montagem antes de rodar. Em dúvida entre dois, pergunte em uma linha; nunca escolha por ela.
+- Leia com a ferramenta de leitura de arquivos, nunca por comando: o cartão, o `contexto/computador.md` e a ficha da frente. Nada mais.
+- **Cartão de antes da 0.2.17** (sem as linhas Pedido e Combinado em "Do começo à entrega"): acrescente as duas, tiradas de "Começa quando" e do `como-usar.md`, numa edição só, antes de rodar. É por elas que o painel mostra o botão.
+- **Abra em uma linha, nas palavras dela**, e já peça o que a rodada precisa, se precisar: "Rodada <n> de <o nome do workflow, como no cartão>. Me conte o seu dia: o que andou e o que travou." Nada de método na mensagem: sem "Campo 1", "cartão", "de ponta a ponta", "a Mera", "detalhar". O mapa fica na trilha do painel. Se o cartão disser algo em "O que pode travar" que impede a rodada, diga em uma linha e resolva primeiro.
 
-## 1. Detalhar, passo a passo (o aprendizado)
-Um passo de cada vez, na ordem do cartão. Para cada passo, **uma pergunta por vez**, só o que o cartão ainda não diz:
-1. **O que entra:** "Nesse passo, o que você tem na mão? Que arquivo, mensagem ou informação?"
-2. **O que você faz e olha:** "Me conte a última vez que você fez esse passo: o que olhou primeiro, o que fez depois?" Peça um caso real e recente; nunca "como você costuma fazer".
-3. **A decisão e o critério:** se o passo tem escolha ("este entra, aquele não"; "este valor está estranho"), pergunte como ela decide, com um exemplo. O critério é o que mais vale aprender: vai para "O que o sistema aprendeu".
-4. **As exceções:** "O que costuma dar errado aqui? Qual foi a última vez?"
-5. **O que sai e onde fica:** o resultado do passo e o lugar (arquivo, pasta, mensagem).
-
-Grave no cartão a cada resposta (uma edição só por resposta): a linha do passo vira "detalhado" e o que ela ensinou vai para "O que o sistema aprendeu", com a data. Se o passo se divide em dois, divida a linha e diga em meia linha.
-
-**Quem faz cada passo** (no fim do detalhamento, você sugere e ela decide; escolha com clique, se tiver a ferramenta de pergunta com opções):
-- **fica com ela:** decisão de julgamento, aprovação de outra pessoa, contato com alguém;
-- **o sistema faz:** o que é ler, juntar, conferir, calcular, montar ou redigir a partir do que está no computador. Com uma rotina gravada (planilha, arquivo: skill `rotinas-e-computador`) ou com um modelo de texto aprovado (`modelos/`);
-- **ainda não dá:** falta um acesso, uma ferramenta ou uma informação. Vai para as Pendências da frente, com de quem depende.
-Diga por que sugere cada um, em meia linha. Nunca tire dela uma decisão que ela não quis passar.
-
-## 2. Rodar de ponta a ponta (a primeira rodada)
-- **Com um caso de verdade:** a próxima vez que a tarefa acontecer, ou agora, com o último caso (o arquivo mais recente). Pergunte qual.
-- Siga o cartão passo a passo. Nos passos do sistema, faça e mostre o resultado em poucas linhas; nos passos dela, diga o que ela faz agora e espere.
-- **Cada correção dela é aprendizado:** corrija, mostre o trecho e grave a regra em "O que o sistema aprendeu" (se valer para tudo, também no `memoria.md`). Diga em meia linha que aprendeu.
+## 1. Rodar (cada rodada)
+- Siga o cartão passo a passo, na ordem. **Nos passos do sistema**, faça e mostre o resultado em poucas linhas. **Nos passos dela** (decisão de julgamento, aprovação de outra pessoa, contato com alguém), diga em uma linha o que ela faz agora e siga com o resto.
+- **Pergunte só quando um passo não dá para fazer**, e uma coisa só, na hora, com as palavras dela ("Qual dos dois fornecedores?", "Cola aqui a mensagem dele?"). Nunca uma pergunta sobre como ela costuma fazer, nem "a última vez que você fez": o jeito dela entra pela correção.
+- **Cada correção dela é aprendizado:** corrija, mostre o trecho e grave a regra em "O que o sistema aprendeu", com a data (se valer para tudo, também no `memoria.md`). Diga em meia linha que aprendeu. Se a correção muda um passo (a ordem, o que entra, o que sai), mude a linha do passo no cartão.
 - **Rotina e modelo se gravam na hora:** pela skill `rotinas-e-computador` (rotina na pasta, conferência dentro, arquivo original intacto); o cartão aponta para cada um, na coluna "Com quê" do passo.
-- **A entrega (Y):** confira contra o "Pronto quando" do cartão, item por item, antes de mostrar. Ela aprova ou corrige. Aprovada, grave em `modelos/` o que for texto ou formato que vai se repetir. Nada sai do computador sem o ok dela: o sistema entrega como rascunho.
+- **A entrega:** confira contra o "Pronto quando" do cartão, item por item, antes de mostrar (se o "Pronto quando" estiver "a completar", escreva-o pelo que a entrega precisa ter, e ela corrige). Nada sai do computador sem o ok dela: o sistema entrega como rascunho.
+- **Conte os pedidos dela:** cada mensagem dela que pediu, respondeu, corrigiu ou destravou algo, do pedido à entrega aprovada. O pedido inicial conta como o primeiro.
+- **Plano B, um passo que falhou duas vezes:** se ela corrigiu o mesmo passo em duas rodadas, detalhe só esse passo, com até 3 perguntas, uma por vez (o que entra, como ela decide, o que costuma dar errado), e grave as respostas no cartão. É a exceção, não o caminho.
 
-## 3. Fechar a rodada e o Campo 1
-- Grave a linha em "As rodadas": a data, o tempo do começo à entrega, **quantos pedidos dela** foram precisos até a entrega (cada mensagem dela que pediu, corrigiu ou destravou algo) e se a entrega foi aprovada.
-- **O estado do workflow:**
-  - **completo, em <data>:** rodou do começo à entrega com **um pedido só dela** e ela aprovou a entrega. Na primeira rodada guiada isso quase nunca acontece, e está tudo bem;
-  - **em andamento:** rodou, mas com vários pedidos dela, ou falta um passo. Diga qual;
-  - **incompleto:** não chegou à entrega. Diga o que falta.
-  Atualize o estado no cartão e na tabela "Workflows" da ficha da frente.
-- **Conte o resultado em até 5 linhas:** o tempo de hoje contra o "antes"; quantos passos o sistema já faz; o que ele aprendeu (as 2 ou 3 regras mais importantes); o que ficou pendente.
-- **O próximo passo** (o começo do Campo 2): "Da próxima vez que essa tarefa chegar, abra uma conversa nesta pasta e peça só: '<o pedido curto, com as palavras dela>'. Se sair pronto com esse pedido e você aprovar, o workflow fica completo." Grave esse pedido no cartão e no `como-usar.md`, em "Pedidos que já funcionam".
+## 2. Entregar e fechar a rodada
+A mensagem da entrega:
+> "<a entrega, inteira se couber em 15 linhas; senão, o começo e onde ficou>
+> ---
+> **Confira: se ficou do seu jeito, clique em Aprovar a entrega (ou escreva aprovado); se não, diga o que mudar.**"
+- **Antes de falar, grave no cartão:** a linha da rodada em "As rodadas" (a data, o tempo do pedido à entrega, os pedidos dela, "Entrega aprovada?" = "a conferir", uma observação curta); a coluna "Quem faz" e "Situação" dos passos com o que aconteceu de fato (o sistema fez / ficou com ela / ainda não dá); o que aprendeu.
+- **Ao "aprovado"** (ou "pode", "ok", "ficou bom", o clique em Aprovar a entrega): marque "sim" em "Entrega aprovada?". Grave em `modelos/` o que for texto ou formato que vai se repetir. **Se ela corrigir**, refaça, mostre de novo e só então peça a aprovação; a correção conta como pedido.
+- **O estado do workflow**, no cartão e na tabela "Workflows" da ficha da frente:
+  - **completo, em <data>:** rodou do começo à entrega com **um pedido só dela** e ela aprovou. Diga: "O workflow <nome> está completo: sai pronto com um pedido seu. O próximo da fila é <o próximo da tabela>; abre quando você quiser." Grave o pedido em `como-usar.md`, em "Pedidos que já funcionam", se ainda não estiver;
+  - **em andamento:** rodou, mas com mais de um pedido dela, ou um passo ficou com ela. Diga em uma linha o que faltou para sair com um pedido só ("hoje foram 3 pedidos: o dia, a correção da data e o ok");
+  - **incompleto:** não chegou à entrega. Diga o que faltou.
+- **O resultado, em até 3 linhas**, no fim: o tempo de hoje contra o "antes" (se o "antes" estiver "a medir", pergunte uma vez: "quanto tempo isso te tomava antes?", e grave com a data e "pela fala dela"); quantos passos o sistema já faz; a regra mais importante que aprendeu. Sem resumo do método.
+- **O próximo passo é sempre o mesmo pedido:** "Na próxima vez, só escreva **<pedido>**." Nunca invente uma segunda frase.
 
 ## Cuidados
 - **Um workflow de cada vez.** Se ela trouxer outra tarefa no meio, ajude em poucas linhas e, se ela se repete, anote na tabela "Workflows" da frente como o próximo.
-- **Não pule o detalhamento para chegar à rodada.** O que o sistema não aprendeu no passo vira correção na rodada, e cada correção custa um pedido dela.
 - **Sem jargão** (a não ser "workflow", que ela já conhece da montagem). Os critérios ficam com as palavras dela.
 - **Sigilo e dados da empresa:** as regras dela, no `AGENTS.md` da raiz, valem aqui. Dado da empresa só com a autorização registrada.
-- **Conversa longa:** depois do detalhamento, se a conversa estiver longa, recomende abrir uma conversa nova para a rodada ("vamos rodar o workflow <nome>"): o cartão guarda tudo.
+- **Uma conversa por rodada**, de preferência: o pedido abre a conversa, a entrega fecha. O cartão guarda tudo; a conversa seguinte não precisa da anterior.
+- **O painel lê o cartão:** o nome (o título), "O quê", as linhas Pedido, Combinado e Estado, a tabela dos passos e a tabela "As rodadas". Mantenha o formato do modelo `workflow.md`; sem isso, o botão do painel some.

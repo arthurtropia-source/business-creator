@@ -1,12 +1,14 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register, RenderSurface } from 'claude-code'
 
-import type { Bloco, Campo, Festa, Montado, Nivel, Painel, Resumo, Status } from '../types'
+import type { Bloco, Campo, Festa, Montado, Nivel, Opcao, Painel, Resumo, Rodada, Status } from '../types'
 
-// Painel da Montagem do Base Camp (v0.6, plugin 0.2.16). Veste a montagem com a marca e tira a
+// Painel da Montagem do Base Camp (v0.7, plugin 0.2.17). Veste a montagem com a marca e tira a
 // barreira técnica: mostra a subida, de quem é a vez e o que o sistema já sabe,
 // dá os botões de aprovar e corrigir e troca as linhas técnicas do app por
 // frases simples. Lê os arquivos da pasta da pessoa e não grava nada nela.
+// Depois do Base Camp montado, o cartão Agora passa a ser o do primeiro workflow (0.2.17):
+// o nome, as rodadas, o estado e o botão com o pedido dela.
 // Fora do painel, só faz o que a pessoa ou a montagem pedem: o teste da etapa 6
 // (uma pergunta à IA com os arquivos da pasta) e a cópia do resumo para o
 // Arthur, no clique dela.
@@ -82,7 +84,7 @@ const ICONES = ['campo-1-rodar', 'campo-2-skill', 'campo-3-agendar']
 const PARA_QUE: Record<string, string> = {
   D: 'Dois pedidos: o que a IA que você mais usa sabe de você, e você com as suas palavras.',
   '1': 'O sistema monta o seu retrato de uma vez; você só confirma ou corrige.',
-  '2': 'O sistema faz a primeira tarefa para você, e combina a próxima.',
+  '2': 'Você escolhe o seu primeiro workflow; o sistema roda a primeira vez e combina a próxima.',
 }
 
 // Ao fechar uma etapa, o painel celebra a obra, não a pessoa.
@@ -207,32 +209,51 @@ function lerBaseCamp(texto: string) {
     /\*\*Montagem:\*\*\s*conclu/i.test(texto) ||
     (blocos.length > 0 && blocos.every(b => b.status === 'aprovado' || b.status === 'pulado'))
   const iniciada = !/\*\*Montagem:\*\*\s*não começou/i.test(texto) || blocos.some(b => b.status !== 'pendente')
-  const linhas = secao(texto, 'Primeiras tarefas').split('\n').map(l => l.trim())
-  const tarefas = linhas
-    .filter(l => /^- \S/.test(l) && !/^- \**(Feita|Combinado)\b/i.test(l))
-    .map(l => l.slice(2).trim())
+  // A seção do passo 2: "O primeiro workflow" desde a 0.2.17; "Primeiras tarefas" nas pastas de antes.
+  const linhas = (secao(texto, 'O primeiro workflow') || secao(texto, 'Primeiras tarefas')).split('\n').map(l => l.trim())
+  // As 3 opções (0.2.17): "- <pedido>: <a primeira entrega>", a recomendada primeiro. Linha sem ": " é o formato
+  // antigo: a tarefa inteira vira o pedido, sem entrega. O negrito é tolerado e sai.
+  const opcoes: Opcao[] = linhas
+    .filter(l => /^- \S/.test(l) && !/^- \**(Feita|Combinado|Escolhido|Rodada|Tempo total|Primeiro workflow)\b/i.test(l))
+    .map(l => {
+      const limpa = l.slice(2).replace(/\*\*/g, '').trim()
+      const corte = limpa.indexOf(': ')
+      return corte < 0 ? { pedido: limpa, entrega: '' } : { pedido: limpa.slice(0, corte).trim(), entrega: limpa.slice(corte + 2).trim() }
+    })
+    .filter(o => o.pedido.length > 0)
     .slice(0, 3)
-  // "Feita:" e "Combinado:" podem vir em negrito (**Feita:**), como o roteiro manda escrever.
-  const feita = linhas.some(l => /^(- )?\**Feita:?\**:?/i.test(l))
-  // A linha "Feita:" começa pelo texto da tarefa (roteiro 3.3): essa sai de "Peça ao seu sistema".
-  // Com uma tarefa só, não sobra nenhuma; sem casar com nenhuma das três, ficam todas (como antes).
-  const linhaFeita = linhas
-    .map(l => /^(?:- )?\**Feita:?\**:?\s*(.+)/i.exec(l)?.[1]?.toLowerCase() ?? '')
-    .find(Boolean) ?? ''
-  const chaveFeita = linhaFeita.split(/ · | em \d|;|\(/)[0]?.trim() ?? ''
-  const restantes = !feita
-    ? tarefas
-    : tarefas.length === 1
-      ? []
-      : tarefas.filter(t => {
-          const tarefa = t.toLowerCase()
-          const casa = (chaveFeita.length >= 8 && tarefa.includes(chaveFeita)) || linhaFeita.includes(tarefa.slice(0, 25))
-          return !casa
-        })
+  // A primeira entrega aconteceu: "Rodada 1:" (0.2.17) ou "Feita:" (formato antigo), em negrito ou não.
+  const feita = linhas.some(l => /^(?:- )?\**(?:Rodada\s*\d+|Feita)\b:?\**:?/i.test(l))
+  const igual = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase()
+  // "Escolhido:" (0.2.17): o pedido antes de " · ", casado com as opções sem diferenciar maiúsculas; sem casar, o texto como está.
+  const linhaEscolhido = linhas
+    .map(l => /^(?:- )?\**Escolhido:?\**:?\s*(.+)/i.exec(l)?.[1]?.trim().replace(/^\*+|\*+$/g, ''))
+    .find((x): x is string => Boolean(x)) ?? null
+  let escolhido: string | null = null
+  if (linhaEscolhido) {
+    const inteiro = linhaEscolhido.split(' · ')[0]?.trim() ?? linhaEscolhido
+    const curto = inteiro.split(/ em \d|;|\(/)[0]?.trim() ?? inteiro
+    escolhido = opcoes.find(o => igual(o.pedido, inteiro))?.pedido ?? opcoes.find(o => igual(o.pedido, curto))?.pedido ?? inteiro
+  } else if (feita) {
+    // Formato antigo (0.2.16), sem "Escolhido:": a linha "Feita:" começa pelo texto da tarefa; a opção que casa é a escolhida.
+    const linhaFeita = linhas
+      .map(l => /^(?:- )?\**Feita:?\**:?\s*(.+)/i.exec(l)?.[1]?.toLowerCase() ?? '')
+      .find(Boolean) ?? ''
+    const chaveFeita = linhaFeita.split(/ · | em \d|;|\(/)[0]?.trim() ?? ''
+    escolhido =
+      opcoes.find(o => {
+        const tarefa = o.pedido.toLowerCase()
+        return (chaveFeita.length >= 8 && tarefa.includes(chaveFeita)) || linhaFeita.includes(tarefa.slice(0, 25))
+      })?.pedido ?? null
+  }
+  // Os próximos workflows: as opções não escolhidas, só quando há uma escolhida e mais de uma opção.
+  const proximos = escolhido && opcoes.length > 1 ? opcoes.filter(o => o.pedido !== escolhido).map(o => o.pedido) : []
   const combinado =
     linhas
       .map(l => /^(?:- )?\**Combinado:?\**:?\s*(.+)/i.exec(l)?.[1]?.trim().replace(/^\*+|\*+$/g, ''))
       .find((x): x is string => Boolean(x)) ?? null
+  // O tempo da montagem (0.2.17): o texto até o primeiro " (" ("27 min"; "374 min pelo relógio").
+  const tempoTotal = /\*\*Tempo total:\*\*[ \t]*(.*)/i.exec(texto)?.[1]?.split(' (')[0]?.trim() || null
   const testeOk = /\*\*Quem sou eu:\*\*\s*passou/i.test(texto)
   // O teste que não passou: o roteiro grava "não passou: <o motivo>" (0.2.16); sem o motivo, fica só "não passou".
   const falha = /\*\*Quem sou eu:\*\*\s*n[ãa]o passou:?[ \t]*(.*)/i.exec(texto)
@@ -240,7 +261,17 @@ function lerBaseCamp(texto: string) {
   const separacaoOk = /\*\*Separação entre frentes:\*\*\s*passou/i.test(texto)
   // A etapa 5 grava aqui onde ficou o cartão do primeiro workflow.
   const workflow = /\*\*Primeiro workflow:\*\*\s*`?([^`\n]+?)`?\s*$/m.exec(texto)?.[1]?.trim() || null
-  return { nivel, iniciada, concluida, blocos, tarefas, restantes, feita, combinado, testeOk, testeFalhou, separacaoOk, workflow }
+  return { nivel, iniciada, concluida, blocos, opcoes, escolhido, proximos, tempoTotal, feita, combinado, testeOk, testeFalhou, separacaoOk, workflow }
+}
+
+// O pedido fica em minúsculas no arquivo, como ela vai escrever; no botão e no rótulo, a primeira letra sobe (0.2.17).
+function maiuscula(texto: string): string {
+  return texto.charAt(0).toUpperCase() + texto.slice(1)
+}
+
+// Um rótulo de botão cabe em 70 caracteres.
+function rotuloCurto(texto: string): string {
+  return texto.length > 70 ? `${texto.slice(0, 67)}…` : texto
 }
 
 // O resumo do que o sistema já sabe (montagem/resumo.md): cartões por assunto e o que falta (0.2.10).
@@ -292,8 +323,76 @@ function extrairPergunta(resposta: string): string | null {
   return q.length <= 90 ? q : `${q.slice(0, 87).replace(/\s+\S*$/, '')}…`
 }
 
-function lerProcesso(texto: string): { processo: string | null; antes: string | null } {
-  const processo = /\*\*O quê:\*\*\s*(.+)/.exec(texto)?.[1]?.trim() ?? null
+type Cartao = Pick<
+  Painel,
+  'processo' | 'antes' | 'workflowNome' | 'pedido' | 'combinadoCartao' | 'estado' | 'estadoTexto' | 'passos' | 'passosSistema' | 'rodadas'
+>
+
+// As células de uma linha de tabela em markdown, sem as bordas.
+function celulas(linha: string): string[] {
+  const partes = linha.trim().split('|').map(c => c.trim())
+  partes.shift()
+  if (partes.length > 0 && partes[partes.length - 1] === '') partes.pop()
+  return partes
+}
+
+// O cartão do workflow (0.2.17): o nome, o pedido, o combinado, o estado, os passos e as rodadas, além do
+// "o quê" e do "antes" de sempre. Toda linha tolera o "- " no começo e o negrito; o que o modelo deixa
+// entre <> (instrução ainda não preenchida) conta como vazio.
+function lerProcesso(texto: string): Cartao {
+  const linha = (rotulo: string): string | null => {
+    const m = new RegExp(`^(?:- )?\\**${rotulo}(?::\\**|\\**:)[ \\t]*(.+)$`, 'm').exec(texto)
+    const t = m?.[1]?.replace(/\*\*/g, '').trim() ?? ''
+    return t && !t.startsWith('<') ? t : null
+  }
+  const processo = linha('O quê')
+  const h1 = /^#\s*Workflow:\s*(.+)$/m.exec(texto)?.[1]?.replace(/\*\*/g, '').trim() ?? ''
+  const workflowNome = h1 && !h1.startsWith('<') ? h1 : null
+  // O pedido: a linha "Pedido", sem aspas. Cartão de antes da 0.2.17: o primeiro negrito depois de "escrev" na linha
+  // "Começa quando" ("abro esta pasta e escrevo **fechar o dia**").
+  const comeca = texto.split('\n').find(l => /^(?:- )?\**Começa quando/i.test(l.trim())) ?? ''
+  const pedidoAntigo = /escrev\w*\s+\*\*([^*]+)\*\*/i.exec(comeca)?.[1]?.trim() || null
+  const pedido = linha('Pedido')?.replace(/^["“”'`]+|["“”'`]+$/g, '').trim() || pedidoAntigo
+  const combinadoCartao = linha('Combinado')
+  const estadoTexto = linha('Estado')
+  const estado: Painel['estado'] = !estadoTexto
+    ? 'incompleto'
+    : /^completo/i.test(estadoTexto)
+      ? 'completo'
+      : /em andamento/i.test(estadoTexto)
+        ? 'em andamento'
+        : 'incompleto'
+  // A tabela "Os passos": as linhas com número; "o sistema" na coluna Quem faz conta como passo do sistema.
+  let passos = 0
+  let passosSistema = 0
+  for (const l of secao(texto, 'Os passos').split('\n')) {
+    const m = /^\|\s*(\d+)\s*\|\s*([^|]*)\|\s*([^|]*)\|/.exec(l.trim())
+    if (!m || (m[2] ?? '').trim().startsWith('<')) continue
+    passos += 1
+    if (/sistema/i.test(m[3] ?? '')) passosSistema += 1
+  }
+  // A tabela "As rodadas": uma linha por rodada, fora o cabeçalho, o separador e as linhas de modelo.
+  const rodadas: Rodada[] = []
+  let cabecalhoLido = false
+  for (const l of secao(texto, 'As rodadas').split('\n')) {
+    const t = l.trim()
+    if (!t.startsWith('|')) continue
+    if (/^\|\s*:?-+/.test(t)) continue
+    if (!cabecalhoLido) {
+      cabecalhoLido = true
+      continue
+    }
+    const [data = '', tempo = '', pedidosTexto = '', aprovadaTexto = '', obs = ''] = celulas(t)
+    if (data.startsWith('<') || /^data$/i.test(data) || (!data && !tempo && !pedidosTexto && !aprovadaTexto && !obs)) continue
+    const numero = /\d+/.exec(pedidosTexto)?.[0]
+    rodadas.push({
+      data,
+      tempo,
+      pedidos: numero ? Number(numero) : null,
+      aprovada: /^sim/i.test(aprovadaTexto) ? 'sim' : /^n[ãa]o/i.test(aprovadaTexto) ? 'nao' : 'pendente',
+      obs,
+    })
+  }
   const linhas = texto.split('\n')
   const cabecalho = linhas.findIndex(l => /Quanto tempo leva hoje/i.test(l))
   const dado = cabecalho >= 0 ? linhas[cabecalho + 2] : undefined
@@ -301,8 +400,16 @@ function lerProcesso(texto: string): { processo: string | null; antes: string | 
   // O tempo entra no meio da frase ("Hoje leva: umas 2 horas"): sem a maiúscula da tabela.
   const meio = antes && /^[A-ZÀ-Ú][a-zà-ú]/.test(antes) ? antes.charAt(0).toLowerCase() + antes.slice(1) : antes
   return {
-    processo: processo && !processo.startsWith('<') ? processo : null,
+    processo,
     antes: meio && !meio.startsWith('<') ? meio : null,
+    workflowNome,
+    pedido,
+    combinadoCartao,
+    estado,
+    estadoTexto,
+    passos,
+    passosSistema,
+    rodadas,
   }
 }
 
@@ -480,10 +587,21 @@ function trilhaSvg(p: Painel, f: Festa | null): string {
   s += `<path d="M198 126 L244 72 L258 82 L288 30 L318 126" fill="${PAPEL}" stroke="${TINTA}" stroke-width="2.2" stroke-linejoin="round"/>`
   const fluir = f && p.concluida ? ' class="flui"' : ''
   s += `<path d="${rota}" fill="none" stroke="${TINTA}" stroke-opacity=".55" stroke-width="1.8" stroke-dasharray="1.5 6" stroke-linecap="round"${fluir}/>`
-  for (const t of CAMPOS_NA_ROTA) {
+  CAMPOS_NA_ROTA.forEach((t, i) => {
     const [x, y] = naRota(t)
+    if (i === 0 && p.concluida) {
+      // Depois do Base Camp, o Campo 1 é o ponto atual (0.2.17): contorno enquanto o workflow não está
+      // completo, com o anel (que pulsa na festa); cheio em tinta quando está.
+      if (p.estado === 'completo') {
+        s += quadrado(x, y, 8, `fill="${TINTA}"`)
+      } else {
+        s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="none" stroke="${TINTA}" stroke-width="1.4" opacity=".25"${f ? ' class="pulso"' : ''}/>`
+        s += quadrado(x, y, 8, `fill="${PAPEL}" stroke="${TINTA}" stroke-width="2.2"`)
+      }
+      return
+    }
     s += quadrado(x, y, 6, `fill="${PAPEL}" stroke="${TINTA}" stroke-width="1.6"`)
-  }
+  })
   s += quadrado(288, 34, 12, `fill="${SINAL}"${f && p.concluida ? ' class="cume"' : ''}`)
   s += `<path d="${caminho}" fill="none" stroke="${TINTA}" stroke-opacity=".35" stroke-width="2" stroke-dasharray="1.5 6" stroke-linecap="round"/>`
   if (prog > 0) {
@@ -511,6 +629,28 @@ function trilhaSvg(p: Painel, f: Festa | null): string {
     s += quadrado(190, 118, 12, `fill="${PAPEL}" stroke="${TINTA}" stroke-width="2.2"`)
   }
   return s + '</svg>'
+}
+
+// A linha das rodadas do cartão Agora, depois do Base Camp (0.2.17): o que o workflow já rodou.
+function linhaDasRodadas(p: Painel): string {
+  const n = p.rodadas.length
+  const ultima = p.rodadas[n - 1]
+  if (!ultima) {
+    return `Ainda não rodou. Quando chegar a hora, clique no botão ou escreva ${p.pedido ?? 'o pedido do seu guia de bolso'}.`
+  }
+  if (/^em andamento/i.test(ultima.tempo)) {
+    const desde = ultima.tempo.replace(/^em andamento:?\s*/i, '').trim()
+    return `Rodada ${n} em andamento${desde ? ` (${desde})` : ''}.`
+  }
+  const entrega = ultima.aprovada === 'sim' ? 'entrega aprovada' : ultima.aprovada === 'nao' ? 'entrega não aprovada' : 'entrega a conferir'
+  const pedidos = ultima.pedidos === null ? '' : `${ultima.pedidos} pedido${ultima.pedidos === 1 ? '' : 's'} até a entrega, `
+  return `Rodou ${n} vez${n === 1 ? '' : 'es'}. A última em ${ultima.data}: ${pedidos}${entrega}.`
+}
+
+// A data do "completo, em <data>" do Estado; sem ela, o texto cru.
+function desdeQuando(estadoTexto: string | null): string {
+  const t = (estadoTexto ?? '').trim().replace(/\.$/, '')
+  return /^completo,?\s*em\s+(.+)$/i.exec(t)?.[1]?.trim() ?? t
 }
 
 // ------------------------------------------------------------ o que roda
@@ -571,8 +711,12 @@ async function carregar($: EngineInterface) {
         teste('1.teste'),
       ]
     } else if (curto && atual?.codigo === '2' && !base.concluida) {
+      // O primeiro workflow (0.2.17): a escolha dela, a primeira rodada entregue e o combinado.
       campos = [
-        { codigo: '2.tarefa', rotulo: 'A primeira tarefa feita', estado: ok(base.feita) },
+        base.escolhido
+          ? { codigo: '2.escolha', rotulo: `O seu primeiro workflow: ${maiuscula(base.escolhido)}`, estado: 'ok' }
+          : { codigo: '2.escolha', rotulo: 'O seu primeiro workflow, escolhido', estado: 'falta' },
+        { codigo: '2.rodada', rotulo: 'A primeira rodada entregue', estado: ok(base.feita) },
         { codigo: '2.combinado', rotulo: 'O combinado', estado: ok(Boolean(base.combinado)) },
       ]
     } else if (atual && atual.codigo === ultima && !base.concluida) {
@@ -1091,6 +1235,7 @@ export const register: Register = on => {
     )
 
     // A subida em uma linha (pedido do Arthur, 31/10), com a base como o primeiro ponto já feito (0.2.16).
+    // Depois do Base Camp, a linha segue até o Campo 1 (0.2.17): o ponto atual, feito quando o workflow está completo.
     const progresso = (
       <Text color={CINZA} size="caption">
         {[
@@ -1099,6 +1244,7 @@ export const register: Register = on => {
             const atual = !dado.concluida && atualBloco?.codigo === b.codigo
             return `${atual ? '●' : b.status === 'aprovado' || b.status === 'pulado' ? '✓' : '○'} ${b.codigo === 'D' ? 'Começo' : dado.blocos.length === 3 ? b.nome : b.codigo}`
           }),
+          ...(dado.concluida ? [dado.estado === 'completo' ? '✓ Campo 1' : '● Campo 1'] : []),
         ].join('   ')}
       </Text>
     )
@@ -1118,9 +1264,9 @@ export const register: Register = on => {
           <Box flexDirection="column">
             <Text color={CINZA}>Onde todo sistema começa: uma pasta, um arquivo e qualquer IA.</Text>
             {trilha}
-            <Text bold color={ROCHA}>{dado.blocos.length === 3 ? '3 passos, uns 30 minutos: você manda, confirma e vê a primeira tarefa feita.' : `${dado.blocos.filter(b => b.codigo !== 'D').length} etapas, uma tarde, com parada no fim de cada uma.`}</Text>
+            <Text bold color={ROCHA}>{dado.blocos.length === 3 ? '3 passos, uns 30 minutos: você manda, confirma e escolhe o seu primeiro workflow, que já roda.' : `${dado.blocos.filter(b => b.codigo !== 'D').length} etapas, uma tarde, com parada no fim de cada uma.`}</Text>
             <Text color={ROCHA}>
-              Você responde do seu jeito, até por voz. O sistema escreve cada arquivo e mostra para você aprovar. No fim, ele já faz a primeira tarefa para você.
+              Você responde do seu jeito, até por voz. O sistema escreve cada arquivo e mostra para você aprovar. No fim, ele já roda o seu primeiro workflow para você.
             </Text>
           </Box>
           <Box flexDirection="column">
@@ -1137,27 +1283,38 @@ export const register: Register = on => {
       )
     }
 
-    // ----- Base Camp montado: o mesmo cartão Agora, com um botão principal; o resto numa zona só, discreta (0.2.16).
+    // ----- Base Camp montado: o cartão Agora vira o do primeiro workflow (0.2.17): o nome, as rodadas, o estado e
+    // o botão com o pedido dela; o resto numa zona só, discreta (0.2.16).
     if (dado.concluida) {
-      const proximo =
-        [
-          'O próximo passo é o Campo 1: detalhar e rodar o seu primeiro workflow de ponta a ponta',
-          dado.processo,
-          completo && dado.antes ? `hoje leva ${dado.antes}` : null,
-        ]
-          .filter((x): x is string => Boolean(x))
-          .join(' · ') + '.'
+      const pedido = dado.pedido
+      const ultimaRodada = dado.rodadas[dado.rodadas.length - 1]
+      // A última rodada espera a aprovação dela: o botão principal aprova a entrega.
+      const aguardaAprovacao = ultimaRodada?.aprovada === 'pendente'
+      const combinadoMostrado = dado.combinadoCartao ?? dado.combinado
       return (
         <Box {...fundo}>
           {cabecalho}
           <Box flexDirection="column" borderStyle="round" borderColor={TINTA} padding={1}>
-            <Text color={TINTA} size="caption">AGORA · BASE CAMP MONTADO</Text>
-            <Text bold color={TINTA}>O seu Base Camp está montado.</Text>
-            <Text color={ROCHA}>{proximo}</Text>
+            <Text color={TINTA} size="caption">AGORA · O SEU PRIMEIRO WORKFLOW</Text>
+            <Text bold color={TINTA}>{dado.workflowNome ?? (pedido ? maiuscula(pedido) : 'O seu primeiro workflow')}</Text>
+            {dado.processo && <Text color={ROCHA}>{dado.processo}</Text>}
+            <Text color={ROCHA}>{linhaDasRodadas(dado)}</Text>
+            {dado.estado === 'completo' ? (
+              <Text color={TINTA}>✓ Completo desde {desdeQuando(dado.estadoTexto)}: sai pronto com um pedido seu.</Text>
+            ) : (
+              <Text color={CINZA} size="caption">
+                Completo quando sair pronto com um pedido só seu.{dado.passos > 0 ? ` O sistema já faz ${dado.passosSistema} de ${dado.passos} passos.` : ''}
+              </Text>
+            )}
             <Box flexDirection="row" flexWrap="wrap" gap={1}>
-              {!pendente && (
-                <Button key="rodar-workflow" variant="primary" label="Rodar o meu primeiro workflow" onPress={() => void enviar($, 'vamos rodar o primeiro workflow')} />
-              )}
+              {!pendente &&
+                (aguardaAprovacao ? (
+                  <Button key="aprovar-entrega" variant="primary" label="Aprovar a entrega" onPress={() => void enviar($, 'pode, aprovado')} />
+                ) : pedido ? (
+                  <Button key="rodar-workflow" variant="primary" label={rotuloCurto(maiuscula(pedido))} onPress={() => void enviar($, pedido)} />
+                ) : (
+                  <Button key="rodar-workflow" variant="primary" label="Rodar o meu primeiro workflow" onPress={() => void enviar($, 'vamos rodar o primeiro workflow')} />
+                ))}
               {corrigirBotao}
             </Box>
             {pendente && aviso}
@@ -1165,21 +1322,13 @@ export const register: Register = on => {
           </Box>
           <Box flexDirection="column">
             <Text color={CINZA} size="caption">O QUE FICOU PRONTO</Text>
+            {dado.tempoTotal && <Text color={TINTA}>✓ Base Camp montado em {dado.tempoTotal}</Text>}
             {dado.testeOk && <Text color={TINTA}>✓ O teste passou: o sistema já sabe quem você é.</Text>}
             {dado.testeFalhou !== null && (
               <Text color={SINAL}>✕ O teste: quem sou eu não passou{dado.testeFalhou ? `: ${dado.testeFalhou}` : ''}</Text>
             )}
-            {dado.combinado && <Text color={ROCHA}>✓ O combinado: {dado.combinado}</Text>}
-            {dado.restantes.length > 0 && !pendente && (
-              <Box flexDirection="column">
-                <Text color={ROCHA}>Peça ao seu sistema:</Text>
-                <Box flexDirection="row" flexWrap="wrap" gap={1}>
-                  {dado.restantes.map((t, i) => (
-                    <Button key={`tarefa-${i}`} label={t.length > 70 ? `${t.slice(0, 67)}…` : t} onPress={() => void enviar($, t)} />
-                  ))}
-                </Box>
-              </Box>
-            )}
+            {combinadoMostrado && <Text color={ROCHA}>✓ O combinado: {combinadoMostrado}</Text>}
+            {dado.proximos.length > 0 && <Text color={ROCHA}>Os próximos workflows: {dado.proximos.join(' · ')}</Text>}
             <Text color={ROCHA}>
               {completo
                 ? 'Para o Arthur: mande o resumo do seu Base Camp para ele revisar e dar robustez ao seu sistema.'
@@ -1215,11 +1364,8 @@ export const register: Register = on => {
     const lembrete = (await read($, parado)) && !ocupado
     const nomeAprov = aprov?.arquivo ? nomeDoArquivo(aprov.arquivo) : null
     const perguntaDaVez = ocupado ? null : await read($, pergunta)
-    // As alternativas de workflow do cartão do resumo (linhas "Alternativa: …"), para o clique no passo 1.
-    const cartaoWorkflow = dado.resumo?.cartoes.find(c => /primeiro workflow/i.test(c.titulo))
-    const alternativas = (cartaoWorkflow?.linhas ?? [])
-      .map(l => /^Alternativa:\s*(.+)$/i.exec(l.texto)?.[1]?.trim())
-      .filter((x): x is string => Boolean(x))
+    // O passo 2 antes da escolha (0.2.17): as 3 opções de primeiro workflow viram botões no cartão Agora.
+    const escolhaDoWorkflow = curto && ehEntrega && !dado.escolhido && dado.opcoes.length > 0 && !ocupado && !pendente
     const testeFalhou = dado.campos.some(c => c.estado === 'falhou')
     // No curto, o retrato montado pede o confirmo e a tarefa feita pede o "ficou bom": o botão principal
     // aparece nesses dois momentos mesmo sem a frase de aprovação, e manda o "pode, aprovado" de sempre.
@@ -1232,7 +1378,8 @@ export const register: Register = on => {
     const principal =
       aprov || retratoMontado || tarefaFeita ? (
         <Button key="aprovar" variant="primary" label={rotuloAprovar} onPress={() => void enviar($, 'pode, aprovado')} />
-      ) : !perguntaDaVez && completo ? (
+      ) : !perguntaDaVez && completo && !escolhaDoWorkflow ? (
+        // Na escolha do workflow, os botões das opções são o caminho: sem um Continuar azul ao lado do recomendado.
         <Button key="continuar" variant="primary" label={rotuloContinuar} onPress={() => void enviar($, 'continuar')} />
       ) : null
     const etiquetaCampos = ehEntrega ? 'O QUE ESTE PASSO ENTREGA' : ehComeco ? 'O SEU COMEÇO' : curto ? 'O QUE JÁ ESTÁ MONTADO' : 'O QUE ESTA ETAPA JÁ TEM'
@@ -1252,28 +1399,27 @@ export const register: Register = on => {
             <Text color={TINTA}>● {agora ?? 'O sistema está trabalhando'}…</Text>
           ) : aprov ? (
             <Text bold color={ROCHA}>Sua vez: aprove ou corrija{nomeAprov ? ` ${nomeAprov}` : ''}.</Text>
+          ) : escolhaDoWorkflow ? (
+            <Text bold color={ROCHA}>Sua vez: escolha o seu primeiro workflow.</Text>
           ) : (
             <Text bold color={ROCHA}>{perguntaDaVez ? `Sua vez: ${perguntaDaVez}` : 'Sua vez: responda na conversa.'}</Text>
           )}
           {atualBloco && PARA_QUE[atualBloco.codigo] && !aprov && <Text color={CINZA} size="caption">{PARA_QUE[atualBloco.codigo]}</Text>}
-          {curto && atualBloco?.codigo === '1' && !ocupado && !pendente && alternativas.length > 0 && (
+          {escolhaDoWorkflow && (
             <Box flexDirection="column" gap={1}>
-              <Text color={CINZA} size="caption">PREFERE OUTRO PRIMEIRO WORKFLOW? CLIQUE NELE</Text>
-              {alternativas.map((t, i) => (
-                <Button key={`alternativa-${i}`} label={t.length > 70 ? `${t.slice(0, 67)}…` : t} onPress={() => void enviar($, `primeiro workflow: ${t}`)} />
-              ))}
-            </Box>
-          )}
-          {curto && ehEntrega && !dado.feita && dado.tarefas.length > 0 && !ocupado && !pendente && (
-            <Box flexDirection="column" gap={1}>
-              <Text color={CINZA} size="caption">A PRIMEIRA TAREFA · ESCOLHA UMA (A PRIMEIRA É A RECOMENDADA)</Text>
-              {dado.tarefas.map((t, i) => (
-                <Button
-                  key={`escolha-${i}`}
-                  variant={i === 0 ? 'primary' : undefined}
-                  label={`Fazer: ${t.length > 63 ? `${t.slice(0, 60)}…` : t}`}
-                  onPress={() => void enviar($, `primeira tarefa: ${t}`)}
-                />
+              <Text color={CINZA} size="caption">O SEU PRIMEIRO WORKFLOW · ESCOLHA UM (O PRIMEIRO É O RECOMENDADO)</Text>
+              {dado.opcoes.map((o, i) => (
+                // A entrega em cima, como legenda; o botão leva o pedido, com a primeira letra em maiúscula, e manda
+                // "primeiro workflow: <pedido>" como está na linha.
+                <Box key={`opcao-${i}`} flexDirection="column">
+                  {o.entrega.length > 0 && <Text color={CINZA} size="caption">{o.entrega}</Text>}
+                  <Button
+                    key={`escolha-${i}`}
+                    variant={i === 0 ? 'primary' : undefined}
+                    label={rotuloCurto(maiuscula(o.pedido))}
+                    onPress={() => void enviar($, `primeiro workflow: ${o.pedido}`)}
+                  />
+                </Box>
               ))}
             </Box>
           )}
