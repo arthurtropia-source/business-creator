@@ -19,6 +19,7 @@ Sem a pasta, no app: clique no **+** ao lado da caixa de texto, **Plugins**, **A
 - `business-creator:montagem-do-base-camp`: a montagem em 3 passos (o começo, o retrato, e o primeiro workflow, que você escolhe entre 3 e já roda) e a reserva de perguntas do uso real.
 - O painel do Base Camp (`/base-camp`).
 - `business-creator:campo-1`: o Campo 1 da primeira montanha: rodar o seu primeiro workflow, rodada a rodada, corrigindo, até ele sair pronto com um pedido só seu.
+- `business-creator:atualizar-a-pasta`: para quem montou o Base Camp numa versão anterior (o kit em zip, por exemplo): escreva **atualizar o meu sistema** e a pasta recebe o que a versão nova traz, sem apagar nada seu.
 - `business-creator:rotinas-e-computador`: as regras para o trabalho de verdade no computador, depois do Base Camp (rotina gravada, conferência, Windows e Mac).
 - O estilo de resposta `base-camp`, que entra sozinho quando o plugin está ligado.
 

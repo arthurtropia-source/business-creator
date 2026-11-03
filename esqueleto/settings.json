@@ -32,6 +32,8 @@
       "PowerShell(./frentes*)",
       "PowerShell(.\\rotinas*)",
       "PowerShell(.\\frentes*)",
+      "PowerShell(powershell -NoProfile -ExecutionPolicy Bypass -File rotinas*)",
+      "PowerShell(powershell -NoProfile -ExecutionPolicy Bypass -File frentes*)",
       "mcp__business-creator__teste_do_base_camp"
     ],
     "ask": [

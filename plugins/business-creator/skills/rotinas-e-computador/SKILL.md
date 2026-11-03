@@ -5,7 +5,7 @@ description: Regras para fazer trabalho de verdade no computador da pessoa sem t
 
 # Rotinas e computador
 
-> Plugin Business Creator 0.2.1 (30/10/2026). Nasceu da primeira implantação com pessoa real: a montagem funcionou, e o uso real travou em permissão, em ambiente e em rotina que não ficou gravada.
+> Plugin Business Creator 0.2.18 (03/11/2026; nasceu na 0.2.0, em 30/10). Nasceu da primeira implantação com pessoa real: a montagem funcionou, e o uso real travou em permissão, em ambiente e em rotina que não ficou gravada.
 
 ## Linha de chegada (de toda entrega feita no computador)
 1. o resultado foi conferido contra a fonte antes de sair (a conta bate, nenhum zero ou vazio sem explicação);
@@ -38,7 +38,7 @@ description: Regras para fazer trabalho de verdade no computador da pessoa sem t
 ## 5. O inventário do computador (`contexto/computador.md`)
 Rode um comando de cada vez, sem juntar com `;`, `&&` ou `|` (cada um sozinho já está liberado na pasta; juntos, viram pedido de permissão).
 - **Mac:** `sw_vers -productVersion`; `xcode-select -p` (se der erro, **não rode `python3`**: no Mac sem as ferramentas de desenvolvedor, ele abre uma janela de instalação; anote "Python: não instalado"); se não deu erro, `python3 --version` e `python3 -m pip show openpyxl`; `ls /Applications` (Excel, Numbers); `defaults read -g AppleLocale` (o idioma e a região, que dizem a vírgula decimal e a data; o `locale` do terminal não serve: devolve "C").
-- **Windows (PowerShell):** `Get-Date -Format "dd/MM/yyyy HH:mm"`; `Get-Command python` e `Get-Command py` (se não houver, "Python: não instalado"); se houver, `python --version` e `python -m pip show openpyxl`; `Get-ChildItem "C:\Program Files\Microsoft Office\root\Office16\EXCEL.EXE"`; `Get-Culture` (o separador decimal e o formato da data).
+- **Windows (PowerShell):** `Get-Date -Format "dd/MM/yyyy HH:mm"`; `Get-Command python` e `Get-Command py` (se não houver, "Python: não instalado"); se houver, `python --version` e `python -m pip show openpyxl`; `Get-ChildItem "C:\Program Files\Microsoft Office\root\Office16\EXCEL.EXE"` (se não achar, `Get-ChildItem "C:\Program Files (x86)\Microsoft Office\root\Office16\EXCEL.EXE"`); `Get-Culture` (o separador decimal e o formato da data).
 - Grave assim, em até 12 linhas:
 
 ```
@@ -53,6 +53,7 @@ Rode um comando de cada vez, sem juntar com `;`, `&&` ou `|` (cada um sozinho j�
 ```
 
 ## 6. Windows
+- **Rode a rotina `.ps1` sempre assim:** `powershell -NoProfile -ExecutionPolicy Bypass -File frentes\<frente>\rotinas\<nome>.ps1` (no leve, `rotinas\<nome>.ps1`), com o caminho a partir da pasta, sem aspas e sem espaço no nome. Num computador da empresa, o Windows costuma bloquear `.\<script>.ps1`; esta forma vale só para essa execução, não muda nada no computador, e é a que a pasta libera sem pedir.
 - Script para o PowerShell (`.ps1`) **sai em UTF-8 com BOM**. Sem a marca, o PowerShell 5.1 lê "ã" e "ç" errado, e a conta dá zero sem erro.
 - **Comparação de texto nunca depende de acento:** normalize (sem acento, minúsculas, sem espaço sobrando) antes de comparar nomes de coluna ou de item.
 - **Número com vírgula decimal:** confira como a fonte escreve ("1.234,56") antes de converter; nunca deixe a vírgula virar separador de milhar.

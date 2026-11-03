@@ -7,7 +7,8 @@ O marketplace `sem-ia` e o plugin `business-creator`: o método do Business Crea
 - **Cada versão é aprovada pelo Arthur**, testada numa pasta limpa fora do OS (`montar-pasta.py --saida`), antes de subir. Sem o ok dele, nada vai ao GitHub.
 - **Toda mudança no plugin sobe o `version` do `plugins/business-creator/.claude-plugin/plugin.json`** e entra no `CHANGELOG.md`. Sem subir a versão, quem já instalou não recebe.
 - **A pasta da pessoa não se mexe por versão.** O que é dela fica nela; o que é do método fica aqui.
-- O kit em zip (`../kit-instalacao/`) segue para quem já o recebeu e não se mexe a partir daqui.
+- O kit em zip (`../kit-instalacao/`) segue para quem já o recebeu e não se mexe a partir daqui. Quem o recebeu passa para o plugin pela skill `atualizar-a-pasta`.
+- **As permissões vivem em dois lugares:** `esqueleto/settings.json` (pastas novas) e `plugins/business-creator/skills/atualizar-a-pasta/permissoes.json` (pastas que se atualizam). Mudou uma, mude a outra; o pré-teste confere.
 
 ## Estrutura
 - `.claude-plugin/marketplace.json`: o marketplace `sem-ia`.
