@@ -211,7 +211,18 @@ function pasta(on: On, arquivos: Record<string, string>, enviados: string[], res
   on('store.set', () => ({ value: undefined }))
   on('env.get', () => ({ value: undefined }))
   on('session.start', (_, e) => ({ cwd: e.cwd }))
-  on('fs.exists', (_, e) => ({ value: e.path in arquivos || e.path.endsWith('.png') || e.path.endsWith('/skills/montagem-do-base-camp/campos.md') }))
+  // Uma pasta existe quando algum arquivo mora nela; a lista dá os filhos diretos (0.2.19, o painel de trabalho).
+  const ehPasta = (p: string) => Object.keys(arquivos).some(a => a.startsWith(`${p}/`))
+  on('fs.exists', (_, e) => ({ value: e.path in arquivos || ehPasta(e.path) || e.path.endsWith('.png') || e.path.endsWith('/skills/montagem-do-base-camp/campos.md') }))
+  on('fs.list', (_, e) => {
+    const filhos = new Map<string, 'file' | 'dir'>()
+    for (const a of Object.keys(arquivos)) {
+      if (!a.startsWith(`${e.path}/`)) continue
+      const [nome = '', ...resto] = a.slice(e.path.length + 1).split('/')
+      filhos.set(nome, resto.length > 0 ? 'dir' : 'file')
+    }
+    return { value: [...filhos].map(([name, kind]) => ({ name, kind, size: 0, mtimeMs: 0, isLink: false })) }
+  })
   on('fs.read', (_, e) => ({ value: e.as === 'bytes' ? { base64: 'AAAA' } : (arquivos[e.path] ?? (e.path.endsWith('/skills/montagem-do-base-camp/campos.md') ? CAMPOS : '')) }))
   on('prompt.submit', (_, e) => {
     enviados.push(e.text)
@@ -398,7 +409,11 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     expect(await ui.find({ type: 'Text', text: /O teste passou/ })).toBeDefined()
     expect((await ui.find({ type: 'Text', text: /O combinado:/ }))?.text).toContain('quando chegar um pedido de orçamento, abra esta pasta e escreva mensagem de retorno')
     expect(await ui.find({ type: 'Text', text: /amanhã, às 8h/ })).toBeUndefined()
-    expect(await ui.find({ type: 'Text', text: /^Os próximos workflows: lista do fechamento · o que está parado$/ })).toBeDefined()
+    // Os próximos (as opções não escolhidas) viram a fila, recolhida (0.2.19).
+    expect(await ui.find({ type: 'Text', text: /Os próximos workflows/ })).toBeUndefined()
+    expect((await ui.find({ type: 'Button', key: 'fila' }))?.props.label).toBe('Na fila: 2')
+    // Os passos em quadrados e os pontos de controle, no cartão Agora.
+    expect(await ui.find({ type: 'Text', text: /^Campo 1 ○ · Skill ○ · Sozinho ○$/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /Peça ao seu sistema/ })).toBeUndefined()
     expect(await ui.find({ type: 'Button', key: 'tarefa-0' })).toBeUndefined()
     expect(await ui.find({ type: 'Text', text: /Depois: Campo 2/ })).toBeDefined()
@@ -659,7 +674,10 @@ test('a pasta de antes da 0.2.17 continua lendo: a tarefa feita, o pedido do "Co
   const aprovar = await ui.find({ type: 'Button', key: 'aprovar-entrega' })
   expect(aprovar?.props.variant).toBe('primary')
   expect(aprovar?.props.label).toBe('Aprovar a entrega')
-  expect(await ui.find({ type: 'Button', key: 'rodar-workflow' })).toBeUndefined()
+  // Desde a 0.2.19, o pedido fica ao lado, como secundário: ela pode rodar de novo sem aprovar.
+  const deNovo = await ui.find({ type: 'Button', key: 'rodar-workflow' })
+  expect(deNovo?.props.variant).toBeUndefined()
+  expect(deNovo?.props.label).toBe('Fechar o dia')
   // Nada de "Peça ao seu sistema"; o combinado mostrado é o do base-camp.md (o cartão não tem); com uma tarefa só,
   // nenhum próximo workflow.
   expect(await ui.find({ type: 'Text', text: /Peça ao seu sistema/ })).toBeUndefined()
@@ -667,6 +685,7 @@ test('a pasta de antes da 0.2.17 continua lendo: a tarefa feita, o pedido do "Co
   expect((await ui.find({ type: 'Text', text: /O combinado:/ }))?.text).toContain('monitor de preço de ontem')
   expect(await ui.find({ type: 'Text', text: /^✓ Base Camp montado em 374 min pelo relógio$/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /Os próximos workflows/ })).toBeUndefined()
+  expect(await ui.find({ type: 'Button', key: 'fila' })).toBeUndefined()
   expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toContain('✓ A primeira tarefa   ● Campo 1')
   await ui.press({ key: 'aprovar-entrega' })
   expect(enviados).toContain('pode, aprovado')
@@ -706,5 +725,95 @@ test('o workflow completo no cartão: a linha do completo e o Campo 1 feito na s
   const desenho = (await ui.findAll({ type: 'Svg' })).find(s => s.props.alt === TRILHA)?.props.source ?? ''
   expect(desenho).toMatch(/x="225\.6" y="100\.[45]" width="8" height="8" fill="#1F2C8F"/)
   expect(desenho).not.toMatch(/x="225\.6" y="100\.[45]" width="8" height="8" fill="#F5F1E8"/)
+  await ui.unmount()
+})
+
+// O painel de trabalho (0.2.19): dois cartões em frentes diferentes, um deles com a rodada a conferir, um terceiro
+// fora do formato, e dois na fila (um deles repete o que já tem cartão e não entra).
+const CARTAO_LOJA = `# Workflow: Pedido da semana
+- **O quê:** O pedido de reposição da loja, pronto para mandar
+- **Frente:** loja
+- **Pedido:** pedido da semana
+- **Estado:** em andamento
+
+## Os passos
+| # | Passo | Quem faz | Com quê | Situação |
+|---|---|---|---|---|
+| 1 | Ler o estoque | o sistema | a skill estoque | o sistema fez |
+| 2 | Somar a venda | o sistema | a planilha | o sistema fez |
+| 3 | Puxar o preço do fornecedor | ela | o portal | ainda não dá: o portal não exporta |
+| 4 | Mandar o pedido | ela | o e-mail | ficou com ela |
+
+## As rodadas
+| Data | Do começo à entrega em | Pedidos dela até a entrega | Entrega aprovada? | Observação |
+|---|---|---|---|---|
+| 01/11/2026 | 20 min | 2 | sim | |
+| 03/11/2026 | 9 min | 1 | a conferir | |
+
+## Os próximos (para depois deste)
+| Workflow | Pedido | A primeira entrega |
+|---|---|---|
+| Conferir a nota | conferir a nota | a nota batida com o pedido |
+| Mensagem de retorno | mensagem de retorno | já tem cartão |
+`
+
+test('o painel de trabalho: o da vez no Agora, os outros numa linha, a fila recolhida e o cartão fora do formato', async ($, on) => {
+  const enviados: string[] = []
+  pasta(on, {
+    '/os/base-camp.md': COM_CARTAO('completo'),
+    [`/os/${CAMINHO_DO_CARTAO}`]: CARTAO,
+    '/os/frentes/loja/workflows/pedido-da-semana.md': CARTAO_LOJA,
+    '/os/frentes/loja/workflows/fechar-o-caixa.md': '# Workflow: Fechar o caixa\n- **O quê:** o caixa do dia\n',
+    '/os/resumo-para-o-arthur.md': RESUMO,
+  }, enviados)
+  await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
+
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  // O Agora é o que espera aprovação, com um botão principal só; o pedido fica ao lado, secundário.
+  expect(await ui.find({ type: 'Text', text: /^AGORA · ESPERA A SUA APROVAÇÃO$/ })).toBeDefined()
+  expect((await ui.find({ type: 'Text', text: /^Pedido da semana$/ }))?.props.bold).toBe(true)
+  const principais = (await ui.findAll({ type: 'Button' })).filter(b => b.props.variant === 'primary')
+  expect(principais.map(b => b.props.key)).toEqual(['aprovar-entrega'])
+  expect((await ui.find({ type: 'Button', key: 'rodar-workflow' }))?.props.label).toBe('Pedido da semana')
+  // Conta pela Situação: 2 de 4; o furo com o motivo; a skill citada no "Com quê".
+  expect(await ui.find({ type: 'Text', text: /O sistema já faz 2 de 4 passos\./ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Falta para ponta a ponta: Puxar o preço do fornecedor \(o portal não exporta\)\.$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Campo 1 ○ · Skill ✓ · Sozinho ○$/ })).toBeDefined()
+  // Duas frentes: os outros agrupados pela frente, uma linha cada, com o botão secundário do pedido.
+  expect(await ui.find({ type: 'Text', text: /^CONSULTORIA$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Mensagem de retorno · 2 de 4 · em andamento$/ })).toBeDefined()
+  const outro = (await ui.findAll({ type: 'Button' })).find(b => b.props.label === 'Mensagem de retorno')
+  expect(outro?.props.variant).toBeUndefined()
+  // O cartão sem a linha Pedido aparece com o que fazer.
+  expect(await ui.find({ type: 'Text', text: /O cartão frentes\/loja\/workflows\/fechar-o-caixa\.md está sem a linha Pedido/ })).toBeDefined()
+  // A fila: as opções não escolhidas e "Conferir a nota", sem repetir o que já tem cartão; recolhida até o clique.
+  expect((await ui.find({ type: 'Button', key: 'fila' }))?.props.label).toBe('Na fila: 3')
+  expect(await ui.find({ type: 'Button', key: 'fila-0' })).toBeUndefined()
+  await ui.press({ key: 'fila' })
+  expect((await ui.find({ type: 'Button', key: 'fila-0' }))?.props.label).toBe('Rodar conferir a nota')
+  await ui.press({ key: 'fila-0' })
+  expect(enviados).toContain('rodar o workflow Conferir a nota')
+  await ui.unmount()
+})
+
+test('com o primeiro workflow completo e outro rodado depois, o Agora é o último que rodou', async ($, on) => {
+  pasta(on, {
+    '/os/base-camp.md': COM_CARTAO('completo'),
+    [`/os/${CAMINHO_DO_CARTAO}`]: CARTAO.replace('**Estado:** em andamento', '**Estado:** completo, em 23/10/2026'),
+    '/os/frentes/consultoria/workflows/pedido-da-semana.md': CARTAO_LOJA.replace('a conferir', 'sim').replace('- **Frente:** loja', '- **Frente:** consultoria'),
+    '/os/resumo-para-o-arthur.md': RESUMO,
+  }, [])
+  await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
+
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await ui.find({ type: 'Text', text: /^AGORA · O ÚLTIMO QUE RODOU$/ })).toBeDefined()
+  const rodar = await ui.find({ type: 'Button', key: 'rodar-workflow' })
+  expect(rodar?.props.variant).toBe('primary')
+  expect(rodar?.props.label).toBe('Pedido da semana')
+  // Uma frente só: sem o título da frente; o outro, completo, numa linha.
+  expect(await ui.find({ type: 'Text', text: /^CONSULTORIA$/ })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /^Mensagem de retorno · 2 de 4 · completo$/ })).toBeDefined()
+  // O Campo 1 fica feito na subida, porque um workflow já está completo.
+  expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toContain('✓ Campo 1')
   await ui.unmount()
 })

@@ -1,14 +1,15 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register, RenderSurface } from 'claude-code'
 
-import type { Bloco, Campo, Festa, Montado, Nivel, Opcao, Painel, Resumo, Rodada, Status } from '../types'
+import type { Bloco, Campo, Festa, Furo, Montado, NaFila, Nivel, Opcao, Painel, Quadro, Resumo, Rodada, Status, Workflow } from '../types'
 
-// Painel da Montagem do Base Camp (v0.7, plugin 0.2.17). Veste a montagem com a marca e tira a
+// Painel da Montagem do Base Camp (v0.8, plugin 0.2.19). Veste a montagem com a marca e tira a
 // barreira técnica: mostra a subida, de quem é a vez e o que o sistema já sabe,
 // dá os botões de aprovar e corrigir e troca as linhas técnicas do app por
 // frases simples. Lê os arquivos da pasta da pessoa e não grava nada nela.
-// Depois do Base Camp montado, o cartão Agora passa a ser o do primeiro workflow (0.2.17):
-// o nome, as rodadas, o estado e o botão com o pedido dela.
+// Depois do Base Camp montado, é o painel de trabalho (0.2.19): um cartão Agora só, com o workflow
+// da vez (o que espera aprovação ou o último que rodou) e um botão principal; os outros workflows
+// uma linha cada, com os passos em quadrados; a fila, recolhida.
 // Fora do painel, só faz o que a pessoa ou a montagem pedem: o teste da etapa 6
 // (uma pergunta à IA com os arquivos da pasta) e a cópia do resumo para o
 // Arthur, no clique dela.
@@ -44,6 +45,8 @@ const arquivoTexto = atom({ plugin: 'business-creator', key: 'arquivoTexto' } as
 const doc = atom({ plugin: 'business-creator', key: 'doc' } as const, null)
 const docTexto = atom({ plugin: 'business-creator', key: 'docTexto' } as const, null)
 const pergunta = atom({ plugin: 'business-creator', key: 'pergunta' } as const, null)
+// A fila do painel de trabalho, recolhida até ela clicar (0.2.19).
+const filaAberta = atom({ plugin: 'business-creator', key: 'filaAberta' } as const, false)
 
 // Identidade SEM IA™ (23 e 24/10/2026): tinta, rocha e papel; o laranja de
 // sinal num ponto só, o cume da primeira montanha.
@@ -336,10 +339,25 @@ function celulas(linha: string): string[] {
   return partes
 }
 
+// O que o painel de trabalho lê a mais de cada cartão (0.2.19).
+type Detalhe = Cartao & {
+  frente: string | null
+  quadros: Quadro[]
+  furos: Furo[]
+  skill: boolean
+  sozinho: boolean
+  proximos: NaFila[]
+}
+
 // O cartão do workflow (0.2.17): o nome, o pedido, o combinado, o estado, os passos e as rodadas, além do
 // "o quê" e do "antes" de sempre. Toda linha tolera o "- " no começo e o negrito; o que o modelo deixa
 // entre <> (instrução ainda não preenchida) conta como vazio.
 function lerProcesso(texto: string): Cartao {
+  const { processo, antes, workflowNome, pedido, combinadoCartao, estado, estadoTexto, passos, passosSistema, rodadas } = lerCartao(texto)
+  return { processo, antes, workflowNome, pedido, combinadoCartao, estado, estadoTexto, passos, passosSistema, rodadas }
+}
+
+function lerCartao(texto: string): Detalhe {
   const linha = (rotulo: string): string | null => {
     const m = new RegExp(`^(?:- )?\\**${rotulo}(?::\\**|\\**:)[ \\t]*(.+)$`, 'm').exec(texto)
     const t = m?.[1]?.replace(/\*\*/g, '').trim() ?? ''
@@ -362,14 +380,33 @@ function lerProcesso(texto: string): Cartao {
       : /em andamento/i.test(estadoTexto)
         ? 'em andamento'
         : 'incompleto'
-  // A tabela "Os passos": as linhas com número; "o sistema" na coluna Quem faz conta como passo do sistema.
-  let passos = 0
-  let passosSistema = 0
+  // A tabela "Os passos": as linhas com número. Desde a 0.2.19 o painel conta pela Situação, o que de fato
+  // aconteceu ("o sistema fez"; "o sistema faz" nos cartões de antes), não pela coluna Quem faz.
+  const quadros: Quadro[] = []
+  const furos: Furo[] = []
+  let skill = false
   for (const l of secao(texto, 'Os passos').split('\n')) {
-    const m = /^\|\s*(\d+)\s*\|\s*([^|]*)\|\s*([^|]*)\|/.exec(l.trim())
-    if (!m || (m[2] ?? '').trim().startsWith('<')) continue
-    passos += 1
-    if (/sistema/i.test(m[3] ?? '')) passosSistema += 1
+    if (!/^\|\s*\d+\s*\|/.test(l.trim())) continue
+    const [, passo = '', , comQue = '', situacao = ''] = celulas(l)
+    if (passo.startsWith('<')) continue
+    if (/skill|\.claude\/skills\//i.test(comQue)) skill = true
+    if (/^o sistema f(ez|az)\b/i.test(situacao)) quadros.push('sistema')
+    else if (/^ainda n[ãa]o d[áa]/i.test(situacao)) {
+      quadros.push('nao')
+      const corte = situacao.indexOf(':')
+      furos.push({ passo, motivo: corte < 0 ? '' : situacao.slice(corte + 1).trim() })
+    } else quadros.push('ela')
+  }
+  const passos = quadros.length
+  const passosSistema = quadros.filter(q => q === 'sistema').length
+  // A tabela "Os próximos": o nome (coluna Workflow) e o pedido, sem as linhas de modelo.
+  const proximos: NaFila[] = []
+  for (const l of secao(texto, 'Os próximos').split('\n')) {
+    const t = l.trim()
+    if (!t.startsWith('|') || /^\|\s*:?-+/.test(t)) continue
+    const [nome = '', pedidoDaFila = ''] = celulas(t).map(c => c.replace(/\*\*/g, '').trim())
+    if (!nome || nome.startsWith('<') || /^workflow$/i.test(nome)) continue
+    proximos.push({ nome, pedido: pedidoDaFila && !pedidoDaFila.startsWith('<') ? pedidoDaFila.replace(/^["“”'`]+|["“”'`]+$/g, '') : null })
   }
   // A tabela "As rodadas": uma linha por rodada, fora o cabeçalho, o separador e as linhas de modelo.
   const rodadas: Rodada[] = []
@@ -410,8 +447,32 @@ function lerProcesso(texto: string): Cartao {
     passos,
     passosSistema,
     rodadas,
+    frente: linha('Frente'),
+    quadros,
+    furos,
+    skill,
+    sozinho: /^sim\b/i.test(linha('Chega sozinho') ?? ''),
+    proximos,
   }
 }
+
+// O dia de uma rodada, para saber qual workflow rodou por último: a data da coluna e, se houver, a hora
+// ("começou às 19:19"). Sem data, 0.
+function quandoRodou(r: Rodada | undefined): number {
+  if (!r) return 0
+  const d = /(\d{2})\/(\d{2})\/(\d{4})/.exec(r.data)
+  if (!d) return 0
+  const h = /(\d{1,2}):(\d{2})/.exec(r.data.replace(/\d{2}\/\d{2}\/\d{4}/, '')) ?? /às\s*(\d{1,2}):(\d{2})/.exec(r.tempo)
+  return new Date(Number(d[3]), Number(d[2]) - 1, Number(d[1]), Number(h?.[1] ?? 0), Number(h?.[2] ?? 0)).getTime()
+}
+
+// A última rodada espera a aprovação dela (a conferir, ou ainda em andamento).
+function aConferir(w: Workflow): boolean {
+  return w.rodadas[w.rodadas.length - 1]?.aprovada === 'pendente'
+}
+
+const mesmo = (a: string | null | undefined, b: string | null | undefined) =>
+  Boolean(a && b && a.trim().toLowerCase() === b.trim().toLowerCase())
 
 type Definicao = { codigo: string; leve: boolean; rotulo: string }
 
@@ -560,6 +621,12 @@ function progresso(p: Painel): number {
   return pontos[Math.max(0, i) + 1] ?? 0
 }
 
+// O Campo 1 da primeira montanha está feito quando algum workflow está completo (0.2.19: com vários abertos,
+// o primeiro que fechar, não só o da linha Primeiro workflow).
+function campo1Feito(p: Painel): boolean {
+  return p.estado === 'completo' || p.workflows.some(w => w.estado === 'completo')
+}
+
 function quadrado(x: number, y: number, lado: number, extra: string): string {
   return `<rect x="${(x - lado / 2).toFixed(1)}" y="${(y - lado / 2).toFixed(1)}" width="${lado}" height="${lado}" ${extra}/>`
 }
@@ -592,7 +659,7 @@ function trilhaSvg(p: Painel, f: Festa | null): string {
     if (i === 0 && p.concluida) {
       // Depois do Base Camp, o Campo 1 é o ponto atual (0.2.17): contorno enquanto o workflow não está
       // completo, com o anel (que pulsa na festa); cheio em tinta quando está.
-      if (p.estado === 'completo') {
+      if (campo1Feito(p)) {
         s += quadrado(x, y, 8, `fill="${TINTA}"`)
       } else {
         s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="none" stroke="${TINTA}" stroke-width="1.4" opacity=".25"${f ? ' class="pulso"' : ''}/>`
@@ -632,7 +699,7 @@ function trilhaSvg(p: Painel, f: Festa | null): string {
 }
 
 // A linha das rodadas do cartão Agora, depois do Base Camp (0.2.17): o que o workflow já rodou.
-function linhaDasRodadas(p: Painel): string {
+function linhaDasRodadas(p: { rodadas: Rodada[]; pedido: string | null }): string {
   const n = p.rodadas.length
   const ultima = p.rodadas[n - 1]
   if (!ultima) {
@@ -669,6 +736,84 @@ async function lerTexto($: EngineInterface, caminho: string): Promise<string> {
   } catch {
     return ''
   }
+}
+
+async function listar($: EngineInterface, caminho: string): Promise<{ name: string; kind: string; mtimeMs: number }[]> {
+  try {
+    return (await existe($, caminho)) ? await $.fs.list(caminho) : []
+  } catch {
+    return []
+  }
+}
+
+// Os cartões de workflow da pasta (0.2.19): frentes/*/workflows/*.md e, no leve, workflows/*.md. O cartão que o
+// base-camp.md aponta (ou o primeiro-processo.md de antes da 0.2.1) entra sempre, mesmo fora dessas pastas.
+async function lerWorkflows($: EngineInterface, dir: string, base: string): Promise<{ workflows: Workflow[]; proximos: NaFila[] }> {
+  const achados: { rel: string; mtime: number }[] = []
+  const cartoesEm = async (pastaRel: string) => {
+    for (const f of await listar($, `${dir}/${pastaRel}`)) {
+      if (f.kind === 'file' && f.name.endsWith('.md') && !/^(readme|_)/i.test(f.name)) achados.push({ rel: `${pastaRel}/${f.name}`, mtime: f.mtimeMs })
+    }
+  }
+  for (const frente of await listar($, `${dir}/frentes`)) {
+    if (frente.kind === 'dir') await cartoesEm(`frentes/${frente.name}/workflows`)
+  }
+  await cartoesEm('workflows')
+  if (!achados.some(a => a.rel === base) && (await existe($, `${dir}/${base}`))) achados.unshift({ rel: base, mtime: 0 })
+  const workflows: Workflow[] = []
+  const proximos: NaFila[] = []
+  for (const { rel, mtime } of achados) {
+    const c = lerCartao(await lerTexto($, `${dir}/${rel}`))
+    const pastaDaFrente = /^frentes\/([^/]+)\//.exec(rel)?.[1] ?? null
+    const arquivo = rel.split('/').pop()?.replace(/\.md$/, '').replace(/-/g, ' ') ?? rel
+    workflows.push({
+      arquivo: rel,
+      frente: c.frente ?? pastaDaFrente,
+      nome: c.workflowNome ?? (c.pedido ? maiuscula(c.pedido) : maiuscula(arquivo)),
+      pedido: c.pedido,
+      processo: c.processo,
+      combinado: c.combinadoCartao,
+      estado: c.estado,
+      estadoTexto: c.estadoTexto,
+      quadros: c.quadros,
+      passos: c.passos,
+      passosSistema: c.passosSistema,
+      furos: c.furos,
+      skill: c.skill,
+      sozinho: c.sozinho,
+      rodadas: c.rodadas,
+      quando: quandoRodou(c.rodadas[c.rodadas.length - 1]),
+      mtime,
+    })
+    proximos.push(...c.proximos)
+  }
+  return { workflows, proximos }
+}
+
+// O workflow da vez (0.2.19): o que tem a última rodada a conferir; senão, o último que rodou; senão, o
+// primeiro workflow. Só cartões com a linha Pedido (os outros aparecem com o aviso).
+function escolherDaVez(workflows: Workflow[], base: string): Workflow | null {
+  const recente = (a: Workflow, b: Workflow) => b.quando - a.quando || b.mtime - a.mtime
+  const validos = workflows.filter(w => w.pedido)
+  return (
+    [...validos].filter(aConferir).sort(recente)[0] ??
+    [...validos].filter(w => w.rodadas.length > 0).sort(recente)[0] ??
+    workflows.find(w => w.arquivo === base) ??
+    validos[0] ??
+    null
+  )
+}
+
+// A fila: as linhas "Os próximos" de todos os cartões e as opções não escolhidas no passo 2, sem repetir e
+// sem as que já têm cartão.
+function montarFila(candidatos: NaFila[], workflows: Workflow[]): NaFila[] {
+  const fila: NaFila[] = []
+  for (const c of candidatos) {
+    const temCartao = workflows.some(w => mesmo(w.nome, c.nome) || mesmo(w.pedido, c.nome) || mesmo(w.pedido, c.pedido))
+    const repetido = fila.some(f => mesmo(f.nome, c.nome) || mesmo(f.pedido, c.nome) || mesmo(f.nome, c.pedido) || mesmo(f.pedido, c.pedido))
+    if (!temCartao && !repetido) fila.push(c)
+  }
+  return fila
 }
 
 async function carregar($: EngineInterface) {
@@ -746,7 +891,22 @@ async function carregar($: EngineInterface) {
       campos = lerCampos(defs, await lerTexto($, `${dir}/montagem/respostas.md`), atual.codigo, base.nivel)
     }
     const sabido = lerResumo(await lerTexto($, `${dir}/montagem/resumo.md`))
-    novo = { ...base, ...proc, campos, montado, resumo: sabido, nome: primeiroNome(sabido) }
+    // O painel de trabalho só existe depois do Base Camp montado: antes, nada de listar a pasta.
+    const relDoCartao = base.workflow ?? 'primeiro-processo.md'
+    const trabalho = base.concluida ? await lerWorkflows($, dir, relDoCartao) : { workflows: [], proximos: [] }
+    const daVez = escolherDaVez(trabalho.workflows, relDoCartao)
+    const fila = montarFila([...trabalho.proximos, ...base.proximos.map(p => ({ nome: p, pedido: p }))], trabalho.workflows)
+    novo = {
+      ...base,
+      ...proc,
+      workflows: trabalho.workflows,
+      daVez: daVez?.arquivo ?? null,
+      fila,
+      campos,
+      montado,
+      resumo: sabido,
+      nome: primeiroNome(sabido),
+    }
   }
   const anterior = await read($, painel)
   if (JSON.stringify(anterior) === JSON.stringify(novo)) return novo
@@ -1244,7 +1404,7 @@ export const register: Register = on => {
             const atual = !dado.concluida && atualBloco?.codigo === b.codigo
             return `${atual ? '●' : b.status === 'aprovado' || b.status === 'pulado' ? '✓' : '○'} ${b.codigo === 'D' ? 'Começo' : dado.blocos.length === 3 ? b.nome : b.codigo}`
           }),
-          ...(dado.concluida ? [dado.estado === 'completo' ? '✓ Campo 1' : '● Campo 1'] : []),
+          ...(dado.concluida ? [campo1Feito(dado) ? '✓ Campo 1' : '● Campo 1'] : []),
         ].join('   ')}
       </Text>
     )
@@ -1283,43 +1443,148 @@ export const register: Register = on => {
       )
     }
 
-    // ----- Base Camp montado: o cartão Agora vira o do primeiro workflow (0.2.17): o nome, as rodadas, o estado e
-    // o botão com o pedido dela; o resto numa zona só, discreta (0.2.16).
+    // ----- Base Camp montado: o painel de trabalho (0.2.19). Um cartão Agora só, com um botão principal: o
+    // workflow que espera a aprovação dela ou o último que rodou. Os outros, uma linha cada na zona dos
+    // workflows; a fila, recolhida. O resto numa zona só, discreta (0.2.16).
     if (dado.concluida) {
-      const pedido = dado.pedido
-      const ultimaRodada = dado.rodadas[dado.rodadas.length - 1]
-      // A última rodada espera a aprovação dela: o botão principal aprova a entrega.
-      const aguardaAprovacao = ultimaRodada?.aprovada === 'pendente'
+      const daVez = dado.workflows.find(w => w.arquivo === dado.daVez) ?? null
+      const outros = dado.workflows.filter(w => w !== daVez)
+      const pedido = daVez ? daVez.pedido : dado.pedido
+      const rodadas = daVez ? daVez.rodadas : dado.rodadas
+      // A última rodada espera a aprovação dela: o botão principal aprova a entrega, e o pedido fica ao lado,
+      // como secundário, para ela poder rodar de novo.
+      const aguardaAprovacao = rodadas[rodadas.length - 1]?.aprovada === 'pendente'
+      const estado = daVez ? daVez.estado : dado.estado
+      const estadoTexto = daVez ? daVez.estadoTexto : dado.estadoTexto
+      const passos = daVez ? daVez.passos : dado.passos
+      const passosSistema = daVez ? daVez.passosSistema : dado.passosSistema
+      // O combinado do que ficou pronto é o do primeiro workflow, o do Base Camp.
       const combinadoMostrado = dado.combinadoCartao ?? dado.combinado
+      const ehOPrimeiro = !daVez || daVez.arquivo === (dado.workflow ?? 'primeiro-processo.md')
+      const emAndamento = /^em andamento/i.test(rodadas[rodadas.length - 1]?.tempo ?? '')
+      const etiquetaAgora = aguardaAprovacao && !emAndamento
+        ? 'AGORA · ESPERA A SUA APROVAÇÃO'
+        : dado.workflows.length > 1
+          ? 'AGORA · O ÚLTIMO QUE RODOU'
+          : 'AGORA · O SEU PRIMEIRO WORKFLOW'
+      const frentes = new Set(dado.workflows.map(w => (w.frente ?? '').toLowerCase()))
+      const porFrente = frentes.size > 1
+      const fila = await read($, filaAberta)
+      // Um quadrado por passo, na cor da Situação: o sistema faz (cheio, em tinta), fica com ela (contorno),
+      // ainda não dá (✕). A forma também muda, para quem não distingue a cor.
+      const fileira = (w: Workflow, k: string) =>
+        w.quadros.length > 0 ? (
+          <Box key={k} flexDirection="row">
+            {w.quadros.map((q, i) => (
+              <Text key={`${k}-${i}`} color={q === 'sistema' ? TINTA : q === 'nao' ? SINAL : ROCHA}>
+                {q === 'sistema' ? '■' : q === 'nao' ? '✕' : '□'}
+              </Text>
+            ))}
+          </Box>
+        ) : null
+      // O cartão fora do formato aparece com o que fazer, em vez de sumir.
+      const semPedido = (w: Workflow) =>
+        !w.pedido && w.arquivo !== 'primeiro-processo.md' ? (
+          <Text key={`sem-pedido-${w.arquivo}`} color={SINAL}>
+            O cartão {w.arquivo} está sem a linha Pedido; peça para o sistema completar.
+          </Text>
+        ) : null
+      const estadoCurto = (w: Workflow) =>
+        aConferir(w) && w.rodadas.length > 0 ? 'entrega a conferir' : w.estado === 'completo' ? 'completo' : w.estado
+      const linhaDoWorkflow = (w: Workflow, i: number) =>
+        !w.pedido ? (
+          semPedido(w)
+        ) : (
+          <Box key={`wf-${i}`} flexDirection="row" flexWrap="wrap" gap={1}>
+            {fileira(w, `wf-${i}-quadros`)}
+            <Text color={ROCHA}>
+              {[w.nome, w.passos > 0 ? `${w.passosSistema} de ${w.passos}` : null, estadoCurto(w)].filter(Boolean).join(' · ')}
+            </Text>
+            {!pendente &&
+              (aConferir(w) && w.rodadas.length > 0 ? (
+                <Button key={`wf-${i}-aprovar`} label="Aprovar a entrega" onPress={() => void enviar($, `aprovar a entrega de ${w.pedido}`)} />
+              ) : (
+                <Button key={`wf-${i}-rodar`} label={rotuloCurto(maiuscula(w.pedido))} onPress={() => void enviar($, w.pedido ?? '')} />
+              ))}
+          </Box>
+        )
+      const grupos = porFrente
+        ? [...new Set(outros.map(w => w.frente ?? ''))].map(f => ({ frente: f, lista: outros.filter(w => (w.frente ?? '') === f) }))
+        : [{ frente: '', lista: outros }]
       return (
         <Box {...fundo}>
           {cabecalho}
           <Box flexDirection="column" borderStyle="round" borderColor={TINTA} padding={1}>
-            <Text color={TINTA} size="caption">AGORA · O SEU PRIMEIRO WORKFLOW</Text>
-            <Text bold color={TINTA}>{dado.workflowNome ?? (pedido ? maiuscula(pedido) : 'O seu primeiro workflow')}</Text>
-            {dado.processo && <Text color={ROCHA}>{dado.processo}</Text>}
-            <Text color={ROCHA}>{linhaDasRodadas(dado)}</Text>
-            {dado.estado === 'completo' ? (
-              <Text color={TINTA}>✓ Completo desde {desdeQuando(dado.estadoTexto)}: sai pronto com um pedido seu.</Text>
+            <Text color={TINTA} size="caption">{etiquetaAgora}</Text>
+            <Text bold color={TINTA}>{daVez?.nome ?? dado.workflowNome ?? (pedido ? maiuscula(pedido) : 'O seu primeiro workflow')}</Text>
+            {(daVez ? daVez.processo : dado.processo) && <Text color={ROCHA}>{daVez ? daVez.processo : dado.processo}</Text>}
+            {daVez && fileira(daVez, 'agora-quadros')}
+            <Text color={ROCHA}>{linhaDasRodadas({ rodadas, pedido })}</Text>
+            {estado === 'completo' ? (
+              <Text color={TINTA}>✓ Completo desde {desdeQuando(estadoTexto)}: sai pronto com um pedido seu.</Text>
             ) : (
               <Text color={CINZA} size="caption">
-                Completo quando sair pronto com um pedido só seu.{dado.passos > 0 ? ` O sistema já faz ${dado.passosSistema} de ${dado.passos} passos.` : ''}
+                Completo quando sair pronto com um pedido só seu.{passos > 0 ? ` O sistema já faz ${passosSistema} de ${passos} passos.` : ''}
               </Text>
             )}
+            {daVez && daVez.furos.length > 0 && (
+              <Text color={ROCHA}>
+                Falta para ponta a ponta: {daVez.furos.map(f => (f.motivo ? `${f.passo} (${f.motivo})` : f.passo)).join('; ')}.
+              </Text>
+            )}
+            {daVez && (
+              <Text color={CINZA} size="caption">
+                {`Campo 1 ${estado === 'completo' ? '✓' : '○'} · Skill ${daVez.skill ? '✓' : '○'} · Sozinho ${daVez.sozinho ? '✓' : '○'}`}
+              </Text>
+            )}
+            {daVez && semPedido(daVez)}
             <Box flexDirection="row" flexWrap="wrap" gap={1}>
+              {!pendente && aguardaAprovacao && (
+                <Button key="aprovar-entrega" variant="primary" label="Aprovar a entrega" onPress={() => void enviar($, 'pode, aprovado')} />
+              )}
               {!pendente &&
-                (aguardaAprovacao ? (
-                  <Button key="aprovar-entrega" variant="primary" label="Aprovar a entrega" onPress={() => void enviar($, 'pode, aprovado')} />
-                ) : pedido ? (
-                  <Button key="rodar-workflow" variant="primary" label={rotuloCurto(maiuscula(pedido))} onPress={() => void enviar($, pedido)} />
+                (pedido ? (
+                  <Button
+                    key="rodar-workflow"
+                    variant={aguardaAprovacao ? undefined : 'primary'}
+                    label={rotuloCurto(maiuscula(pedido))}
+                    onPress={() => void enviar($, pedido)}
+                  />
                 ) : (
-                  <Button key="rodar-workflow" variant="primary" label="Rodar o meu primeiro workflow" onPress={() => void enviar($, 'vamos rodar o primeiro workflow')} />
+                  !aguardaAprovacao &&
+                  ehOPrimeiro && (
+                    <Button key="rodar-workflow" variant="primary" label="Rodar o meu primeiro workflow" onPress={() => void enviar($, 'vamos rodar o primeiro workflow')} />
+                  )
                 ))}
               {corrigirBotao}
             </Box>
             {pendente && aviso}
             {ultima}
           </Box>
+          {(outros.length > 0 || dado.fila.length > 0) && (
+            <Box flexDirection="column">
+              <Text color={CINZA} size="caption">OS SEUS WORKFLOWS · UM POR CONVERSA</Text>
+              {grupos.map(g => (
+                <Box key={`frente-${g.frente}`} flexDirection="column">
+                  {porFrente && g.lista.length > 0 && <Text color={CINZA} size="caption">{(g.frente || 'Sem frente').toUpperCase()}</Text>}
+                  {g.lista.map(w => linhaDoWorkflow(w, dado.workflows.indexOf(w)))}
+                </Box>
+              ))}
+              {dado.fila.length > 0 && (
+                <Box flexDirection="column">
+                  <Button key="fila" label={`Na fila: ${dado.fila.length}`} onPress={() => void update($, filaAberta, a => !a)} />
+                  {fila &&
+                    dado.fila.map((f, i) => (
+                      <Button
+                        key={`fila-${i}`}
+                        label={rotuloCurto(`Rodar ${f.nome.charAt(0).toLowerCase()}${f.nome.slice(1)}`)}
+                        onPress={() => void enviar($, `rodar o workflow ${f.nome}`)}
+                      />
+                    ))}
+                </Box>
+              )}
+            </Box>
+          )}
           <Box flexDirection="column">
             <Text color={CINZA} size="caption">O QUE FICOU PRONTO</Text>
             {dado.tempoTotal && <Text color={TINTA}>✓ Base Camp montado em {dado.tempoTotal}</Text>}
@@ -1328,7 +1593,6 @@ export const register: Register = on => {
               <Text color={SINAL}>✕ O teste: quem sou eu não passou{dado.testeFalhou ? `: ${dado.testeFalhou}` : ''}</Text>
             )}
             {combinadoMostrado && <Text color={ROCHA}>✓ O combinado: {combinadoMostrado}</Text>}
-            {dado.proximos.length > 0 && <Text color={ROCHA}>Os próximos workflows: {dado.proximos.join(' · ')}</Text>}
             <Text color={ROCHA}>
               {completo
                 ? 'Para o Arthur: mande o resumo do seu Base Camp para ele revisar e dar robustez ao seu sistema.'

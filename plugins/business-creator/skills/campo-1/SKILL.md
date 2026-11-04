@@ -5,7 +5,7 @@ description: Conduz o Campo 1 da primeira montanha, depois do Base Camp - rodar 
 
 # Campo 1: rodar até sair com um pedido só
 
-> Plugin Business Creator 0.2.17 (02/11/2026), versão 2 desta skill: **rodadas com correção, sem questionário** (decisão do Arthur, 02/11/2026: no teste dele o Campo 1 abriu com perguntas que o Base Camp tinha prometido não fazer, e ele preferiu aprender rodando). O Campo 2 (os passos que se repetem viram skills) e o Campo 3 (chegar sozinho) vêm na 0.3.
+> Plugin Business Creator 0.2.19 (03/11/2026), versão 3 desta skill: **um workflow por conversa, vários abertos** (decisão do Arthur, 03/11/2026). Versão 2 (0.2.17, 02/11/2026): **rodadas com correção, sem questionário** (decisão do Arthur, 02/11/2026: no teste dele o Campo 1 abriu com perguntas que o Base Camp tinha prometido não fazer, e ele preferiu aprender rodando). O Campo 2 (os passos que se repetem viram skills) e o Campo 3 (chegar sozinho) vêm na 0.3.
 
 Um workflow é o caminho de uma tarefa da pessoa, do ponto de partida até a entrega. Cada frente dela é um conjunto de workflows. O primeiro foi escolhido por ela no fim do Base Camp e já rodou uma vez (a rodada 1). **O Campo 1 é rodar de novo, cada vez que a tarefa chegar, corrigindo:** ela escreve o pedido, o sistema roda o cartão passo a passo, entrega, ela aprova ou corrige, e cada correção vira regra. Está pronto quando sair do começo à entrega com um pedido só dela, e ela aprovar.
 
@@ -16,7 +16,7 @@ Um workflow é o caminho de uma tarefa da pessoa, do ponto de partida até a ent
 4. "O que o sistema aprendeu" tem as regras das correções dela, com a data; "As rodadas" tem uma linha por rodada, com o tempo contra o "antes".
 
 ## Antes de rodar
-- **Ache o cartão pelo pedido.** O pedido que ela escreveu é a linha **Pedido** de um cartão em `workflows/` (na frente, ou na raiz no nível leve). Se ela escreveu "vamos rodar o primeiro workflow" ou "Campo 1", o cartão é o da linha **Primeiro workflow** do `base-camp.md`, e só ele. Se ela nomear outro ("vamos rodar o de projetos"), é esse; se o cartão não existir, crie pelo modelo `workflow.md` da montagem antes de rodar. Em dúvida entre dois, pergunte em uma linha; nunca escolha por ela.
+- **Ache o cartão pelo pedido.** O pedido que ela escreveu é a linha **Pedido** de um cartão em `workflows/` (na frente, ou na raiz no nível leve). Se ela escreveu "vamos rodar o primeiro workflow" ou "Campo 1", o cartão é o da linha **Primeiro workflow** do `base-camp.md`, e só ele. Se ela nomear outro ("vamos rodar o de projetos", ou o clique "rodar o workflow <nome>" na fila do painel), é esse; se o cartão não existir, crie pelo modelo `workflow.md` da montagem (a frente, o nome, o pedido e os passos como ela contou ou como estão em "Os próximos" do cartão de onde ele veio) e rode na mesma conversa. Em dúvida entre dois, pergunte em uma linha; nunca escolha por ela.
 - Leia com a ferramenta de leitura de arquivos, nunca por comando: o cartão, o `contexto/computador.md` e a ficha da frente. Nada mais.
 - **Cartão de antes da 0.2.17** (sem as linhas Pedido e Combinado em "Do começo à entrega"): acrescente as duas, tiradas de "Começa quando" e do `como-usar.md`, numa edição só, antes de rodar. É por elas que o painel mostra o botão.
 - **Abra em uma linha, nas palavras dela**, e já peça o que a rodada precisa, se precisar: "Rodada <n> de <o nome do workflow, como no cartão>. Me conte o seu dia: o que andou e o que travou." Nada de método na mensagem: sem "Campo 1", "cartão", "de ponta a ponta", "a Mera", "detalhar". O mapa fica na trilha do painel. Se o cartão disser algo em "O que pode travar" que impede a rodada, diga em uma linha e resolva primeiro. **Se um passo depende de uma fonte que não está ao alcance**, não entregue um modelo com campos em branco no lugar do resultado: faça o que dá com o que existe, diga em uma linha o que faltou e de quem depende, e grave em Pendências.
@@ -45,7 +45,7 @@ A mensagem da entrega:
 - **O próximo passo é sempre o mesmo pedido:** "Na próxima vez, só escreva **<pedido>**." Nunca invente uma segunda frase.
 
 ## Cuidados
-- **Um workflow de cada vez.** Se ela trouxer outra tarefa no meio, ajude em poucas linhas e, se ela se repete, anote na tabela "Workflows" da frente como o próximo.
+- **Um workflow por conversa; vários abertos ao mesmo tempo, cada um com o seu cartão.** Ela pode abrir outro workflow, até de outra frente, antes de este ficar completo: o cartão de cada um guarda onde ele parou. Nesta conversa, roda-se um só. Se ela trouxer outra tarefa no meio, ajude em poucas linhas e, se ela se repete, anote em "Os próximos" do cartão e na tabela "Workflows" da frente. **Pasta de antes da 0.2.19:** se o `AGENTS.md` da raiz ainda diz "um workflow de cada vez" e "só abra o segundo quando este estiver completo", vale a regra nova; diga em uma linha que a regra mudou e, com o ok dela, troque a linha pela do modelo `AGENTS-raiz.md` (a pasta é dela: sem o ok, não mexa).
 - **Sem jargão** (a não ser "workflow", que ela já conhece da montagem). Os critérios ficam com as palavras dela.
 - **Sigilo e dados da empresa:** as regras dela, no `AGENTS.md` da raiz, valem aqui. Dado da empresa só com a autorização registrada.
 - **Uma conversa por rodada**, de preferência: o pedido abre a conversa, a entrega fecha. O cartão guarda tudo; a conversa seguinte não precisa da anterior.

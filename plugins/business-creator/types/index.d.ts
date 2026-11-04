@@ -40,6 +40,46 @@ export type Rodada = {
   obs: string
 }
 
+// Um passo do cartão, pela coluna Situação (0.2.19): "o sistema fez" = o sistema faz; "ainda não dá" = não dá; o resto fica com ela.
+export type Quadro = 'sistema' | 'ela' | 'nao'
+
+// Um passo "ainda não dá", com o motivo (o texto depois dos dois-pontos da Situação).
+export type Furo = {
+  passo: string
+  motivo: string
+}
+
+// Uma linha da tabela "Os próximos" de um cartão, ou uma opção não escolhida no passo 2 (0.2.19).
+export type NaFila = {
+  nome: string
+  pedido: string | null
+}
+
+// Um cartão de workflow, como o painel de trabalho o mostra (0.2.19): todos os cartões de frentes/*/workflows/ e workflows/.
+export type Workflow = {
+  // O caminho do cartão, relativo à pasta.
+  arquivo: string
+  frente: string | null
+  nome: string
+  pedido: string | null
+  processo: string | null
+  combinado: string | null
+  estado: 'incompleto' | 'em andamento' | 'completo'
+  estadoTexto: string | null
+  quadros: Quadro[]
+  passos: number
+  passosSistema: number
+  furos: Furo[]
+  // Algum passo usa uma skill (a coluna "Com quê" cita skill ou .claude/skills/).
+  skill: boolean
+  // O cartão diz "Chega sozinho: sim".
+  sozinho: boolean
+  rodadas: Rodada[]
+  // A data da última rodada, em milissegundos (0 sem rodada); a modificação do arquivo desempata.
+  quando: number
+  mtime: number
+}
+
 export type Painel = {
   nivel: Nivel
   iniciada: boolean
@@ -61,6 +101,10 @@ export type Painel = {
   passos: number
   passosSistema: number
   rodadas: Rodada[]
+  // O painel de trabalho (0.2.19): todos os cartões, o da vez (o arquivo) e a fila, sem repetir e sem os que já têm cartão.
+  workflows: Workflow[]
+  daVez: string | null
+  fila: NaFila[]
   feita: boolean
   combinado: string | null
   testeOk: boolean
@@ -124,6 +168,7 @@ declare module 'claude-code' {
       doc: 'guia' | 'resumo' | null
       docTexto: string | null
       pergunta: string | null
+      filaAberta: boolean
     }
   }
 }
