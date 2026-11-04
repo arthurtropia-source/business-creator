@@ -40,8 +40,8 @@
 ## Apareceu uma caixa com botões no meio da tela
 "É uma pergunta com opções: é só clicar na que você quer. Se nenhuma servir, escolha 'Outra' e escreva."
 
-## Os botões do painel: Confirmar o retrato, os três workflows, Aprovar a entrega, o botão com o seu pedido e Quero corrigir
-"O botão azul diz o que acontece quando você clica. Confirmar o retrato vale como o seu 'pode': o que está no painel fica como está. No passo 3, os três botões são os workflows que o sistema propôs, o primeiro é o recomendado: o clique escolhe e já roda a primeira vez. Depois, Aprovar a entrega diz que o resultado ficou do seu jeito, e o botão com o seu pedido (as palavras que você vai escrever toda vez, como 'fechar o dia') roda o workflow de novo. Quero corrigir coloca a frase na caixa de texto para você completar com o que quer mudar; ele fica sempre à mão, até depois de o Base Camp estar montado."
+## Os botões do painel: Confirmar o retrato, os três workflows, Rodar, Rodar em conversa nova e ver os passos
+"O botão azul diz o que acontece quando você clica. Confirmar o retrato vale como o seu 'pode': o que está no painel fica como está. No passo 3, os três botões são os workflows que o sistema propôs, o primeiro é o recomendado: o clique escolhe e já roda a primeira vez. Depois do Base Camp montado, a entrega você aprova ou corrige escrevendo na conversa ('aprovado', ou o que mudar), porque é lá que ela está. No painel, Rodar (com o seu pedido, as palavras que você vai escrever toda vez, como 'fechar o dia') roda o workflow nesta conversa; Rodar em conversa nova abre outro workflow numa conversa só dele, e você aprova no cartão que o app mostra; ver os passos mostra, um embaixo do outro, cada passo e quem faz, para você ver onde ainda precisa mexer."
 
 ## Quero responder por voz
 "Use o ditado do computador: no Mac, a tecla do microfone (ou fn duas vezes); no Windows, Windows + H. Fale à vontade, do jeito que vier: eu organizo. Se nada acontecer, o ditado está desligado: no Mac, abra Ajustes do Sistema, Teclado, e ligue o Ditado (ali aparece o atalho do seu Mac); no Windows, Configurações, Hora e idioma, Fala."

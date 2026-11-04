@@ -23,7 +23,10 @@ Quando <o gatilho, com as palavras dela>, abra esta pasta e escreva **<pedido>**
 - <pedido 3: "o que está parado nas minhas frentes e qual o próximo passo de cada uma?">
 
 ## Uma conversa por assunto
-Para cada assunto novo, abra uma conversa nova nesta pasta. O sistema já sabe quem você é em toda conversa; conversa longa demais fica lenta e gasta mais do seu plano.
+Para cada assunto novo, abra uma conversa nova nesta pasta. O sistema já sabe quem você é em toda conversa; conversa longa demais fica lenta e gasta mais do seu plano. Cada workflow roda na sua conversa: no painel, "Rodar em conversa nova" abre uma para ele, e você só aprova.
+
+## O seu dia por aqui
+Faça o seu trabalho por esta pasta, qualquer tarefa. O sistema anota cada conversa num diário da frente (`frentes/<frente>/diario/`): o pedido, os arquivos e o tempo, nunca o conteúdo. O diário é seu, fica no seu computador e pode ser apagado quando você quiser; serve para mostrar, depois, o que se repete.
 
 ## O que nunca acontece sem você
 Nada sai do computador sem o seu ok: e-mail, mensagem, publicação, compra, dinheiro. Na dúvida, o sistema entrega como rascunho.

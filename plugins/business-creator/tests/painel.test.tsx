@@ -206,7 +206,10 @@ function pasta(on: On, arquivos: Record<string, string>, enviados: string[], res
     enviados.push(`[aviso] ${e.text}`)
     return { value: undefined }
   })
-  on('ui.copy', () => ({ value: { isCopied: true } }))
+  on('ui.copy', (_, e) => {
+    enviados.push(`[copiado] ${e.text}`)
+    return { value: { isCopied: true } }
+  })
   on('store.get', () => ({ value: undefined }))
   on('store.set', () => ({ value: undefined }))
   on('env.get', () => ({ value: undefined }))
@@ -243,6 +246,13 @@ function pasta(on: On, arquivos: Record<string, string>, enviados: string[], res
     },
   }))
   on('tool.call', () => ({ result: 'ok' }))
+  // O diário (0.3.0): o painel grava a linha da conversa; aqui, na mesma pasta de mentira.
+  on('fs.write', (_, e) => {
+    if (e.path.includes('/frentes/bloqueada/')) throw new Error('sem permissão')
+    arquivos[e.path] = e.text
+    return { value: undefined }
+  })
+  on('session.id', () => ({ value: 'sessao-c7f2' }))
 }
 
 const MEIO = (nivel: string) => ({
@@ -387,42 +397,40 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     await $.session.start({ cwd: '/os', surface, isInteractive: true })
 
     const ui = await $.ui.mount({ ...PANE, surface })
-    // Depois do Base Camp, o cartão Agora é o do workflow (0.2.17): o nome do cartão, o "o quê", as rodadas lidas
-    // da tabela e o estado. O título do painel é o sistema dela (sem o nome no resumo, "O seu sistema").
-    expect(await ui.find({ type: 'Text', text: /AGORA · O SEU PRIMEIRO WORKFLOW/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /BASE CAMP MONTADO/ })).toBeUndefined()
+    // O painel de trabalho cortado (0.3.0): o cartão Agora com o nome, os passos em quadrados com a conta, o
+    // combinado e um botão só, Rodar. O título do painel é o sistema dela (sem o nome no resumo, "O seu sistema").
+    expect(await ui.find({ type: 'Text', text: /^AGORA$/ })).toBeDefined()
     expect((await ui.find({ type: 'Text', text: /^Mensagem de retorno$/ }))?.props.bold).toBe(true)
-    expect(await ui.find({ type: 'Text', text: /A resposta ao cliente que pediu um orçamento/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /^Rodou 1 vez\. A última em 23\/10\/2026: 1 pedido até a entrega, entrega aprovada\.$/ })).toBeDefined()
-    expect((await ui.find({ type: 'Text', text: /O sistema já faz 2 de 4 passos\./ }))?.text).toContain('Completo quando sair pronto com um pedido só seu.')
+    expect(await ui.find({ type: 'Text', text: /^o sistema faz 2 de 4 passos$/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /^Combinado: quando chegar um pedido de orçamento, abra esta pasta e escreva mensagem de retorno$/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /^O seu sistema$/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /^Montagem do Base Camp$/ })).toBeUndefined()
-    expect(await ui.find({ type: 'Button', key: 'corrigir' })).toBeDefined()
-    // O botão principal leva o pedido, com a primeira letra em maiúscula, e manda o pedido como está no cartão.
-    const rodar = await ui.find({ type: 'Button', key: 'rodar-workflow' })
-    expect(rodar?.props.variant).toBe('primary')
-    expect(rodar?.props.label).toBe('Mensagem de retorno')
-    expect(await ui.find({ type: 'Button', key: 'aprovar-entrega' })).toBeUndefined()
-    // O que ficou pronto: o tempo da montagem, o teste, o combinado do cartão (não o do base-camp.md) e os
-    // próximos workflows. "Peça ao seu sistema" saiu.
-    expect(await ui.find({ type: 'Text', text: /^✓ Base Camp montado em 27 min$/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /O teste passou/ })).toBeDefined()
-    expect((await ui.find({ type: 'Text', text: /O combinado:/ }))?.text).toContain('quando chegar um pedido de orçamento, abra esta pasta e escreva mensagem de retorno')
-    expect(await ui.find({ type: 'Text', text: /amanhã, às 8h/ })).toBeUndefined()
-    // Os próximos (as opções não escolhidas) viram a fila, recolhida (0.2.19).
-    expect(await ui.find({ type: 'Text', text: /Os próximos workflows/ })).toBeUndefined()
-    expect((await ui.find({ type: 'Button', key: 'fila' }))?.props.label).toBe('Na fila: 2')
-    // Os passos em quadrados e os pontos de controle, no cartão Agora.
-    expect(await ui.find({ type: 'Text', text: /^Campo 1 ○ · Skill ○ · Sozinho ○$/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /Peça ao seu sistema/ })).toBeUndefined()
-    expect(await ui.find({ type: 'Button', key: 'tarefa-0' })).toBeUndefined()
-    expect(await ui.find({ type: 'Text', text: /Depois: Campo 2/ })).toBeDefined()
-    // A subida segue até o Campo 1, o ponto atual (0.2.17): na linha e na trilha (contorno, borda 2.2).
+    const botoes = await ui.findAll({ type: 'Button' })
+    expect(botoes.filter(b => b.props.variant === 'primary').map(b => b.props.label)).toEqual(['Rodar mensagem de retorno'])
+    // O que saiu do painel (0.3.0): aprovar, corrigir, a descrição repetida, os três pontos de controle, a linha do
+    // "Depois" e o bloco do que ficou pronto.
+    for (const k of ['aprovar-entrega', 'corrigir', 'copiar-resumo', 'guia']) expect(await ui.find({ type: 'Button', key: k })).toBeUndefined()
+    for (const t of [/A resposta ao cliente que pediu/, /Campo 1 [○✓]/, /Depois: Campo 2/, /O QUE FICOU PRONTO/, /UM POR CONVERSA/, /sugestão do sistema/]) {
+      expect(await ui.find({ type: 'Text', text: t })).toBeUndefined()
+    }
+    // "ver os passos": a lista na vertical, com quem faz.
+    expect(await ui.find({ type: 'Text', text: /^■ 1\. Ler o pedido do cliente · o sistema faz$/ })).toBeUndefined()
+    await ui.press({ key: 'ver-agora' })
+    expect(await ui.find({ type: 'Text', text: /^■ 1\. Ler o pedido do cliente · o sistema faz$/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /^□ 2\. Conferir o que já foi combinado · fica com você$/ })).toBeDefined()
+    expect((await ui.find({ type: 'Button', key: 'ver-agora' }))?.props.label).toBe('fechar os passos')
+    // As opções não escolhidas, recolhidas em "A começar"; os marcos numa linha; o Base Camp numa linha.
+    expect((await ui.find({ type: 'Button', key: 'fila' }))?.props.label).toBe('A começar: 2')
+    expect(await ui.find({ type: 'Text', text: /^Mera ○ · Island ○ · Lobuche East ○$/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /^Base Camp montado em 27 min$/ })).toBeDefined()
+    // A trilha e a subida ficam dentro do "Ver o resumo" (decisão 2, 04/11).
+    expect(await ui.find({ type: 'Text', text: /Começo/ })).toBeUndefined()
+    await ui.press({ key: 'ver-resumo' })
     expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toBe('✓ Base   ✓ Começo   ✓ O retrato   ✓ O primeiro workflow   ● Campo 1')
     if (surface !== 'terminal') {
       const desenho = (await ui.findAll({ type: 'Svg' })).find(s => s.props.alt === TRILHA)?.props.source ?? ''
       expect(desenho).toMatch(/x="225\.6" y="100\.[45]" width="8" height="8" fill="#F5F1E8" stroke="#1F2C8F" stroke-width="2\.2"/)
     }
+    expect(await ui.find({ type: 'Button', key: 'copiar-resumo' })).toBeDefined()
     await ui.press({ key: 'rodar-workflow' })
     expect(enviados).toContain('mensagem de retorno')
     await ui.unmount()
@@ -437,15 +445,19 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     await $.session.start({ cwd: '/os', surface, isInteractive: true })
 
     const ui = await $.ui.mount({ ...PANE, surface })
-    expect(await ui.find({ type: 'Text', text: /o Arthur sobe a Mera com você/ })).toBeDefined()
     // Sem o cartão do workflow: o nome genérico, "ainda não rodou" e o botão de sempre (0.2.17).
     expect((await ui.find({ type: 'Text', text: /^O seu primeiro workflow$/ }))?.props.bold).toBe(true)
-    expect(await ui.find({ type: 'Text', text: /^Ainda não rodou\. Quando chegar a hora, clique no botão ou escreva o pedido do seu guia de bolso\.$/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /^Ainda não rodou\.$/ })).toBeDefined()
     expect((await ui.find({ type: 'Button', key: 'rodar-workflow' }))?.props.label).toBe('Rodar o meu primeiro workflow')
+    // O resumo, a cópia e o recado do programa ficam dentro do "Ver o resumo" (0.3.0).
+    expect(await ui.find({ type: 'Text', text: /o Arthur sobe a Mera com você/ })).toBeUndefined()
+    await ui.press({ key: 'ver-resumo' })
+    expect(await ui.find({ type: 'Markdown', text: /A Ana toca duas frentes/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /o Arthur sobe a Mera com você/ })).toBeDefined()
     await ui.press({ key: 'copiar-resumo' })
     expect(enviados.some(t => t.startsWith('[aviso] Resumo copiado'))).toBe(true)
     await ui.press({ key: 'ver-resumo' })
-    expect(await ui.find({ type: 'Markdown', text: /A Ana toca duas frentes/ })).toBeDefined()
+    expect(await ui.find({ type: 'Markdown', text: /A Ana toca duas frentes/ })).toBeUndefined()
     await ui.unmount()
   })
 
@@ -666,32 +678,18 @@ test('a pasta de antes da 0.2.17 continua lendo: a tarefa feita, o pedido do "Co
   await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
 
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
-  expect(await ui.find({ type: 'Text', text: /AGORA · O SEU PRIMEIRO WORKFLOW/ })).toBeDefined()
+  // A rodada em andamento espera por ela no chat: o cartão diz onde está e não tem botão (0.3.0).
+  expect(await ui.find({ type: 'Text', text: /^AGORA · ESPERANDO VOCÊ NO CHAT$/ })).toBeDefined()
   expect((await ui.find({ type: 'Text', text: /^Fechar o dia$/ }))?.props.bold).toBe(true)
-  expect(await ui.find({ type: 'Text', text: /^Rodada 1 em andamento \(começou às 19:19\)\.$/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /O sistema já faz 2 de 3 passos\./ })).toBeDefined()
-  // A última rodada ainda espera a aprovação dela: o botão principal aprova a entrega, não roda de novo.
-  const aprovar = await ui.find({ type: 'Button', key: 'aprovar-entrega' })
-  expect(aprovar?.props.variant).toBe('primary')
-  expect(aprovar?.props.label).toBe('Aprovar a entrega')
-  // Desde a 0.2.19, o pedido fica ao lado, como secundário: ela pode rodar de novo sem aprovar.
-  const deNovo = await ui.find({ type: 'Button', key: 'rodar-workflow' })
-  expect(deNovo?.props.variant).toBeUndefined()
-  expect(deNovo?.props.label).toBe('Fechar o dia')
-  // Nada de "Peça ao seu sistema"; o combinado mostrado é o do base-camp.md (o cartão não tem); com uma tarefa só,
-  // nenhum próximo workflow.
-  expect(await ui.find({ type: 'Text', text: /Peça ao seu sistema/ })).toBeUndefined()
-  expect(await ui.find({ type: 'Button', key: 'tarefa-0' })).toBeUndefined()
-  expect((await ui.find({ type: 'Text', text: /O combinado:/ }))?.text).toContain('monitor de preço de ontem')
-  expect(await ui.find({ type: 'Text', text: /^✓ Base Camp montado em 374 min pelo relógio$/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /Os próximos workflows/ })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /^A rodada está em andamento no chat\.$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^o sistema faz 2 de 3 passos$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'rodar-workflow' })).toBeUndefined()
+  expect(await ui.find({ type: 'Button', key: 'aprovar-entrega' })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /^Base Camp montado em 374 min pelo relógio$/ })).toBeDefined()
   expect(await ui.find({ type: 'Button', key: 'fila' })).toBeUndefined()
-  expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toContain('✓ A primeira tarefa   ● Campo 1')
-  await ui.press({ key: 'aprovar-entrega' })
-  expect(enviados).toContain('pode, aprovado')
   await ui.unmount()
 
-  // Com a rodada aprovada, o botão principal volta a ser o pedido, lido do "Começa quando" do cartão antigo.
+  // Com a rodada aprovada no chat, o botão volta: o pedido, lido do "Começa quando" do cartão antigo.
   arquivos['/os/frentes/projetos/workflows/fechar-o-dia.md'] = CARTAO_ANTIGO.replace(
     '| 02/11/2026 | em andamento: começou às 19:19 | | | |',
     '| 02/11/2026 | 12 min | 3 | sim | a data da lista saiu errada |',
@@ -699,15 +697,15 @@ test('a pasta de antes da 0.2.17 continua lendo: a tarefa feita, o pedido do "Co
   await $.turn.start({ text: 'pode, aprovado', turnId: 't1' })
   await $.turn.complete({ answer: 'Aprovado.', durationMs: 1000, isAborted: false, turnId: 't1', reason: 'answer' })
   const depois = await $.ui.mount({ ...PANE, surface: 'desktop' })
-  expect(await depois.find({ type: 'Text', text: /^Rodou 1 vez\. A última em 02\/11\/2026: 3 pedidos até a entrega, entrega aprovada\.$/ })).toBeDefined()
-  expect(await depois.find({ type: 'Button', key: 'aprovar-entrega' })).toBeUndefined()
-  expect((await depois.find({ type: 'Button', key: 'rodar-workflow' }))?.props.label).toBe('Fechar o dia')
+  expect(await depois.find({ type: 'Text', text: /^AGORA$/ })).toBeDefined()
+  expect(await depois.find({ type: 'Text', text: /^Combinado: .*monitor de preço de ontem/ })).toBeDefined()
+  expect((await depois.find({ type: 'Button', key: 'rodar-workflow' }))?.props.label).toBe('Rodar fechar o dia')
   await depois.press({ key: 'rodar-workflow' })
   expect(enviados).toContain('fechar o dia')
   await depois.unmount()
 })
 
-test('o workflow completo no cartão: a linha do completo e o Campo 1 feito na subida', async ($, on) => {
+test('o workflow completo no cartão: o ✓ no nome, a Mera fechada e o próximo ponto de controle', async ($, on) => {
   pasta(on, {
     '/os/base-camp.md': COM_CARTAO('completo'),
     [`/os/${CAMINHO_DO_CARTAO}`]: CARTAO.replace('**Estado:** em andamento', '**Estado:** completo, em 05/11/2026'),
@@ -716,15 +714,16 @@ test('o workflow completo no cartão: a linha do completo e o Campo 1 feito na s
   await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
 
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
-  expect(await ui.find({ type: 'Text', text: /^✓ Completo desde 05\/11\/2026: sai pronto com um pedido seu\.$/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /Completo quando sair pronto/ })).toBeUndefined()
-  expect(await ui.find({ type: 'Text', text: /O sistema já faz/ })).toBeUndefined()
-  expect((await ui.find({ type: 'Button', key: 'rodar-workflow' }))?.props.label).toBe('Mensagem de retorno')
-  // Na subida, o Campo 1 fica feito: na linha e na trilha (o quadrado cheio, em tinta).
+  expect((await ui.find({ type: 'Text', text: /^Mensagem de retorno ✓$/ }))?.props.bold).toBe(true)
+  expect(await ui.find({ type: 'Text', text: /^Próximo: virar habilidade$/ })).toBeDefined()
+  expect((await ui.find({ type: 'Button', key: 'rodar-workflow' }))?.props.label).toBe('Rodar mensagem de retorno')
+  // Os marcos: a Mera fechada; a Island conta os workflows da frente (um só, ainda não fecha).
+  expect(await ui.find({ type: 'Text', text: /^Mera ✓ · Island: 1 de 1 completos · Lobuche East ○$/ })).toBeDefined()
+  // Na subida (dentro do "Ver o resumo"), o Campo 1 fica feito: na linha e na trilha (o quadrado cheio, em tinta).
+  await ui.press({ key: 'ver-resumo' })
   expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toBe('✓ Base   ✓ Começo   ✓ O retrato   ✓ O primeiro workflow   ✓ Campo 1')
   const desenho = (await ui.findAll({ type: 'Svg' })).find(s => s.props.alt === TRILHA)?.props.source ?? ''
   expect(desenho).toMatch(/x="225\.6" y="100\.[45]" width="8" height="8" fill="#1F2C8F"/)
-  expect(desenho).not.toMatch(/x="225\.6" y="100\.[45]" width="8" height="8" fill="#F5F1E8"/)
   await ui.unmount()
 })
 
@@ -757,63 +756,200 @@ const CARTAO_LOJA = `# Workflow: Pedido da semana
 | Mensagem de retorno | mensagem de retorno | já tem cartão |
 `
 
-test('o painel de trabalho: o da vez no Agora, os outros numa linha, a fila recolhida e o cartão fora do formato', async ($, on) => {
+test('o painel de trabalho: o Agora sem botão enquanto a entrega espera, a lista com o mesmo botão e "A começar"', async ($, on) => {
   const enviados: string[] = []
   pasta(on, {
     '/os/base-camp.md': COM_CARTAO('completo'),
     [`/os/${CAMINHO_DO_CARTAO}`]: CARTAO,
     '/os/frentes/loja/workflows/pedido-da-semana.md': CARTAO_LOJA,
     '/os/frentes/loja/workflows/fechar-o-caixa.md': '# Workflow: Fechar o caixa\n- **O quê:** o caixa do dia\n',
+    '/os/frentes/loja/workflows/quebrado.md': 'umas anotações soltas\n',
     '/os/resumo-para-o-arthur.md': RESUMO,
   }, enviados)
   await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
 
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
-  // O Agora é o que espera aprovação, com um botão principal só; o pedido fica ao lado, secundário.
-  expect(await ui.find({ type: 'Text', text: /^AGORA · ESPERA A SUA APROVAÇÃO$/ })).toBeDefined()
+  // O Agora é o que espera por ela no chat: nenhum botão (aprovar e corrigir são respostas no chat).
+  expect(await ui.find({ type: 'Text', text: /^AGORA · ESPERANDO VOCÊ NO CHAT$/ })).toBeDefined()
   expect((await ui.find({ type: 'Text', text: /^Pedido da semana$/ }))?.props.bold).toBe(true)
-  const principais = (await ui.findAll({ type: 'Button' })).filter(b => b.props.variant === 'primary')
-  expect(principais.map(b => b.props.key)).toEqual(['aprovar-entrega'])
-  expect((await ui.find({ type: 'Button', key: 'rodar-workflow' }))?.props.label).toBe('Pedido da semana')
-  // Conta pela Situação: 2 de 4; o furo com o motivo; a skill citada no "Com quê".
-  expect(await ui.find({ type: 'Text', text: /O sistema já faz 2 de 4 passos\./ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /^Falta para ponta a ponta: Puxar o preço do fornecedor \(o portal não exporta\)\.$/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /^Campo 1 ○ · Skill ✓ · Sozinho ○$/ })).toBeDefined()
-  // Duas frentes: os outros agrupados pela frente, uma linha cada, com o botão secundário do pedido.
-  expect(await ui.find({ type: 'Text', text: /^CONSULTORIA$/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /^Mensagem de retorno · 2 de 4 · em andamento$/ })).toBeDefined()
-  const outro = (await ui.findAll({ type: 'Button' })).find(b => b.props.label === 'Mensagem de retorno')
-  expect(outro?.props.variant).toBeUndefined()
-  // O cartão sem a linha Pedido aparece com o que fazer.
-  expect(await ui.find({ type: 'Text', text: /O cartão frentes\/loja\/workflows\/fechar-o-caixa\.md está sem a linha Pedido/ })).toBeDefined()
-  // A fila: as opções não escolhidas e "Conferir a nota", sem repetir o que já tem cartão; recolhida até o clique.
-  expect((await ui.find({ type: 'Button', key: 'fila' }))?.props.label).toBe('Na fila: 3')
-  expect(await ui.find({ type: 'Button', key: 'fila-0' })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /^o sistema faz 2 de 4 passos$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^A entrega está no chat para você conferir\.$/ })).toBeDefined()
+  expect((await ui.findAll({ type: 'Button' })).filter(b => b.props.variant === 'primary')).toEqual([])
+  expect(await ui.find({ type: 'Button', key: 'rodar-workflow' })).toBeUndefined()
+  // Os passos do Agora na vertical, com o motivo do que ainda não dá.
+  await ui.press({ key: 'ver-agora' })
+  expect(await ui.find({ type: 'Text', text: /^✕ 3\. Puxar o preço do fornecedor · ainda não dá: o portal não exporta$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^□ 4\. Mandar o pedido · fica com você$/ })).toBeDefined()
+  // A lista: o que já rodou, uma linha com a conta e o mesmo botão; o cartão que não se lê, "precisa de ajuste".
+  expect(await ui.find({ type: 'Text', text: /^OS SEUS WORKFLOWS$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Mensagem de retorno · 2 de 4$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Quebrado · precisa de ajuste$/ })).toBeDefined()
+  const novas = (await ui.findAll({ type: 'Button' })).filter(b => String(b.props.key).startsWith('nova-'))
+  expect(new Set(novas.map(b => b.props.label))).toEqual(new Set(['Rodar em conversa nova']))
+  // "A começar": o cartão que nunca rodou e a fila (as opções não escolhidas e "Conferir a nota"), sem repetir
+  // o que já tem cartão; recolhido até o toque.
+  expect((await ui.find({ type: 'Button', key: 'fila' }))?.props.label).toBe('A começar: 4')
+  expect(await ui.find({ type: 'Text', text: /^Fechar o caixa$/ })).toBeUndefined()
   await ui.press({ key: 'fila' })
-  expect((await ui.find({ type: 'Button', key: 'fila-0' }))?.props.label).toBe('Rodar conferir a nota')
-  await ui.press({ key: 'fila-0' })
-  expect(enviados).toContain('rodar o workflow Conferir a nota')
+  expect(await ui.find({ type: 'Text', text: /^Fechar o caixa$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Conferir a nota$/ })).toBeDefined()
+  // O botão da lista pede a conversa nova; os botões somem até a resposta.
+  await ui.press({ key: 'nova-wf-0' })
+  expect(enviados).toContain('abrir o workflow Mensagem de retorno numa conversa nova')
+  expect((await ui.findAll({ type: 'Button' })).filter(b => String(b.props.key).startsWith('nova-'))).toEqual([])
   await ui.unmount()
 })
 
-test('com o primeiro workflow completo e outro rodado depois, o Agora é o último que rodou', async ($, on) => {
+test('a conversa nova que não abriu: o painel copia o pedido; a que abriu, não copia nada', async ($, on) => {
+  const enviados: string[] = []
+  const falhou = 'Não consegui abrir a conversa nova. Copiei o pedido: abra uma conversa nova e cole.'
   pasta(on, {
     '/os/base-camp.md': COM_CARTAO('completo'),
-    [`/os/${CAMINHO_DO_CARTAO}`]: CARTAO.replace('**Estado:** em andamento', '**Estado:** completo, em 23/10/2026'),
-    '/os/frentes/consultoria/workflows/pedido-da-semana.md': CARTAO_LOJA.replace('a conferir', 'sim').replace('- **Frente:** loja', '- **Frente:** consultoria'),
+    [`/os/${CAMINHO_DO_CARTAO}`]: CARTAO,
+    '/os/frentes/loja/workflows/pedido-da-semana.md': CARTAO_LOJA.replace('a conferir', 'sim'),
     '/os/resumo-para-o-arthur.md': RESUMO,
-  }, [])
+  }, enviados)
   await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
 
+  // A que abriu: a resposta não traz a frase, e nada é copiado.
+  let ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  await ui.press({ key: 'nova-wf-0' })
+  await ui.unmount()
+  await $.turn.start({ text: 'abrir o workflow Mensagem de retorno numa conversa nova', turnId: 'n1' })
+  await $.turn.complete({ answer: 'Abri a conversa nova; é só aprovar no cartão.', durationMs: 1000, isAborted: false, turnId: 'n1', reason: 'answer' })
+  expect(enviados.some(t => t.startsWith('[copiado]'))).toBe(false)
+
+  // A que não abriu: a frase fixa da campo-1, e o pedido vai para a área de transferência.
+  ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  await ui.press({ key: 'nova-wf-0' })
+  await ui.unmount()
+  await $.turn.start({ text: 'abrir o workflow Mensagem de retorno numa conversa nova', turnId: 'n2' })
+  await $.turn.complete({ answer: falhou, durationMs: 1000, isAborted: false, turnId: 'n2', reason: 'answer' })
+  expect(enviados).toContain('[copiado] mensagem de retorno')
+  expect(enviados).toContain('[aviso] Copiei o pedido. Abra uma conversa nova e cole.')
+
+  // Sem o botão (ela pediu o segundo workflow escrevendo): o pedido vem em negrito no fim da frase.
+  await $.turn.start({ text: 'proposta', turnId: 'n3' })
+  await $.turn.complete({ answer: `${falhou} O pedido: **proposta**.`, durationMs: 1000, isAborted: false, turnId: 'n3', reason: 'answer' })
+  expect(enviados).toContain('[copiado] proposta')
+})
+
+test('os marcos: a Island fecha com a frente inteira, a Lobuche East com outra frente, e o fecho só com fatos', async ($, on) => {
+  const enviados: string[] = []
+  const completo = (texto: string, data: string) => texto.replace(/\*\*Estado:\*\* em andamento/, `**Estado:** completo, em ${data}`)
+  const arquivos: Record<string, string> = {
+    '/os/base-camp.md': COM_CARTAO('completo'),
+    [`/os/${CAMINHO_DO_CARTAO}`]: CARTAO,
+    '/os/frentes/consultoria/workflows/proposta.md': CARTAO.replace('# Workflow: Mensagem de retorno', '# Workflow: Proposta')
+      .replace('**Pedido:** mensagem de retorno', '**Pedido:** proposta'),
+    '/os/frentes/loja/workflows/pedido-da-semana.md': CARTAO_LOJA.replace('a conferir', 'sim').replace(/\n## Os próximos[\s\S]*$/, '\n'),
+    '/os/resumo-para-o-arthur.md': RESUMO,
+  }
+  pasta(on, arquivos, enviados)
+  await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
+  let ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await ui.find({ type: 'Text', text: /^Mera ○ · Island ○ · Lobuche East ○$/ })).toBeDefined()
+  await ui.unmount()
+
+  // O primeiro completo fecha a Mera, com o fecho em fatos: o antes do cartão e o tempo da última vez.
+  arquivos[`/os/${CAMINHO_DO_CARTAO}`] = completo(CARTAO, '05/11/2026')
+  await $.turn.start({ text: 'aprovado', turnId: 'm1' })
+  await $.turn.complete({ answer: 'Completo.', durationMs: 1000, isAborted: false, turnId: 'm1', reason: 'answer' })
+  expect(enviados).toContain('[aviso] Mera: Mensagem de retorno sai pronto com um pedido seu, desde 05/11/2026. Antes, 3 horas; na última vez, 7 min.')
+  ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await ui.find({ type: 'Text', text: /^Mera ✓ · Island: 1 de 2 completos · Lobuche East ○$/ })).toBeDefined()
+  await ui.unmount()
+
+  // O segundo da mesma frente fecha a Island; um completo noutra frente fecha a Lobuche East.
+  arquivos['/os/frentes/consultoria/workflows/proposta.md'] = completo(arquivos['/os/frentes/consultoria/workflows/proposta.md'] ?? '', '06/11/2026')
+  arquivos['/os/frentes/loja/workflows/pedido-da-semana.md'] = completo(arquivos['/os/frentes/loja/workflows/pedido-da-semana.md'] ?? '', '07/11/2026')
+  await $.turn.start({ text: 'aprovado', turnId: 'm2' })
+  await $.turn.complete({ answer: 'Completo.', durationMs: 1000, isAborted: false, turnId: 'm2', reason: 'answer' })
+  ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await ui.find({ type: 'Text', text: /^Mera ✓ · Island ✓ · Lobuche East ✓$/ })).toBeDefined()
+  await ui.unmount()
+  expect(enviados.some(t => /confete|parabéns|🎉/i.test(t))).toBe(false)
+})
+
+test('o diário: uma linha por conversa, reescrita a cada resposta, com o pedido cortado e sem números longos', async ($, on) => {
+  mock.clock(on, { now: new Date(2026, 10, 4, 14, 20).getTime() })
+  const arquivos: Record<string, string> = {
+    '/os/base-camp.md': COM_CARTAO('completo'),
+    [`/os/${CAMINHO_DO_CARTAO}`]: CARTAO,
+    '/os/resumo-para-o-arthur.md': RESUMO,
+  }
+  pasta(on, arquivos, [])
+  await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
+
+  const pedido = `monta o relatório de vendas da loja 1234567 ${'com todas as lojas '.repeat(8)}`
+  await $.turn.start({ text: pedido, turnId: 'd1' })
+  await $.tool.call({ tool: 'Read', file_path: '/os/frentes/loja/vendas.csv' })
+  await $.tool.call({ tool: 'Read', file_path: '/os/AGENTS.md' })
+  await $.tool.call({ tool: 'Bash', command: 'python3 frentes/loja/rotinas/relatorio.py' })
+  await $.tool.call({ tool: 'Write', file_path: '/os/frentes/loja/relatorio-semana.xlsx', content: 'x' })
+  await $.turn.complete({ answer: 'Pronto.', durationMs: 120000, isAborted: false, turnId: 'd1', reason: 'answer' })
+
+  const diario = arquivos['/os/frentes/loja/diario/2026-11.md'] ?? ''
+  expect(diario.startsWith('# Diário: loja · novembro de 2026\n')).toBe(true)
+  expect(diario).toContain('Pode apagar quando quiser.\n\n- 04/11')
+  let linhas = diario.split('\n').filter(l => l.startsWith('- '))
+  expect(linhas.length).toBe(1)
+  const linha = linhas[0] ?? ''
+  expect(linha.startsWith('- 04/11 14:20 · ')).toBe(true)
+  expect(linha).toContain('(o sistema: 2)')
+  expect(linha).toContain('1 pedido ·')
+  expect(linha).toContain('"monta o relatório de vendas da loja # com todas')
+  expect(linha).not.toContain('1234567')
+  expect((/"([^"]*)"/.exec(linha)?.[1] ?? '').length).toBeLessThanOrEqual(100)
+  expect(linha).toContain('gravou: relatorio-semana.xlsx')
+  expect(linha).toContain('leu: vendas.csv ·')
+  expect(linha).toContain('rodou: relatorio.py')
+  expect(linha).not.toContain('AGENTS.md')
+  expect(linha).toContain('passos: Li vendas.csv › Salvei relatorio-semana.xlsx')
+  expect(linha.endsWith(' · c7f2')).toBe(true)
+
+  // A segunda resposta da mesma conversa reescreve a mesma linha, mesmo com o painel recarregado no meio.
+  await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
+  await $.turn.start({ text: 'agora some por loja', turnId: 'd2' })
+  await $.turn.complete({ answer: 'Somei.', durationMs: 60000, isAborted: false, turnId: 'd2', reason: 'answer' })
+  linhas = (arquivos['/os/frentes/loja/diario/2026-11.md'] ?? '').split('\n').filter(l => l.startsWith('- '))
+  expect(linhas.length).toBe(1)
+  expect(linhas[0]).toContain('2 pedidos')
+  expect(linhas[0]).toContain('(o sistema: 3)')
+})
+
+test('o diário não anota a montagem nem a atualização da pasta', async ($, on) => {
+  const arquivos: Record<string, string> = {
+    '/os/base-camp.md': COM_CARTAO('completo'),
+    [`/os/${CAMINHO_DO_CARTAO}`]: CARTAO,
+    '/os/resumo-para-o-arthur.md': RESUMO,
+  }
+  pasta(on, arquivos, [])
+  await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
+  await $.turn.start({ text: 'atualizar a pasta', turnId: 's1' })
+  await $.tool.call({ tool: 'Skill', skill: 'business-creator:atualizar-a-pasta' })
+  await $.tool.call({ tool: 'Write', file_path: '/os/frentes/loja/notas.md', content: 'x' })
+  await $.turn.complete({ answer: 'Atualizada.', durationMs: 1000, isAborted: false, turnId: 's1', reason: 'answer' })
+  expect(Object.keys(arquivos).some(a => a.includes('/diario/'))).toBe(false)
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
-  expect(await ui.find({ type: 'Text', text: /^AGORA · O ÚLTIMO QUE RODOU$/ })).toBeDefined()
-  const rodar = await ui.find({ type: 'Button', key: 'rodar-workflow' })
-  expect(rodar?.props.variant).toBe('primary')
-  expect(rodar?.props.label).toBe('Pedido da semana')
-  // Uma frente só: sem o título da frente; o outro, completo, numa linha.
-  expect(await ui.find({ type: 'Text', text: /^CONSULTORIA$/ })).toBeUndefined()
-  expect(await ui.find({ type: 'Text', text: /^Mensagem de retorno · 2 de 4 · completo$/ })).toBeDefined()
-  // O Campo 1 fica feito na subida, porque um workflow já está completo.
-  expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toContain('✓ Campo 1')
+  expect(await ui.find({ type: 'Text', text: /O diário não está gravando/ })).toBeUndefined()
+  await ui.unmount()
+})
+
+test('a gravação do diário que falha aparece numa linha do painel, e nada mais para', async ($, on) => {
+  const arquivos: Record<string, string> = {
+    '/os/base-camp.md': COM_CARTAO('completo'),
+    [`/os/${CAMINHO_DO_CARTAO}`]: CARTAO,
+    '/os/resumo-para-o-arthur.md': RESUMO,
+  }
+  pasta(on, arquivos, [])
+  await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
+  // A pasta da frente não aceita a gravação.
+  await $.turn.start({ text: 'confere o estoque', turnId: 's2' })
+  await $.tool.call({ tool: 'Write', file_path: '/os/frentes/bloqueada/estoque.md', content: 'x' })
+  await $.turn.complete({ answer: 'Conferido.', durationMs: 1000, isAborted: false, turnId: 's2', reason: 'answer' })
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await ui.find({ type: 'Text', text: /^O diário não está gravando\. Escreva travei\.$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^AGORA$/ })).toBeDefined()
   await ui.unmount()
 })

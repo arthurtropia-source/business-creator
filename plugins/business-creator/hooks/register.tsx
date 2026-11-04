@@ -1,15 +1,17 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register, RenderSurface } from 'claude-code'
 
-import type { Bloco, Campo, Festa, Furo, Montado, NaFila, Nivel, Opcao, Painel, Quadro, Resumo, Rodada, Status, Workflow } from '../types'
+import type { Bloco, Campo, Conversa, Festa, Furo, Marcos, Montado, NaFila, Nivel, Opcao, Painel, Passo, Quadro, Resumo, Rodada, Status, Workflow } from '../types'
 
-// Painel da Montagem do Base Camp (v0.8, plugin 0.2.19). Veste a montagem com a marca e tira a
+// Painel da Montagem do Base Camp (v0.9, plugin 0.3.0). Veste a montagem com a marca e tira a
 // barreira técnica: mostra a subida, de quem é a vez e o que o sistema já sabe,
 // dá os botões de aprovar e corrigir e troca as linhas técnicas do app por
-// frases simples. Lê os arquivos da pasta da pessoa e não grava nada nela.
-// Depois do Base Camp montado, é o painel de trabalho (0.2.19): um cartão Agora só, com o workflow
-// da vez (o que espera aprovação ou o último que rodou) e um botão principal; os outros workflows
-// uma linha cada, com os passos em quadrados; a fila, recolhida.
+// frases simples. Lê os arquivos da pasta da pessoa; grava só o diário (0.3.0).
+// Depois do Base Camp montado, é o painel de trabalho cortado (0.3.0): um cartão Agora só, com o
+// workflow da vez e um botão só, Rodar (aprovar e corrigir são respostas no chat); os outros
+// workflows, uma linha cada, com o mesmo botão, que abre uma conversa nova; os que não rodaram,
+// recolhidos em "A começar"; os passos de cada um, na vertical, num toque; e os marcos das montanhas.
+// O diário: uma linha por conversa de trabalho, em frentes/<frente>/diario/AAAA-MM.md, sem modelo.
 // Fora do painel, só faz o que a pessoa ou a montagem pedem: o teste da etapa 6
 // (uma pergunta à IA com os arquivos da pasta) e a cópia do resumo para o
 // Arthur, no clique dela.
@@ -47,6 +49,17 @@ const docTexto = atom({ plugin: 'business-creator', key: 'docTexto' } as const, 
 const pergunta = atom({ plugin: 'business-creator', key: 'pergunta' } as const, null)
 // A fila do painel de trabalho, recolhida até ela clicar (0.2.19).
 const filaAberta = atom({ plugin: 'business-creator', key: 'filaAberta' } as const, false)
+// Os workflows com os passos abertos na vertical (0.3.0), pelo caminho do cartão.
+const passosAbertos = atom({ plugin: 'business-creator', key: 'passosAbertos' } as const, [])
+// O pedido do workflow que um botão mandou abrir numa conversa nova: se a conversa nova não abrir, o painel
+// copia este pedido para ela colar (0.3.0).
+const aAbrir = atom({ plugin: 'business-creator', key: 'aAbrir' } as const, null)
+// A conversa de agora, para a linha do diário, e se a gravação falhou (0.3.0).
+const conversa = atom({ plugin: 'business-creator', key: 'conversa' } as const, null)
+const diarioFalhou = atom({ plugin: 'business-creator', key: 'diarioFalhou' } as const, false)
+
+// A frase fixa da campo-1 quando a conversa nova não abre (0.3.0): o painel a reconhece e copia o pedido.
+const NAO_ABRIU = 'Não consegui abrir a conversa nova'
 
 // Identidade SEM IA™ (23 e 24/10/2026): tinta, rocha e papel; o laranja de
 // sinal num ponto só, o cume da primeira montanha.
@@ -343,6 +356,7 @@ function celulas(linha: string): string[] {
 type Detalhe = Cartao & {
   frente: string | null
   quadros: Quadro[]
+  lista: Passo[]
   furos: Furo[]
   skill: boolean
   sozinho: boolean
@@ -383,6 +397,7 @@ function lerCartao(texto: string): Detalhe {
   // A tabela "Os passos": as linhas com número. Desde a 0.2.19 o painel conta pela Situação, o que de fato
   // aconteceu ("o sistema fez"; "o sistema faz" nos cartões de antes), não pela coluna Quem faz.
   const quadros: Quadro[] = []
+  const lista: Passo[] = []
   const furos: Furo[] = []
   let skill = false
   for (const l of secao(texto, 'Os passos').split('\n')) {
@@ -390,12 +405,19 @@ function lerCartao(texto: string): Detalhe {
     const [, passo = '', , comQue = '', situacao = ''] = celulas(l)
     if (passo.startsWith('<')) continue
     if (/skill|\.claude\/skills\//i.test(comQue)) skill = true
-    if (/^o sistema f(ez|az)\b/i.test(situacao)) quadros.push('sistema')
-    else if (/^ainda n[ãa]o d[áa]/i.test(situacao)) {
+    if (/^o sistema f(ez|az)\b/i.test(situacao)) {
+      quadros.push('sistema')
+      lista.push({ nome: passo, quadro: 'sistema', motivo: '' })
+    } else if (/^ainda n[ãa]o d[áa]/i.test(situacao)) {
       quadros.push('nao')
       const corte = situacao.indexOf(':')
-      furos.push({ passo, motivo: corte < 0 ? '' : situacao.slice(corte + 1).trim() })
-    } else quadros.push('ela')
+      const motivo = corte < 0 ? '' : situacao.slice(corte + 1).trim()
+      furos.push({ passo, motivo })
+      lista.push({ nome: passo, quadro: 'nao', motivo })
+    } else {
+      quadros.push('ela')
+      lista.push({ nome: passo, quadro: 'ela', motivo: '' })
+    }
   }
   const passos = quadros.length
   const passosSistema = quadros.filter(q => q === 'sistema').length
@@ -449,6 +471,7 @@ function lerCartao(texto: string): Detalhe {
     rodadas,
     frente: linha('Frente'),
     quadros,
+    lista,
     furos,
     skill,
     sozinho: /^sim\b/i.test(linha('Chega sozinho') ?? ''),
@@ -776,16 +799,19 @@ async function lerWorkflows($: EngineInterface, dir: string, base: string): Prom
       estado: c.estado,
       estadoTexto: c.estadoTexto,
       quadros: c.quadros,
+      lista: c.lista,
       passos: c.passos,
       passosSistema: c.passosSistema,
       furos: c.furos,
+      antes: c.antes,
+      ilegivel: !c.workflowNome && !c.pedido && c.passos === 0,
       skill: c.skill,
       sozinho: c.sozinho,
       rodadas: c.rodadas,
       quando: quandoRodou(c.rodadas[c.rodadas.length - 1]),
       mtime,
     })
-    proximos.push(...c.proximos)
+    proximos.push(...c.proximos.map(p => ({ ...p, frente: c.frente ?? pastaDaFrente })))
   }
   return { workflows, proximos }
 }
@@ -814,6 +840,157 @@ function montarFila(candidatos: NaFila[], workflows: Workflow[]): NaFila[] {
     if (!temCartao && !repetido) fila.push(c)
   }
   return fila
+}
+
+// ------------------------------------------------------------ os marcos das montanhas (0.3.0)
+
+// A data do "completo, em <data>" do cartão, para saber qual completou primeiro; sem data, o fim da fila.
+function dataDoCompleto(w: Workflow): { ms: number; texto: string | null } {
+  const d = /(\d{2})\/(\d{2})\/(\d{4})/.exec(w.estadoTexto ?? '')
+  if (!d) return { ms: Number.MAX_SAFE_INTEGER, texto: null }
+  return { ms: new Date(Number(d[3]), Number(d[2]) - 1, Number(d[1])).getTime(), texto: d[0] }
+}
+
+const frenteDe = (w: { frente?: string | null }) => (w.frente ?? '').trim().toLowerCase()
+
+// Mera: o primeiro cartão completo. Island: todos os workflows da frente da Mera completos, no mínimo 2, contando os
+// que ainda estão em "Os próximos" dos cartões dela. Lobuche East: um cartão completo noutra frente.
+function calcularMarcos(workflows: Workflow[], fila: NaFila[]): Marcos {
+  const completos = workflows
+    .filter(w => w.estado === 'completo')
+    .map(w => ({ w, ...dataDoCompleto(w) }))
+    .sort((a, b) => a.ms - b.ms)
+  const primeiro = completos[0]
+  const vazio = { fechado: false, workflow: null, data: null }
+  if (!primeiro) return { mera: vazio, island: { ...vazio, feitos: 0, total: 0 }, lobuche: vazio }
+  const frente = frenteDe(primeiro.w)
+  const daFrente = workflows.filter(w => frenteDe(w) === frente)
+  const feitos = daFrente.filter(w => w.estado === 'completo').length
+  const total = daFrente.length + fila.filter(f => f.frente !== undefined && f.frente !== null && frenteDe(f) === frente).length
+  const ultimoDaFrente = completos.filter(c => frenteDe(c.w) === frente).at(-1)
+  const outra = completos.find(c => frenteDe(c.w) !== frente)
+  return {
+    mera: { fechado: true, workflow: primeiro.w.nome, data: primeiro.texto },
+    island: {
+      fechado: total >= 2 && feitos === total,
+      workflow: ultimoDaFrente?.w.nome ?? null,
+      data: ultimoDaFrente?.texto ?? null,
+      feitos,
+      total,
+    },
+    lobuche: outra ? { fechado: true, workflow: outra.w.nome, data: outra.texto } : vazio,
+  }
+}
+
+function linhaDosMarcos(m: Marcos): string {
+  const island = m.island.fechado ? 'Island ✓' : m.mera.fechado ? `Island: ${m.island.feitos} de ${m.island.total} completos` : 'Island ○'
+  return [`Mera ${m.mera.fechado ? '✓' : '○'}`, island, `Lobuche East ${m.lobuche.fechado ? '✓' : '○'}`].join(' · ')
+}
+
+// O fecho de um marco, só com fatos (sem confete): o workflow, desde quando, e o antes e a última vez, se houver.
+function fechoDoMarco(nome: string, w: Workflow | undefined, data: string | null): string {
+  const base = `${nome}: ${w?.nome ?? 'o workflow'} sai pronto com um pedido seu${data ? `, desde ${data}` : ''}.`
+  const ultima = w?.rodadas.at(-1)?.tempo
+  return w?.antes && ultima ? `${base} Antes, ${w.antes}; na última vez, ${ultima}.` : base
+}
+
+// ------------------------------------------------------------ o diário (0.3.0)
+
+// Os arquivos que são do sistema, não do trabalho dela: não marcam a frente nem entram em "leu" e "gravou".
+function doSistema(rel: string): boolean {
+  return (
+    /^(contexto|montagem|diario|\.claude)\//.test(rel) ||
+    /^frentes\/[^/]+\/(diario\/|AGENTS\.md$|CLAUDE\.md$)/.test(rel) ||
+    ['AGENTS.md', 'CLAUDE.md', 'base-camp.md', 'memoria.md', 'como-usar.md', 'resumo-para-o-arthur.md', 'primeiro-processo.md'].includes(rel)
+  )
+}
+
+// O pedido entra cortado em 100 caracteres, numa linha só, e sem números longos (5 dígitos ou mais viram #).
+function pedidoDoDiario(texto: string): string {
+  const limpo = texto.replace(/\s+/g, ' ').replace(/"/g, "'").replace(/\d{5,}/g, '#').trim()
+  return limpo.length > 100 ? `${limpo.slice(0, 99).trimEnd()}…` : limpo
+}
+
+const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro']
+const dois = (n: number) => String(n).padStart(2, '0')
+
+function linhaDoDiario(c: Conversa, agora: number): string {
+  const d = new Date(c.inicio)
+  const minutos = Math.max(1, Math.round((agora - c.inicio) / 60000))
+  const doSistemaMin = Math.round(c.sistemaMs / 60000)
+  const lista = (rotulo: string, itens: string[]) => (itens.length > 0 ? `${rotulo}: ${itens.slice(0, 6).join(', ')}` : null)
+  return [
+    `- ${dois(d.getDate())}/${dois(d.getMonth() + 1)} ${dois(d.getHours())}:${dois(d.getMinutes())}`,
+    `${minutos} min (o sistema: ${doSistemaMin})`,
+    `${c.pedidos} pedido${c.pedidos === 1 ? '' : 's'}`,
+    `"${c.pedido}"`,
+    `workflow: ${c.workflow ?? 'nenhum'}`,
+    lista('gravou', c.gravou),
+    lista('leu', c.leu),
+    lista('rodou', c.rodou),
+    c.gravou.length + c.leu.length + c.rodou.length === 0 ? 'consulta' : null,
+    c.passos.length > 0 ? `passos: ${c.passos.slice(0, 8).join(' › ')}` : null,
+    c.id,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+}
+
+// Reescreve a linha da conversa (pelo código no fim) ou acrescenta; o arquivo nasce com o cabeçalho.
+async function gravarDiario($: EngineInterface) {
+  const c = await read($, conversa)
+  if (!c || c.deSistema || !c.pedido) return
+  const dir = await read($, pasta)
+  const agora = await agoraMs($)
+  const d = new Date(c.inicio)
+  const rel = `${c.frente ? `frentes/${c.frente}/` : ''}diario/${d.getFullYear()}-${dois(d.getMonth() + 1)}.md`
+  const linha = linhaDoDiario(c, agora)
+  try {
+    const atual = await lerTexto($, `${dir}/${rel}`)
+    const cabecalho =
+      `# Diário: ${c.frente ?? 'geral'} · ${MESES[d.getMonth()]} de ${d.getFullYear()}\n` +
+      '> Anotado pelo sistema a cada conversa. Só o que ajuda a achar o que se repete. Pode apagar quando quiser.\n\n'
+    const linhas = atual ? atual.split('\n') : []
+    const i = linhas.findIndex(l => l.endsWith(` · ${c.id}`))
+    if (i >= 0) linhas[i] = linha
+    else {
+      while (linhas.length > 0 && linhas[linhas.length - 1] === '') linhas.pop()
+      linhas.push(linha)
+    }
+    await $.fs.write(`${dir}/${rel}`, `${atual ? '' : cabecalho}${linhas.join('\n')}\n`)
+    await update($, diarioFalhou, () => false)
+  } catch {
+    await update($, diarioFalhou, () => true)
+  }
+}
+
+// O que a conversa fez, a cada ferramenta: os arquivos dela (só o nome), a rotina, a frase e o cartão que rodou.
+function anotar(c: Conversa, tool: string, entrada: Record<string, unknown>, dir: string, f: Frase | null): Conversa {
+  const novo = { ...c, gravou: [...c.gravou], leu: [...c.leu], rodou: [...c.rodou], passos: [...c.passos] }
+  if (tool === 'Skill' && typeof entrada.skill === 'string' && /(^|:)(montagem-do-base-camp|atualizar-a-pasta)$/.test(entrada.skill)) {
+    novo.deSistema = true
+  }
+  const cmd = typeof entrada.command === 'string' ? entrada.command : ''
+  const rotina = /rotinas[\\/]([^\s"'\\/]+)/.exec(cmd)?.[1]
+  if ((tool === 'Bash' || tool === 'PowerShell') && rotina && !novo.rodou.includes(rotina)) novo.rodou.push(rotina)
+  const caminho = typeof entrada.file_path === 'string' ? entrada.file_path : null
+  const rel = caminho ? relativo(dir, caminho.replace(/\\/g, '/')) : null
+  if (rel) {
+    const cartao = /^(?:frentes\/[^/]+\/)?workflows\/([^/]+)\.md$/.exec(rel)
+    if (cartao?.[1]) novo.workflow = cartao[1].replace(/-/g, ' ')
+    const frente = /^frentes\/([^/]+)\//.exec(rel)?.[1]
+    if (frente && !doSistema(rel) && !novo.frente) novo.frente = frente
+    if (!doSistema(rel) && !cartao) {
+      const nome = rel.split('/').pop() ?? rel
+      const alvo = tool === 'Read' ? novo.leu : tool === 'Write' || tool === 'Edit' || tool === 'MultiEdit' ? novo.gravou : null
+      if (alvo && !alvo.includes(nome)) alvo.push(nome)
+    }
+  }
+  const doTrabalho = !rel || !doSistema(rel)
+  if (f && doTrabalho && !/^(Marquei a hora|Conferi onde paramos|Procurei nos seus arquivos)/.test(f.feito) && novo.passos.at(-1) !== f.feito) {
+    novo.passos.push(f.feito.replace(/(?:[A-Za-z]:)?(?:[^\s/\\]+[/\\])+([^\s/\\]+)/g, '$1'))
+  }
+  return novo
 }
 
 async function carregar($: EngineInterface) {
@@ -917,6 +1094,20 @@ async function carregar($: EngineInterface) {
 
 async function celebrar($: EngineInterface, antes: Painel, depois: Painel) {
   let texto: string | null = null
+  if (antes.concluida && depois.concluida) {
+    // Depois do Base Camp, o que se celebra é um marco que fechou (0.3.0), com fatos.
+    const m0 = calcularMarcos(antes.workflows, antes.fila)
+    const m1 = calcularMarcos(depois.workflows, depois.fila)
+    const achar = (nome: string | null) => depois.workflows.find(w => w.nome === nome)
+    if (!m0.lobuche.fechado && m1.lobuche.fechado) texto = fechoDoMarco('Lobuche East', achar(m1.lobuche.workflow), m1.lobuche.data)
+    else if (!m0.island.fechado && m1.island.fechado) texto = fechoDoMarco('Island', achar(m1.island.workflow), m1.island.data)
+    else if (!m0.mera.fechado && m1.mera.fechado) texto = fechoDoMarco('Mera', achar(m1.mera.workflow), m1.mera.data)
+    if (!texto) return
+    $.ui.toast(texto, { timeoutMs: 9000 })
+    await update($, festa, () => ({ texto, anterior: progresso(antes) }))
+    $.clock.after(9000, () => void update($, festa, () => null))
+    return
+  }
   if (!antes.concluida && depois.concluida) {
     texto = OBRA.fim ?? null
   } else if (!depois.concluida) {
@@ -967,6 +1158,14 @@ async function enviar($: EngineInterface, texto: string) {
   void $.prompt.submit({ text: texto, asUser: true })
 }
 
+// Um workflow da lista abre numa conversa nova (0.3.0): o botão pede, e a campo-1 abre a conversa com o
+// pedido dele (o cartão do app, para ela aprovar). O pedido fica guardado para a reserva do copiar e colar.
+async function abrirNova($: EngineInterface, nome: string, pedido: string | null) {
+  if (await read($, enviado)) return
+  await update($, aAbrir, () => pedido ?? `rodar o workflow ${nome}`)
+  await enviar($, `abrir o workflow ${nome} numa conversa nova`)
+}
+
 async function limpar($: EngineInterface) {
   await update($, enviado, () => null)
   await update($, turno, () => null)
@@ -994,13 +1193,8 @@ async function abrirDoc($: EngineInterface, qual: 'guia' | 'resumo') {
   await update($, docTexto, () => (texto ? texto.slice(0, 8000) : 'Este arquivo ainda não foi escrito.'))
 }
 
-async function copiarResumo($: EngineInterface, surface: RenderSurface) {
-  const dir = await read($, pasta)
-  const texto = (await lerTexto($, `${dir}/resumo-para-o-arthur.md`)).replace(/<!--[\s\S]*?-->/g, '').trim()
-  if (!texto) {
-    $.ui.toast('O resumo para o Arthur ainda não foi escrito.')
-    return
-  }
+// Copia um texto: pelo app; no Mac, se o app não copiar, pelo pbcopy. Diz se copiou.
+async function copiar($: EngineInterface, texto: string, surface?: RenderSurface): Promise<boolean> {
   let copiado = false
   try {
     copiado = (await $.ui.copy({ text: texto, surface })).isCopied
@@ -1016,7 +1210,17 @@ async function copiarResumo($: EngineInterface, surface: RenderSurface) {
       copiado = false
     }
   }
-  if (copiado) {
+  return copiado
+}
+
+async function copiarResumo($: EngineInterface, surface: RenderSurface) {
+  const dir = await read($, pasta)
+  const texto = (await lerTexto($, `${dir}/resumo-para-o-arthur.md`)).replace(/<!--[\s\S]*?-->/g, '').trim()
+  if (!texto) {
+    $.ui.toast('O resumo para o Arthur ainda não foi escrito.')
+    return
+  }
+  if (await copiar($, texto, surface)) {
     $.ui.toast('Resumo copiado. Agora é só colar na conversa com o Arthur.', { timeoutMs: 7000 })
     return
   }
@@ -1099,6 +1303,17 @@ export const register: Register = on => {
     await update($, trabalhando, () => false)
     await update($, atividade, () => null)
     await update($, ultimaAcao, () => null)
+    // O diário (0.3.0): quando o painel recarrega no meio da mesma conversa, a linha dela continua; numa
+    // conversa nova, começa outra.
+    const anterior = await read($, conversa)
+    let estaSessao = ''
+    try {
+      estaSessao = (await $.session.id()).replace(/[^a-z0-9]/gi, '').slice(-4)
+    } catch {
+      estaSessao = ''
+    }
+    if (!anterior || !estaSessao || anterior.id !== estaSessao) await update($, conversa, () => null)
+    await update($, aAbrir, () => null)
     const dado = await carregar($)
     if (dado) void $.ui.open({ id: PANE, title: TITULO })
     if (await existe($, `${e.cwd}/base-camp.md`)) {
@@ -1160,6 +1375,9 @@ export const register: Register = on => {
     const f = frase(String(e.tool), entrada, dir)
     if (f) await update($, atividade, () => f.fazendo)
     const resultado = await next(e)
+    // O diário (0.3.0): o que esta conversa de trabalho fez.
+    const c = await read($, conversa)
+    if (c) await update($, conversa, () => anotar(c, String(e.tool), entrada, dir, f))
     if (f) {
       // O que acabou de acontecer, para o cartão Agora (0.2.16).
       const hora = horaLocal(await agoraMs($))
@@ -1185,6 +1403,36 @@ export const register: Register = on => {
       await update($, verArquivo, () => false)
       await update($, fim, () => null)
       await update($, parado, () => false)
+      // O diário (0.3.0): só depois do Base Camp montado; o primeiro pedido abre a linha da conversa.
+      const texto = e.text.trim()
+      if ((await read($, painel))?.concluida && texto) {
+        const atual = await read($, conversa)
+        if (atual) await update($, conversa, () => ({ ...atual, pedidos: atual.pedidos + 1 }))
+        else {
+          let id = ''
+          try {
+            id = (await $.session.id()).replace(/[^a-z0-9]/gi, '').slice(-4)
+          } catch {
+            id = ''
+          }
+          const inicio = await agoraMs($)
+          const nova: Conversa = {
+            id: id || Math.random().toString(16).slice(2, 6),
+            inicio,
+            pedido: pedidoDoDiario(texto),
+            pedidos: 1,
+            sistemaMs: 0,
+            frente: null,
+            workflow: null,
+            gravou: [],
+            leu: [],
+            rodou: [],
+            passos: [],
+            deSistema: /^abrir o workflow .+ numa conversa nova$/i.test(texto),
+          }
+          await update($, conversa, () => nova)
+        }
+      }
     }
 
     return next(e)
@@ -1210,6 +1458,27 @@ export const register: Register = on => {
     if (resposta && (await emMontagem($))) {
       const s = sugestao(resposta)
       if (s) $.clock.after(400, () => void $.prompt.suggest({ text: s }))
+    }
+    // A reserva do botão de conversa nova (0.3.0): só quando a campo-1 diz que não abriu. O pedido é o do botão
+    // ou, quando ela pediu escrevendo, o que a frase traz em negrito no fim.
+    const doBotao = await read($, aAbrir)
+    const naFrase = /\*\*([^*]+)\*\*\.?\s*$/.exec(resposta)?.[1]?.trim() ?? null
+    const pedidoNovo = doBotao ?? (resposta.includes(NAO_ABRIU) ? naFrase : null)
+    if (pedidoNovo && resposta) {
+      await update($, aAbrir, () => null)
+      if (resposta.includes(NAO_ABRIU)) {
+        const copiou = await copiar($, pedidoNovo)
+        $.ui.toast(
+          copiou ? 'Copiei o pedido. Abra uma conversa nova e cole.' : `Abra uma conversa nova e escreva: ${pedidoNovo}`,
+          { timeoutMs: 9000 },
+        )
+      }
+    }
+    // O diário (0.3.0): a linha desta conversa, reescrita a cada resposta.
+    const c = await read($, conversa)
+    if (c) {
+      await update($, conversa, () => ({ ...c, sistemaMs: c.sistemaMs + (e.durationMs || 0) }))
+      await gravarDiario($)
     }
 
     return r
@@ -1443,33 +1712,22 @@ export const register: Register = on => {
       )
     }
 
-    // ----- Base Camp montado: o painel de trabalho (0.2.19). Um cartão Agora só, com um botão principal: o
-    // workflow que espera a aprovação dela ou o último que rodou. Os outros, uma linha cada na zona dos
-    // workflows; a fila, recolhida. O resto numa zona só, discreta (0.2.16).
+    // ----- Base Camp montado: o painel de trabalho cortado (0.3.0). Um cartão Agora só, com o workflow da vez
+    // e um botão só, Rodar, nesta conversa; enquanto a entrega espera, nenhum botão: aprovar e corrigir são
+    // respostas no chat. Os outros workflows, uma linha cada, com o mesmo botão, que abre uma conversa nova; os
+    // que nunca rodaram, recolhidos em "A começar"; os marcos das montanhas numa linha; o Base Camp, recolhido.
     if (dado.concluida) {
       const daVez = dado.workflows.find(w => w.arquivo === dado.daVez) ?? null
-      const outros = dado.workflows.filter(w => w !== daVez)
       const pedido = daVez ? daVez.pedido : dado.pedido
       const rodadas = daVez ? daVez.rodadas : dado.rodadas
-      // A última rodada espera a aprovação dela: o botão principal aprova a entrega, e o pedido fica ao lado,
-      // como secundário, para ela poder rodar de novo.
       const aguardaAprovacao = rodadas[rodadas.length - 1]?.aprovada === 'pendente'
       const estado = daVez ? daVez.estado : dado.estado
-      const estadoTexto = daVez ? daVez.estadoTexto : dado.estadoTexto
-      const passos = daVez ? daVez.passos : dado.passos
-      const passosSistema = daVez ? daVez.passosSistema : dado.passosSistema
-      // O combinado do que ficou pronto é o do primeiro workflow, o do Base Camp.
-      const combinadoMostrado = dado.combinadoCartao ?? dado.combinado
       const ehOPrimeiro = !daVez || daVez.arquivo === (dado.workflow ?? 'primeiro-processo.md')
-      const emAndamento = /^em andamento/i.test(rodadas[rodadas.length - 1]?.tempo ?? '')
-      const etiquetaAgora = aguardaAprovacao && !emAndamento
-        ? 'AGORA · ESPERA A SUA APROVAÇÃO'
-        : dado.workflows.length > 1
-          ? 'AGORA · O ÚLTIMO QUE RODOU'
-          : 'AGORA · O SEU PRIMEIRO WORKFLOW'
-      const frentes = new Set(dado.workflows.map(w => (w.frente ?? '').toLowerCase()))
-      const porFrente = frentes.size > 1
-      const fila = await read($, filaAberta)
+      const abertos = await read($, passosAbertos)
+      const aComecarAberto = await read($, filaAberta)
+      const marcos = calcularMarcos(dado.workflows, dado.fila)
+      const falhou = await read($, diarioFalhou)
+      const zonaDoBaseCamp = aberto === 'resumo' || aberto === 'guia'
       // Um quadrado por passo, na cor da Situação: o sistema faz (cheio, em tinta), fica com ela (contorno),
       // ainda não dá (✕). A forma também muda, para quem não distingue a cor.
       const fileira = (w: Workflow, k: string) =>
@@ -1482,134 +1740,148 @@ export const register: Register = on => {
             ))}
           </Box>
         ) : null
-      // O cartão fora do formato aparece com o que fazer, em vez de sumir.
-      const semPedido = (w: Workflow) =>
-        !w.pedido && w.arquivo !== 'primeiro-processo.md' ? (
-          <Text key={`sem-pedido-${w.arquivo}`} color={SINAL}>
-            O cartão {w.arquivo} está sem a linha Pedido; peça para o sistema completar.
-          </Text>
+      // "ver os passos" (pedido do Arthur, 04/11): os passos na vertical, com quem faz, para ela ver onde mexer.
+      const verPassos = (w: Workflow, k: string) =>
+        w.lista.length > 0 ? (
+          <Button
+            key={`ver-${k}`}
+            label={abertos.includes(w.arquivo) ? 'fechar os passos' : 'ver os passos'}
+            onPress={() => void update($, passosAbertos, a => (a.includes(w.arquivo) ? a.filter(x => x !== w.arquivo) : [...a, w.arquivo]))}
+          />
         ) : null
-      const estadoCurto = (w: Workflow) =>
-        aConferir(w) && w.rodadas.length > 0 ? 'entrega a conferir' : w.estado === 'completo' ? 'completo' : w.estado
-      const linhaDoWorkflow = (w: Workflow, i: number) =>
-        !w.pedido ? (
-          semPedido(w)
-        ) : (
-          <Box key={`wf-${i}`} flexDirection="row" flexWrap="wrap" gap={1}>
-            {fileira(w, `wf-${i}-quadros`)}
-            <Text color={ROCHA}>
-              {[w.nome, w.passos > 0 ? `${w.passosSistema} de ${w.passos}` : null, estadoCurto(w)].filter(Boolean).join(' · ')}
-            </Text>
-            {!pendente &&
-              (aConferir(w) && w.rodadas.length > 0 ? (
-                <Button key={`wf-${i}-aprovar`} label="Aprovar a entrega" onPress={() => void enviar($, `aprovar a entrega de ${w.pedido}`)} />
-              ) : (
-                <Button key={`wf-${i}-rodar`} label={rotuloCurto(maiuscula(w.pedido))} onPress={() => void enviar($, w.pedido ?? '')} />
-              ))}
+      const listaDePassos = (w: Workflow, k: string) =>
+        abertos.includes(w.arquivo) ? (
+          <Box key={`lista-${k}`} flexDirection="column">
+            {w.lista.map((p, i) => (
+              <Text key={`${k}-passo-${i}`} color={p.quadro === 'nao' ? SINAL : ROCHA}>
+                {`${p.quadro === 'sistema' ? '■' : p.quadro === 'nao' ? '✕' : '□'} ${i + 1}. ${p.nome} · ${
+                  p.quadro === 'sistema' ? 'o sistema faz' : p.quadro === 'nao' ? `ainda não dá${p.motivo ? `: ${p.motivo}` : ''}` : 'fica com você'
+                }`}
+              </Text>
+            ))}
+          </Box>
+        ) : null
+      const contagem = (w: Workflow) => (w.passos > 0 ? `${w.passosSistema} de ${w.passos}` : null)
+      const rodarNova = (nome: string, pedidoDele: string | null, k: string) =>
+        pendente ? null : (
+          <Button key={`nova-${k}`} label="Rodar em conversa nova" onPress={() => void abrirNova($, nome, pedidoDele)} />
+        )
+
+      // O cartão Agora.
+      const etiquetaAgora = aguardaAprovacao ? 'AGORA · ESPERANDO VOCÊ NO CHAT' : 'AGORA'
+      const nomeDaVez = daVez?.nome ?? dado.workflowNome ?? (pedido ? maiuscula(pedido) : 'O seu primeiro workflow')
+      const linhaDaVez = aguardaAprovacao
+        ? /^em andamento/i.test(rodadas[rodadas.length - 1]?.tempo ?? '')
+          ? 'A rodada está em andamento no chat.'
+          : 'A entrega está no chat para você conferir.'
+        : rodadas.length === 0
+          ? 'Ainda não rodou.'
+          : (daVez?.combinado ?? dado.combinadoCartao ?? dado.combinado)
+            ? `Combinado: ${(daVez?.combinado ?? dado.combinadoCartao ?? dado.combinado ?? '').replace(/\*\*/g, '')}`
+            : null
+      // O próximo ponto de controle, um só (0.3.0): a lista dos três saiu.
+      const proximo =
+        daVez && estado === 'completo' ? (!daVez.skill ? 'Próximo: virar habilidade' : !daVez.sozinho ? 'Próximo: chegar sozinho' : null) : null
+      // A última ação, curta: só o nome do arquivo, nunca o caminho.
+      const ultimaCurta = acao ? (
+        <Text color={CINZA} size="caption">
+          {acao.texto.replace(/(?:[A-Za-z]:)?(?:[^\s/\\]+[/\\])+([^\s/\\]+)/g, '$1')} · {acao.hora}
+        </Text>
+      ) : null
+      const rodarAqui = aguardaAprovacao || pendente ? null : pedido ? (
+        <Button key="rodar-workflow" variant="primary" label={rotuloCurto(`Rodar ${pedido}`)} onPress={() => void enviar($, pedido)} />
+      ) : ehOPrimeiro ? (
+        <Button key="rodar-workflow" variant="primary" label="Rodar o meu primeiro workflow" onPress={() => void enviar($, 'vamos rodar o primeiro workflow')} />
+      ) : null
+
+      // A lista: os que já rodaram (ou que precisam de ajuste) e os que nunca rodaram, recolhidos.
+      const outros = dado.workflows.filter(w => w !== daVez)
+      const jaRodaram = outros.filter(w => w.rodadas.length > 0 || w.ilegivel)
+      const nuncaRodaram = outros.filter(w => w.rodadas.length === 0 && !w.ilegivel)
+      const aComecar: { nome: string; pedido: string | null }[] = [
+        ...nuncaRodaram.map(w => ({ nome: w.nome, pedido: w.pedido })),
+        ...dado.fila.map(f => ({ nome: maiuscula(f.nome), pedido: f.pedido })),
+      ]
+      const linhaDoWorkflow = (w: Workflow, i: number) => {
+        const k = `wf-${i}`
+        const nomeDoArquivo = w.arquivo.split('/').pop()?.replace(/\.md$/, '').replace(/-/g, ' ') ?? w.arquivo
+        return (
+          <Box key={k} flexDirection="column">
+            <Box flexDirection="row" flexWrap="wrap" gap={1}>
+              {fileira(w, `${k}-quadros`)}
+              <Text color={w.ilegivel ? SINAL : ROCHA}>
+                {w.ilegivel
+                  ? `${maiuscula(nomeDoArquivo)} · precisa de ajuste`
+                  : [w.nome + (w.estado === 'completo' ? ' ✓' : ''), contagem(w)].filter(Boolean).join(' · ')}
+              </Text>
+              {verPassos(w, k)}
+              {rodarNova(w.ilegivel ? maiuscula(nomeDoArquivo) : w.nome, w.pedido, k)}
+            </Box>
+            {listaDePassos(w, k)}
           </Box>
         )
-      const grupos = porFrente
-        ? [...new Set(outros.map(w => w.frente ?? ''))].map(f => ({ frente: f, lista: outros.filter(w => (w.frente ?? '') === f) }))
-        : [{ frente: '', lista: outros }]
+      }
+
       return (
         <Box {...fundo}>
           {cabecalho}
           <Box flexDirection="column" borderStyle="round" borderColor={TINTA} padding={1}>
             <Text color={TINTA} size="caption">{etiquetaAgora}</Text>
-            <Text bold color={TINTA}>{daVez?.nome ?? dado.workflowNome ?? (pedido ? maiuscula(pedido) : 'O seu primeiro workflow')}</Text>
-            {(daVez ? daVez.processo : dado.processo) && <Text color={ROCHA}>{daVez ? daVez.processo : dado.processo}</Text>}
-            {daVez && fileira(daVez, 'agora-quadros')}
-            <Text color={ROCHA}>{linhaDasRodadas({ rodadas, pedido })}</Text>
-            {estado === 'completo' ? (
-              <Text color={TINTA}>✓ Completo desde {desdeQuando(estadoTexto)}: sai pronto com um pedido seu.</Text>
-            ) : (
-              <Text color={CINZA} size="caption">
-                Completo quando sair pronto com um pedido só seu.{passos > 0 ? ` O sistema já faz ${passosSistema} de ${passos} passos.` : ''}
-              </Text>
+            <Text bold color={TINTA}>{nomeDaVez + (estado === 'completo' ? ' ✓' : '')}</Text>
+            {daVez && daVez.passos > 0 && (
+              <Box flexDirection="row" flexWrap="wrap" gap={1}>
+                {fileira(daVez, 'agora-quadros')}
+                <Text color={ROCHA}>{`o sistema faz ${daVez.passosSistema} de ${daVez.passos} passos`}</Text>
+                {verPassos(daVez, 'agora')}
+              </Box>
             )}
-            {daVez && daVez.furos.length > 0 && (
-              <Text color={ROCHA}>
-                Falta para ponta a ponta: {daVez.furos.map(f => (f.motivo ? `${f.passo} (${f.motivo})` : f.passo)).join('; ')}.
-              </Text>
-            )}
-            {daVez && (
-              <Text color={CINZA} size="caption">
-                {`Campo 1 ${estado === 'completo' ? '✓' : '○'} · Skill ${daVez.skill ? '✓' : '○'} · Sozinho ${daVez.sozinho ? '✓' : '○'}`}
-              </Text>
-            )}
-            {daVez && semPedido(daVez)}
-            <Box flexDirection="row" flexWrap="wrap" gap={1}>
-              {!pendente && aguardaAprovacao && (
-                <Button key="aprovar-entrega" variant="primary" label="Aprovar a entrega" onPress={() => void enviar($, 'pode, aprovado')} />
-              )}
-              {!pendente &&
-                (pedido ? (
-                  <Button
-                    key="rodar-workflow"
-                    variant={aguardaAprovacao ? undefined : 'primary'}
-                    label={rotuloCurto(maiuscula(pedido))}
-                    onPress={() => void enviar($, pedido)}
-                  />
-                ) : (
-                  !aguardaAprovacao &&
-                  ehOPrimeiro && (
-                    <Button key="rodar-workflow" variant="primary" label="Rodar o meu primeiro workflow" onPress={() => void enviar($, 'vamos rodar o primeiro workflow')} />
-                  )
-                ))}
-              {corrigirBotao}
-            </Box>
+            {daVez && listaDePassos(daVez, 'agora')}
+            {linhaDaVez && <Text color={ROCHA}>{linhaDaVez}</Text>}
+            {rodarAqui}
             {pendente && aviso}
-            {ultima}
+            {proximo && <Text color={CINZA} size="caption">{proximo}</Text>}
+            {ultimaCurta}
           </Box>
-          {(outros.length > 0 || dado.fila.length > 0) && (
+          {(jaRodaram.length > 0 || aComecar.length > 0) && (
             <Box flexDirection="column">
-              <Text color={CINZA} size="caption">OS SEUS WORKFLOWS · UM POR CONVERSA</Text>
-              {grupos.map(g => (
-                <Box key={`frente-${g.frente}`} flexDirection="column">
-                  {porFrente && g.lista.length > 0 && <Text color={CINZA} size="caption">{(g.frente || 'Sem frente').toUpperCase()}</Text>}
-                  {g.lista.map(w => linhaDoWorkflow(w, dado.workflows.indexOf(w)))}
-                </Box>
-              ))}
-              {dado.fila.length > 0 && (
+              <Text color={CINZA} size="caption">OS SEUS WORKFLOWS</Text>
+              {jaRodaram.map(w => linhaDoWorkflow(w, dado.workflows.indexOf(w)))}
+              {aComecar.length > 0 && (
                 <Box flexDirection="column">
-                  <Button key="fila" label={`Na fila: ${dado.fila.length}`} onPress={() => void update($, filaAberta, a => !a)} />
-                  {fila &&
-                    dado.fila.map((f, i) => (
-                      <Button
-                        key={`fila-${i}`}
-                        label={rotuloCurto(`Rodar ${f.nome.charAt(0).toLowerCase()}${f.nome.slice(1)}`)}
-                        onPress={() => void enviar($, `rodar o workflow ${f.nome}`)}
-                      />
+                  <Button key="fila" label={`A começar: ${aComecar.length}`} onPress={() => void update($, filaAberta, a => !a)} />
+                  {aComecarAberto &&
+                    aComecar.map((f, i) => (
+                      <Box key={`comecar-${i}`} flexDirection="row" flexWrap="wrap" gap={1}>
+                        <Text color={ROCHA}>{f.nome}</Text>
+                        {rodarNova(f.nome, f.pedido, `comecar-${i}`)}
+                      </Box>
                     ))}
                 </Box>
               )}
             </Box>
           )}
           <Box flexDirection="column">
-            <Text color={CINZA} size="caption">O QUE FICOU PRONTO</Text>
-            {dado.tempoTotal && <Text color={TINTA}>✓ Base Camp montado em {dado.tempoTotal}</Text>}
-            {dado.testeOk && <Text color={TINTA}>✓ O teste passou: o sistema já sabe quem você é.</Text>}
-            {dado.testeFalhou !== null && (
-              <Text color={SINAL}>✕ O teste: quem sou eu não passou{dado.testeFalhou ? `: ${dado.testeFalhou}` : ''}</Text>
-            )}
-            {combinadoMostrado && <Text color={ROCHA}>✓ O combinado: {combinadoMostrado}</Text>}
-            <Text color={ROCHA}>
-              {completo
-                ? 'Para o Arthur: mande o resumo do seu Base Camp para ele revisar e dar robustez ao seu sistema.'
-                : 'Para o Arthur: se quiser que ele dê uma olhada no seu Base Camp, mande o resumo.'}
-            </Text>
+            <Text color={ROCHA}>{linhaDosMarcos(marcos)}</Text>
+            {falhou && <Text color={SINAL} size="caption">O diário não está gravando. Escreva travei.</Text>}
             <Box flexDirection="row" flexWrap="wrap" gap={1}>
-              <Button key="copiar-resumo" label="Copiar o resumo" onPress={press => void copiarResumo($, press.surface)} />
-              <Button key="ver-resumo" label={aberto === 'resumo' ? 'Fechar o resumo' : 'Ver o resumo'} onPress={() => void abrirDoc($, 'resumo')} />
-              <Button key="guia" label={aberto === 'guia' ? 'Fechar o guia de bolso' : 'Ver o guia de bolso'} onPress={() => void abrirDoc($, 'guia')} />
+              <Text color={CINZA} size="caption">{dado.tempoTotal ? `Base Camp montado em ${dado.tempoTotal}` : 'Base Camp montado'}</Text>
+              <Button key="ver-resumo" label={zonaDoBaseCamp ? 'Fechar o resumo' : 'Ver o resumo'} onPress={() => void (zonaDoBaseCamp ? update($, doc, () => null) : abrirDoc($, 'resumo'))} />
             </Box>
-            {docAberto}
-            <Text color={CINZA} size="caption">Depois: Campo 2, sair pronto com um pedido seu · Campo 3, chegar sozinho · Cume, medir as horas que voltaram.</Text>
-            {!completo && <Text color={CINZA} size="caption">No programa, o Arthur sobe a Mera com você.</Text>}
-          </Box>
-          <Box flexDirection="column">
-            {trilha}
-            {progresso}
+            {zonaDoBaseCamp && (
+              <Box flexDirection="column">
+                {trilha}
+                {progresso}
+                {dado.testeFalhou !== null && (
+                  <Text color={SINAL}>✕ O teste: quem sou eu não passou{dado.testeFalhou ? `: ${dado.testeFalhou}` : ''}</Text>
+                )}
+                <Box flexDirection="row" flexWrap="wrap" gap={1}>
+                  <Button key="copiar-resumo" label="Copiar o resumo" onPress={press => void copiarResumo($, press.surface)} />
+                  <Button key="guia" label={aberto === 'guia' ? 'Ver o resumo' : 'Ver o guia de bolso'} onPress={() => void abrirDoc($, aberto === 'guia' ? 'resumo' : 'guia')} />
+                </Box>
+                {docAberto}
+                {!completo && <Text color={CINZA} size="caption">No programa, o Arthur sobe a Mera com você.</Text>}
+              </Box>
+            )}
           </Box>
           {rodape}
         </Box>

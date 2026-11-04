@@ -50,9 +50,48 @@ export type Furo = {
 }
 
 // Uma linha da tabela "Os próximos" de um cartão, ou uma opção não escolhida no passo 2 (0.2.19).
+// A frente é a do cartão de onde veio (0.3.0, para a Island); null nas opções do passo 2.
 export type NaFila = {
   nome: string
   pedido: string | null
+  frente?: string | null
+}
+
+// Um passo do cartão, para o "ver os passos" (0.3.0): o nome, quem faz e, no "ainda não dá", o motivo.
+export type Passo = {
+  nome: string
+  quadro: Quadro
+  motivo: string
+}
+
+// Os marcos das montanhas, calculados dos cartões (0.3.0). A data é a do cartão que fechou o marco.
+export type Marco = {
+  fechado: boolean
+  workflow: string | null
+  data: string | null
+}
+
+export type Marcos = {
+  mera: Marco
+  island: Marco & { feitos: number; total: number }
+  lobuche: Marco
+}
+
+// A conversa de agora, para a linha do diário (0.3.0). O painel grava só isto na pasta dela.
+export type Conversa = {
+  id: string
+  inicio: number
+  pedido: string
+  pedidos: number
+  sistemaMs: number
+  frente: string | null
+  workflow: string | null
+  gravou: string[]
+  leu: string[]
+  rodou: string[]
+  passos: string[]
+  // Conversa da montagem, da atualização da pasta ou da abertura de um workflow numa conversa nova: não entra.
+  deSistema: boolean
 }
 
 // Um cartão de workflow, como o painel de trabalho o mostra (0.2.19): todos os cartões de frentes/*/workflows/ e workflows/.
@@ -67,9 +106,15 @@ export type Workflow = {
   estado: 'incompleto' | 'em andamento' | 'completo'
   estadoTexto: string | null
   quadros: Quadro[]
+  // Os passos com o nome, para o "ver os passos" (0.3.0).
+  lista: Passo[]
   passos: number
   passosSistema: number
   furos: Furo[]
+  // O "antes" do cartão (o número de partida), para o fecho de um marco (0.3.0).
+  antes: string | null
+  // O cartão não se deixa ler: sem o título, sem o pedido e sem passos (0.3.0: "precisa de ajuste").
+  ilegivel: boolean
   // Algum passo usa uma skill (a coluna "Com quê" cita skill ou .claude/skills/).
   skill: boolean
   // O cartão diz "Chega sozinho: sim".
@@ -94,6 +139,8 @@ export type Painel = {
   tempoTotal: string | null
   // O cartão do workflow (0.2.17): o nome do H1, o pedido, o combinado do cartão, o estado e as tabelas.
   workflowNome: string | null
+  // O caminho do cartão do primeiro workflow (a linha "Primeiro workflow" do base-camp.md); null antes da 0.2.1.
+  workflow: string | null
   pedido: string | null
   combinadoCartao: string | null
   estado: 'incompleto' | 'em andamento' | 'completo'
@@ -169,6 +216,10 @@ declare module 'claude-code' {
       docTexto: string | null
       pergunta: string | null
       filaAberta: boolean
+      passosAbertos: string[]
+      aAbrir: string | null
+      conversa: Conversa | null
+      diarioFalhou: boolean
     }
   }
 }

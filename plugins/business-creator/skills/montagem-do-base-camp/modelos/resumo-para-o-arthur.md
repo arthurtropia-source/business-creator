@@ -39,6 +39,9 @@ Tire estes comentários e as instruções entre <>.
 - "Quem sou eu": <passou / passou depois de corrigir X / não feito>.
 - Separação entre frentes: <passou / não feito / não se aplica (leve)>.
 
+## Os marcos
+<!-- Uma linha por marco, gravada pela skill campo-1 quando um workflow completo fecha um marco: "- **Mera:** <data> · <workflow> · antes <o antes>, agora <o tempo>". Vazio até a Mera. -->
+
 ## O que ficou em aberto
 - <Perguntas puladas, campos "a completar", dúvidas que apareceram.>
 - <Pedidos sobre o kit, se houver.>

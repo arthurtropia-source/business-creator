@@ -8,6 +8,8 @@ O marketplace `sem-ia` e o plugin `business-creator`: o método do Business Crea
 - **Toda mudança no plugin sobe o `version` do `plugins/business-creator/.claude-plugin/plugin.json`** e entra no `CHANGELOG.md`. Sem subir a versão, quem já instalou não recebe.
 - **A pasta da pessoa não se mexe por versão.** O que é dela fica nela; o que é do método fica aqui.
 - O kit em zip (`../kit-instalacao/`) segue para quem já o recebeu e não se mexe a partir daqui. Quem o recebeu passa para o plugin pela skill `atualizar-a-pasta`.
+- **O painel lê; grava só o diário** (0.3.0): a linha de cada conversa de trabalho em `frentes/<frente>/diario/AAAA-MM.md` da pasta da pessoa. Nenhuma outra escrita do painel na pasta dela.
+- **Anotar nunca usa modelo:** o diário é escrito pelo painel a cada resposta, sem custo de tokens. Nada de gancho `Stop` com prompt nem de modelo a cada turno.
 - **As permissões vivem em dois lugares:** `esqueleto/settings.json` (pastas novas) e `plugins/business-creator/skills/atualizar-a-pasta/permissoes.json` (pastas que se atualizam). Mudou uma, mude a outra; o pré-teste confere.
 
 ## Estrutura
