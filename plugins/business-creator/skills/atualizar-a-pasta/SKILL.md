@@ -5,7 +5,7 @@ description: Leva para a versão atual do método uma pasta que já tinha o Base
 
 # Atualizar a pasta para a versão atual
 
-> Plugin Business Creator 0.2.18 (03/11/2026). Nasceu da primeira cliente, que montou o Base Camp com o kit em zip (v1.6) e passa para o plugin sem refazer a montagem (decisão do Arthur, 03/11/2026: atualizar a pasta dela sem zerar; os arquivos dela continuam valendo).
+> Plugin Business Creator 0.2.18 (03/11/2026); o modo empresa (passo 5b) na 0.3.1 (05/11/2026). Nasceu da primeira cliente, que montou o Base Camp com o kit em zip (v1.6) e passa para o plugin sem refazer a montagem (decisão do Arthur, 03/11/2026: atualizar a pasta dela sem zerar; os arquivos dela continuam valendo).
 
 A pessoa já tem o sistema montado. Ela não refaz nada: o que ela escreveu e aprovou continua valendo. Esta skill só acrescenta o que as versões novas do método trazem e tira da pasta as cópias antigas do kit, que agora chegam pelo plugin.
 
@@ -17,7 +17,8 @@ A atualização está pronta quando:
 4. existe o cartão do primeiro workflow, com as linhas **Pedido**, **Combinado** e **Estado**, e o `base-camp.md` aponta para ele na linha **Primeiro workflow**;
 5. a ficha da frente, o `AGENTS.md` da raiz e o `como-usar.md` têm as seções novas, com o que já se sabe dela;
 6. o `base-camp.md` tem a linha **Atualizada:** e a nota em "Pedidos sobre o kit".
-Se a pasta já tem a linha **Atualizada:** no `base-camp.md`, nada disso se faz: diga em uma linha que ela já está na versão nova e responda ao que ela pediu.
+7. **no modo empresa** (existe `*/contexto/regras-da-empresa.md`; skill `montagem-do-base-camp`, `modo-empresa.md`): o `AGENTS.md` da raiz tem a seção "A empresa onde eu trabalho", a ficha da frente de trabalho aponta para o repositório, e o `.claude/settings.json` tem as permissões da área e a atualização da base.
+Se a pasta já tem a linha **Atualizada:** no `base-camp.md`, nada disso se faz, **a não ser o item 7**: se o arquivo de regras da empresa existe e o `AGENTS.md` da raiz ainda não tem a seção "A empresa onde eu trabalho", faça só o passo 5b. Senão, diga em uma linha que ela já está na versão nova e responda ao que ela pediu.
 
 ## Regras que não se negociam
 - **Nada da pessoa se apaga, se move ou se reescreve.** Os arquivos dela (o retrato, as fichas, a memória, as planilhas, os modelos) só ganham seções; o texto dela fica como está. As únicas coisas que mudam de lugar são as 3 cópias do kit, e vão para `montagem/kit-anterior/`, nunca para a lixeira.
@@ -69,6 +70,11 @@ Se não existir `contexto/computador.md`, faça o inventário pela skill `rotina
   - No topo do `primeiro-processo.md`, acrescente só uma linha: `> Virou o cartão do workflow em \`<caminho>\`, em <data>.` O resto do arquivo fica.
 - **Se não existe nem cartão nem `primeiro-processo.md`:** não invente um. Anote em "Em aberto" do `base-camp.md`: "escolher o primeiro workflow", e na mensagem final peça, em vez do pedido, "me diga qual tarefa você repete e quer ver rodando".
 - No `base-camp.md`: a linha `- **Primeiro workflow:** \`<caminho do cartão>\`` logo abaixo da linha **Montagem:**; a seção "O primeiro workflow" (se não existir, depois de "Testes"), com `**Escolhido:** <pedido> · em <data da montagem, se souber; senão, a de hoje>` e `**Combinado:** quando <gatilho>, abra esta pasta e escreva **<pedido>**`. A seção "Primeiras tarefas", se houver, fica como está.
+
+### 5b. A empresa (só se existir `*/contexto/regras-da-empresa.md`)
+- Leia o `modo-empresa.md` da skill `montagem-do-base-camp` e aplique os itens 1 a 5 de "O que muda na montagem e na atualização da pasta".
+- No cartão do primeiro workflow, se "O que pode travar" tem a linha "Dados da empresa: falta registrar quem autoriza o uso neste sistema", troque por "Dados da empresa: valem as regras de `<repositório>/contexto/regras-da-empresa.md` (desde <data>)". Nas Pendências da ficha, a mesma pergunta sai, com "resolvida pelo arquivo de regras da empresa em <data>".
+- Na mensagem final, a linha: "o seu sistema passou a trabalhar junto com a base da <Empresa>: as regras dos dados vêm de lá, sempre atualizadas".
 
 ### 6. As seções novas
 Acrescente só o que falta, pelo modelo atual da skill `montagem-do-base-camp`, no lugar que o modelo indica, com o que já se sabe dela (o que não se sabe fica "Nenhuma ainda"):

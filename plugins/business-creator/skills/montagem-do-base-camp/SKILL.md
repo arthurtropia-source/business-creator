@@ -26,6 +26,7 @@ A aprovação da entrega da rodada 1 vem depois e não trava a montagem: é a me
 - `modelos/`: o modelo de cada arquivo que você escreve.
 - `perguntas-do-uso-real.md`: as perguntas que **não** se fazem na montagem, e quando cada uma aparece depois.
 - `ajuda.md`: respostas para quando a pessoa travar.
+- `modo-empresa.md`: o que muda quando a pasta tem o repositório da área de uma empresa, com o arquivo de regras dela (0.3.1).
 
 ## Os arquivos da pessoa (na raiz da pasta)
 - `base-camp.md`: o estado da montagem. **Leia no começo de toda conversa.** Diz o nível (`leve` ou `completo`), o passo atual, o status e os horários; na seção "O primeiro workflow", as 3 opções, o escolhido, a rodada 1 e o combinado.
@@ -35,6 +36,7 @@ A aprovação da entrega da rodada 1 vem depois e não trava a montagem: é a me
 
 ## Como começar ou retomar
 0. **Antes de tudo, confira se o plugin está ligado e se o `base-camp.md` está na raiz da pasta aberta.** Sem o `base-camp.md`, não grave nada: pare e diga, em uma linha, como abrir no app a pasta do computador dela (não um ambiente na nuvem, e sem anexar nada na conversa).
+0b. **Confira o modo empresa, uma vez por conversa:** procure `*/contexto/regras-da-empresa.md` com a ferramenta de busca de arquivos. Se existir, leia `modo-empresa.md` e siga-o em todos os passos. Não pergunte a ela se a pasta é de empresa: o arquivo responde.
 1. Leia `base-camp.md`. **Se a seção "Em aberto" tiver alguma pergunta, comece por ela** e apague-a quando ela responder.
 2. **Se nenhum passo começou:** mande a abertura do `roteiro.md` palavra por palavra, inteira, escrita na resposta, e registre o início do passo D (passo "Horário", abaixo). Sem escolha, sem caixa de opções.
 3. **Se há um passo "em andamento", ou passos aprovados e o próximo pendente** (quem trocou de conversa): leia `montagem/respostas.md`, diga em uma linha onde vocês estão e siga dali, sem refazer nada. No passo 1, se os arquivos já estão gravados e falta só o "confirmo", repita só o pedido de confirmação. No passo 2, se as 3 opções já estão no `base-camp.md`, repita só o pedido do clique; se há um escolhido e a rodada 1 não terminou, siga a rodada. **Pasta que começou na montagem longa** (tabela com etapas 1 a 5 ou 1 a 6) ou numa versão anterior (seção "Primeiras tarefas"): trate o que já foi aprovado como insumo e siga o roteiro desta versão; anote em "Pedidos sobre o kit": "veio da montagem longa" ou "veio da versão anterior".
@@ -83,7 +85,7 @@ Cada passo seu (ler, gravar, editar) é uma volta a mais, que deixa a resposta m
 
 ## Cuidados
 - **Sigilo:** saúde, conflitos de família, dinheiro pessoal e assuntos íntimos não são necessários para montar o sistema. Se vierem, não grave o conteúdo: anote só "[assunto pessoal, não registrado]".
-- **A empresa onde ela trabalha:** registre o papel dela e o que ela faz, nunca números, clientes, nomes de colegas ou documentos. Se ela colar dados da empresa, avise com cuidado: "Dados da empresa só entram se a empresa autorizar. Aqui eu registro só o seu papel."
+- **A empresa onde ela trabalha:** registre o papel dela e o que ela faz, nunca números, clientes, nomes de colegas ou documentos. Se ela colar dados da empresa, avise com cuidado: "Dados da empresa só entram se a empresa autorizar. Aqui eu registro só o seu papel." **No modo empresa** (`modo-empresa.md`), a autorização e o lugar dos dados vêm do arquivo de regras da empresa: o dado entra no trabalho da área, no repositório, e o retrato continua só com o papel dela.
 - **Nada sai do computador:** você não envia e-mail, mensagem nem arquivo para ninguém. O resumo para o Arthur é ela quem manda, se quiser.
 - **Não altere** os arquivos deste kit (eles vêm do plugin e não ficam na pasta dela). Pedido para mudar o jeito da montagem vai para "Pedidos sobre o kit", no `base-camp.md`.
 

@@ -13,6 +13,8 @@ Você recebe do Arthur a sua pasta (`meu-os`), que já sabe onde buscar o plugin
 
 **Modelo sugerido:** o Opus 5.5, no esforço padrão (médio). Escolha no seletor de modelo, embaixo da caixa de texto do app. É só uma sugestão: você pode mudar quando quiser.
 
+**No trabalho, numa empresa com a base da área no GitHub** (0.3.1): clone o repositório da área dentro da sua pasta antes do passo 4. Se ele tiver o arquivo `contexto/regras-da-empresa.md`, escrito pelo dono da empresa, a montagem liga a sua pasta à base sozinha, e as regras da empresa para os dados passam a vir de lá, sempre atualizadas.
+
 Sem a pasta, no app: clique no **+** ao lado da caixa de texto, **Plugins**, **Add marketplace** com `arthurtropia-source/business-creator`, depois **Add plugin** e escolha `business-creator`. Num terminal: `claude plugin install business-creator --marketplace arthurtropia-source/business-creator`.
 
 ## O que vem nele

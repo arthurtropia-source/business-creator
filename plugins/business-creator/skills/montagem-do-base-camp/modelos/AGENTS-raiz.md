@@ -41,6 +41,13 @@ Antes de trabalhar numa frente, leia o `AGENTS.md` dela.
 - <pergunta ou assunto que ficou sem resposta · de quem depende · desde quando. "Nenhuma ainda.">
 </só no leve>
 
+<só no modo empresa (`modo-empresa.md`); uma seção por área, se houver mais de uma>
+## A empresa onde eu trabalho
+- Trabalho na <Empresa>, na área <Área>. A base da área está em `<repositório>/`, que se atualiza sozinha quando abro uma conversa.
+- **Dados da empresa:** valem as regras de `<repositório>/contexto/regras-da-empresa.md`: quem autoriza, o que está autorizado, onde fica o trabalho e onde fica o dado bruto. Leia esse arquivo antes de qualquer trabalho com dado da empresa. Elas valem acima das minhas regras nesse assunto.
+- **O trabalho da área** segue `<repositório>/AGENTS.md`, que manda nele. Aqui ficam só os cartões dos meus workflows, o diário e o que é meu.
+</só no modo empresa>
+
 ## O meu computador
 - Antes de rodar qualquer rotina ou mexer em planilha, leia `contexto/computador.md`.
 

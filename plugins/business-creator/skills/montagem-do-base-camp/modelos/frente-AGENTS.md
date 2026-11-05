@@ -12,6 +12,7 @@ Tire estes comentários e as instruções entre <>.
 - <Uma ou duas linhas.>
 - **Meu papel:** <FRENTE.pessoas: o papel dela.>
 - **Quem mais está:** <primeiro nome e papel, só se ajudar.>
+<só no modo empresa, na frente de trabalho:> - O trabalho desta frente mora em `<repositório>/` (<o que diz **Onde fica o trabalho**>). Antes de trabalhar nela, leia `<repositório>/AGENTS.md`: ele manda no trabalho da área. Aqui ficam só os cartões dos workflows, o diário e o que é meu.
 
 ## O que já existe
 | O quê | Onde fica | Situação |
