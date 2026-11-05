@@ -42,7 +42,7 @@ Tire estes comentários e as instruções entre <>.
 ## O antes (o número de partida)
 | Quanto tempo leva hoje | Vezes por mês | Horas por mês | Quando | Como foi medido |
 |---|---|---|---|---|
-| <PROC.antes, ou "a medir"> | <quantas> | <o tempo vezes as vezes> | <data> | medido hoje / lembrança da última vez / estimativa, pela fala dela / pela outra IA |
+| <PROC.antes, ou "não medido"> | <quantas> | <o tempo vezes as vezes> | <data> | medido hoje / lembrança da última vez / estimativa, pela fala dela / pela outra IA |
 
 ## Os próximos (para depois deste)
 | Workflow | Pedido | A primeira entrega |

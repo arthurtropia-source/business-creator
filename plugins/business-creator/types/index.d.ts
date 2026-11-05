@@ -217,6 +217,8 @@ declare module 'claude-code' {
       pergunta: string | null
       filaAberta: boolean
       passosAbertos: string[]
+      // O marco com a explicação aberta, pelo "i" da legenda da subida (0.3.2).
+      marcoAberto: string | null
       aAbrir: string | null
       conversa: Conversa | null
       diarioFalhou: boolean

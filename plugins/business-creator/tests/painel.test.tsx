@@ -147,6 +147,9 @@ const CARTAO_ANTIGO = `# Workflow: Fechar o dia
 | 40 min | 22 | 15 horas | 01/11/2026 | estimativa |
 `
 
+// A abertura do roteiro, no formato de lá (com as marcas de citação): o botão "Copiar o pedido 1" lê a caixa (0.3.2).
+const ROTEIRO = '## Abertura\n\n> **Pedido 1.** Copie o texto abaixo.\n>\n> ```text\n> Estou montando um sistema de trabalho com IA e quero que ele me conheça.\n>\n> Entregue tudo num bloco e termine com a linha FIM DO RETRATO.\n> ```\n>\n> **Pedido 2.** Me conte.\n'
+
 const CAMPOS = `# Mapa de campos
 | Código | O que é | Preenchido quando | Vem de |
 |---|---|---|---|
@@ -216,7 +219,7 @@ function pasta(on: On, arquivos: Record<string, string>, enviados: string[], res
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   // Uma pasta existe quando algum arquivo mora nela; a lista dá os filhos diretos (0.2.19, o painel de trabalho).
   const ehPasta = (p: string) => Object.keys(arquivos).some(a => a.startsWith(`${p}/`))
-  on('fs.exists', (_, e) => ({ value: e.path in arquivos || ehPasta(e.path) || e.path.endsWith('.png') || e.path.endsWith('/skills/montagem-do-base-camp/campos.md') }))
+  on('fs.exists', (_, e) => ({ value: e.path in arquivos || ehPasta(e.path) || e.path.endsWith('.png') || e.path.endsWith('/skills/montagem-do-base-camp/campos.md') || e.path.endsWith('/skills/montagem-do-base-camp/roteiro.md') }))
   on('fs.list', (_, e) => {
     const filhos = new Map<string, 'file' | 'dir'>()
     for (const a of Object.keys(arquivos)) {
@@ -226,7 +229,7 @@ function pasta(on: On, arquivos: Record<string, string>, enviados: string[], res
     }
     return { value: [...filhos].map(([name, kind]) => ({ name, kind, size: 0, mtimeMs: 0, isLink: false })) }
   })
-  on('fs.read', (_, e) => ({ value: e.as === 'bytes' ? { base64: 'AAAA' } : (arquivos[e.path] ?? (e.path.endsWith('/skills/montagem-do-base-camp/campos.md') ? CAMPOS : '')) }))
+  on('fs.read', (_, e) => ({ value: e.as === 'bytes' ? { base64: 'AAAA' } : (arquivos[e.path] ?? (e.path.endsWith('/skills/montagem-do-base-camp/campos.md') ? CAMPOS : e.path.endsWith('/skills/montagem-do-base-camp/roteiro.md') ? ROTEIRO : '')) }))
   on('prompt.submit', (_, e) => {
     enviados.push(e.text)
     return { text: e.text }
@@ -331,9 +334,15 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     await $.session.start({ cwd: '/os', surface, isInteractive: true })
 
     const ui = await $.ui.mount({ ...PANE, surface })
-    expect(await ui.find({ type: 'Text', text: /O SEU COMEÇO · 1 DE 3/ })).toBeDefined()
-    expect((await ui.find({ type: 'Text', text: /Pedido 2: você, com as suas palavras/ }))?.text).toContain('✓')
-    expect((await ui.find({ type: 'Text', text: /Pedido 1: o que a outra IA/ }))?.text).toContain('○')
+    // O começo desenhado (0.3.2): o mapa dos 3 passos e os 2 pedidos com o estado, no cartão Agora; a lista sai.
+    expect(await ui.find({ type: 'Text', text: /O SEU COMEÇO/ })).toBeUndefined()
+    expect((await ui.find({ type: 'Text', text: /1 · Você manda/ }))?.text).toBe('● 1 · Você manda')
+    expect(await ui.find({ type: 'Text', text: /^3 · O primeiro workflow roda$/ })).toBeDefined()
+    expect((await ui.find({ type: 'Text', text: /Pedido 2 · você, por voz/ }))?.text).toContain('✓')
+    expect((await ui.find({ type: 'Text', text: /Pedido 1 · a outra IA/ }))?.text).toContain('○')
+    // Com o pedido 2 na pasta, o copiar e o "Não uso outra IA" saem: o primário é montar o retrato.
+    expect(await ui.find({ type: 'Button', key: 'copiar-pedido-1' })).toBeUndefined()
+    expect(await ui.find({ type: 'Button', key: 'sem-outra-ia' })).toBeUndefined()
     expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toContain('● Começo')
     // O que o sistema já sabe vai para o painel, em cartões (0.2.10).
     expect(await ui.find({ type: 'Text', text: /O QUE EU JÁ SEI DE VOCÊ/ })).toBeDefined()
@@ -420,7 +429,13 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     expect((await ui.find({ type: 'Button', key: 'ver-agora' }))?.props.label).toBe('fechar os passos')
     // As opções não escolhidas, recolhidas em "A começar"; os marcos numa linha; o Base Camp numa linha.
     expect((await ui.find({ type: 'Button', key: 'fila' }))?.props.label).toBe('A começar: 2')
-    expect(await ui.find({ type: 'Text', text: /^Mera ○ · Island ○ · Lobuche East ○$/ })).toBeDefined()
+    // A subida desenhada no lugar da linha dos marcos (0.3.2), com a legenda do resultado e o "i" num toque.
+    if (surface === 'terminal') expect(await ui.find({ type: 'Text', text: /^Mera ○ · Island ○ · Lobuche East ○$/ })).toBeDefined()
+    else expect((await ui.findAll({ type: 'Svg' })).some(s => /^A subida/.test(String(s.props.alt)) && /você está aqui/.test(String(s.props.source)))).toBe(true)
+    expect(await ui.find({ type: 'Text', text: /^Mera · o 1º workflow completo$/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /^Mera: o primeiro workflow/ })).toBeUndefined()
+    await ui.press({ key: 'i-mera' })
+    expect(await ui.find({ type: 'Text', text: /^Mera: o primeiro workflow/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /^Base Camp montado em 27 min$/ })).toBeDefined()
     // A trilha e a subida ficam dentro do "Ver o resumo" (decisão 2, 04/11).
     expect(await ui.find({ type: 'Text', text: /Começo/ })).toBeUndefined()
@@ -705,6 +720,35 @@ test('a pasta de antes da 0.2.17 continua lendo: a tarefa feita, o pedido do "Co
   await depois.unmount()
 })
 
+test('o começo sem nada ainda: o primário copia o pedido 1, e "Não uso outra IA" manda a frase', async ($, on) => {
+  const enviados: string[] = []
+  const comeco = BASE_CAMP.replace('NIVEL', 'completo')
+    .replace('| D · O começo | aprovado | 23/10/2026 17:24 | 23/10/2026 17:36 |', '| D · O começo | em andamento | 23/10/2026 17:24 | |')
+    .replace('| 1 · O retrato | em andamento | 23/10/2026 17:36 | |', '| 1 · O retrato | pendente | | |')
+  pasta(on, { '/os/base-camp.md': comeco, '/os/montagem/respostas.md': '' }, enviados)
+  await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
+
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  const primarios = (await ui.findAll({ type: 'Button' })).filter(b => b.props.variant === 'primary').map(b => b.props.label)
+  expect(primarios).toEqual(['Copiar o pedido 1'])
+  expect(await ui.find({ type: 'Text', text: /^Fale pelo microfone do Claude/ })).toBeDefined()
+  await ui.press({ key: 'copiar-pedido-1' })
+  expect(enviados.some(t => t.startsWith('[copiado] Estou montando um sistema de trabalho com IA'))).toBe(true)
+  expect(enviados.some(t => t.startsWith('[copiado]') && /FIM DO RETRATO/.test(t) && !/^\[copiado\] >/m.test(t))).toBe(true)
+  await ui.press({ key: 'sem-outra-ia' })
+  expect(enviados).toContain('não uso outra IA')
+  await ui.unmount()
+})
+
+test('o retrato na tela mostra "Confirmar o retrato" mesmo com um campo faltando', async ($, on) => {
+  const resumo = '# O que o sistema já sabe\n\n## Já sei isto\n### Quem você é\n- Ana, consultora de RH\n\n## Falta isto\n- A sua última semana\n'
+  pasta(on, { '/os/base-camp.md': BASE_CAMP.replace('NIVEL', 'completo'), '/os/montagem/respostas.md': '', '/os/montagem/resumo.md': resumo }, [])
+  await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect((await ui.find({ type: 'Button', key: 'aprovar' }))?.props.label).toBe('Confirmar o retrato')
+  await ui.unmount()
+})
+
 test('o workflow completo no cartão: o ✓ no nome, a Mera fechada e o próximo ponto de controle', async ($, on) => {
   pasta(on, {
     '/os/base-camp.md': COM_CARTAO('completo'),
@@ -715,10 +759,12 @@ test('o workflow completo no cartão: o ✓ no nome, a Mera fechada e o próximo
 
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
   expect((await ui.find({ type: 'Text', text: /^Mensagem de retorno ✓$/ }))?.props.bold).toBe(true)
-  expect(await ui.find({ type: 'Text', text: /^Próximo: virar habilidade$/ })).toBeDefined()
+  // O próximo ponto de controle é a skill, na trilha ao lado dos quadrados (0.3.2): nenhuma rodada sem correção ainda.
+  expect(await ui.find({ type: 'Text', text: /^⚙ próximo: skill$/ })).toBeDefined()
   expect((await ui.find({ type: 'Button', key: 'rodar-workflow' }))?.props.label).toBe('Rodar mensagem de retorno')
   // Os marcos: a Mera fechada; a Island conta os workflows da frente (um só, ainda não fecha).
-  expect(await ui.find({ type: 'Text', text: /^Mera ✓ · Island: 1 de 1 completos · Lobuche East ○$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Mera · o 1º workflow completo ✓$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Island · a frente inteira: 1 de 1$/ })).toBeDefined()
   // Na subida (dentro do "Ver o resumo"), o Campo 1 fica feito: na linha e na trilha (o quadrado cheio, em tinta).
   await ui.press({ key: 'ver-resumo' })
   expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toBe('✓ Base   ✓ Começo   ✓ O retrato   ✓ O primeiro workflow   ✓ Campo 1')
@@ -782,10 +828,15 @@ test('o painel de trabalho: o Agora sem botão enquanto a entrega espera, a list
   expect(await ui.find({ type: 'Text', text: /^□ 4\. Mandar o pedido · fica com você$/ })).toBeDefined()
   // A lista: o que já rodou, uma linha com a conta e o mesmo botão; o cartão que não se lê, "precisa de ajuste".
   expect(await ui.find({ type: 'Text', text: /^OS SEUS WORKFLOWS$/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /^Mensagem de retorno · 2 de 4$/ })).toBeDefined()
+  // Cada workflow num cartão (0.3.2): o nome, a frente, o estado e, embaixo, a conta e a trilha da skill.
+  expect((await ui.find({ type: 'Text', text: /^Mensagem de retorno$/ }))?.props.bold).toBe(true)
+  expect(await ui.find({ type: 'Text', text: /^o sistema faz 2 de 4$/ })).toBeDefined()
+  // O Agora é da loja, que usa a skill estoque: a trilha acesa; o da lista ainda não tem skill.
+  expect(await ui.find({ type: 'Text', text: /^⚙ skill pronta$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^· Loja$/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /^Quebrado · precisa de ajuste$/ })).toBeDefined()
   const novas = (await ui.findAll({ type: 'Button' })).filter(b => String(b.props.key).startsWith('nova-'))
-  expect(new Set(novas.map(b => b.props.label))).toEqual(new Set(['Rodar em conversa nova']))
+  expect(new Set(novas.map(b => b.props.label))).toEqual(new Set(['Rodar']))
   // "A começar": o cartão que nunca rodou e a fila (as opções não escolhidas e "Conferir a nota"), sem repetir
   // o que já tem cartão; recolhido até o toque.
   expect((await ui.find({ type: 'Button', key: 'fila' }))?.props.label).toBe('A começar: 4')
@@ -848,7 +899,7 @@ test('os marcos: a Island fecha com a frente inteira, a Lobuche East com outra f
   pasta(on, arquivos, enviados)
   await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
   let ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
-  expect(await ui.find({ type: 'Text', text: /^Mera ○ · Island ○ · Lobuche East ○$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Mera · o 1º workflow completo$/ })).toBeDefined()
   await ui.unmount()
 
   // O primeiro completo fecha a Mera, com o fecho em fatos: o antes do cartão e o tempo da última vez.
@@ -857,7 +908,8 @@ test('os marcos: a Island fecha com a frente inteira, a Lobuche East com outra f
   await $.turn.complete({ answer: 'Completo.', durationMs: 1000, isAborted: false, turnId: 'm1', reason: 'answer' })
   expect(enviados).toContain('[aviso] Mera: Mensagem de retorno sai pronto com um pedido seu, desde 05/11/2026. Antes, 3 horas; na última vez, 7 min.')
   ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
-  expect(await ui.find({ type: 'Text', text: /^Mera ✓ · Island: 1 de 2 completos · Lobuche East ○$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Mera · o 1º workflow completo ✓$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Island · a frente inteira: 1 de 2$/ })).toBeDefined()
   await ui.unmount()
 
   // O segundo da mesma frente fecha a Island; um completo noutra frente fecha a Lobuche East.
@@ -866,7 +918,11 @@ test('os marcos: a Island fecha com a frente inteira, a Lobuche East com outra f
   await $.turn.start({ text: 'aprovado', turnId: 'm2' })
   await $.turn.complete({ answer: 'Completo.', durationMs: 1000, isAborted: false, turnId: 'm2', reason: 'answer' })
   ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
-  expect(await ui.find({ type: 'Text', text: /^Mera ✓ · Island ✓ · Lobuche East ✓$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Island · a frente inteira ✓$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Lobuche East · a 2ª frente ✓$/ })).toBeDefined()
+  // No fim, o "você está aqui" no cume da Lobuche East, sem sair do desenho.
+  const fim = (await ui.findAll({ type: 'Svg' })).find(s => /^A subida/.test(String(s.props.alt)))?.props.source ?? ''
+  expect(fim).toContain('<circle cx="225.0" cy="40.0" r="5" fill="#FF6F1A"/>')
   await ui.unmount()
   expect(enviados.some(t => /confete|parabéns|🎉/i.test(t))).toBe(false)
 })

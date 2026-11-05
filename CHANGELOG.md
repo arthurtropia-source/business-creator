@@ -2,6 +2,22 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.3.2 (05/11/2026)
+**A abertura desenhada e o painel de trabalho com cartões** (as melhorias da rodada (a) do teste do Data Room, aprovadas pelo Arthur em 05/11/2026, "sim, todas": `propostas/2026-11-05-abertura-visual.md` v1.2 e `propostas/2026-11-05-melhorias-rodada-a.md` v1.4, fora do git). A rodada (b) do Data Room roda nesta versão.
+- **A abertura curta:** três linhas e a caixa do pedido 1 ("Boas-vindas ao seu Base Camp. São 3 passos, uns 30 minutos, e você só responde. O caminho está no painel ao lado."). Saem a metáfora do acampamento, o "dá para parar" e o atalho de voz do sistema.
+- **O começo no painel:** o mapa dos 3 passos ("1 · Você manda → 2 · Você confirma o retrato → 3 · O primeiro workflow roda", com o atual em tinta), os 2 pedidos com o estado (○ / ✓ recebido) e um primário por vez: **Copiar o pedido 1** (copia a caixa do roteiro), depois **Montar o meu retrato**. Secundário: **Não uso outra IA**, que manda a frase e o sistema segue só com o pedido 2. A lista "O SEU COMEÇO" sai.
+- **A voz é o microfone do Claude:** a dica embaixo da caixa vira "Responda pelo microfone do Claude · Travou? escreva travei", igual no Mac e no Windows (sai o Windows + H); no terminal, só "Travou? escreva travei".
+- **O pedido 1 conferido inteiro:** o pedido termina com "FIM DO RETRATO"; se faltar seção, o sistema pede só o resto.
+- **"Confirmar o retrato" aparece quando o retrato está na tela**, falte ou não um campo (no teste, ele sumia e a pessoa escreveu "continuar" duas vezes).
+- **O `(?)` que o "confirmo" não apaga:** todo ponto da outra IA deduzido, com mais de 3 meses ou sem data leva `(?)`, sem exceção; o "confirmo" em bloco não o confirma (continua "a confirmar" até ela falar dele).
+- **Primeiro, o que já roda (passo 2):** antes das 3 opções, o sistema olha a pasta e as ferramentas conectadas (no e-mail, só os enviados dos últimos 30 dias, pelo assunto e pela frequência, sem abrir o conteúdo) e põe a tarefa que já se repete como a recomendada, com a evidência e uma linha do que leu.
+- **Sem a pergunta do "antes":** nem no fim da montagem nem no Campo 1. O "antes" fica "não medido", a não ser que a pessoa diga; o sistema mede o tempo de cada rodada e os pedidos.
+- **A versão do plugin no `base-camp.md`:** `- **Plugin:** <versão>`, e `<início> → <fim>` se mudar no meio da montagem.
+- **O painel de trabalho com cartões:** cada workflow num cartão com moldura, em 2 linhas: o nome, a frente (pequena, em cinza), o estado e os botões **Rodar** e **ver os passos**; embaixo, os quadrados com a conta e, à direita, **a trilha da skill** (um círculo por rodada aprovada com um pedido só, até 2, e "⚙ skill"; "⚙ skill pronta" quando o cartão já usa uma skill). No Agora, a mesma trilha com "⚙ próximo: skill" e a frente ao lado do nome; o "Próximo: virar habilidade" em texto sai.
+- **A subida desenhada no lugar da linha dos marcos** (muda a decisão 2 de 04/11): o Base Camp no início, Mera, Island e Lobuche East com o nome, o Everest esmaecido no fim, o caminho feito em tinta até a bola laranja e, acima dela, o montanhista e "você está aqui". O traço anda só quando um marco fecha. A legenda diz o resultado antes do nome ("Mera · o 1º workflow completo"), e o "i" abre a explicação num toque. No terminal, a linha de antes.
+- **O aviso de instalação:** o passo 3 vira "Volte a esta conversa e escreva **oi**. Se o painel não aparecer, abra uma conversa nova nesta pasta e escreva **oi**."
+- **Testes:** 55 testes do painel (novos: o começo com o copiar e o "Não uso outra IA", o retrato com campo faltando; refeitos: os marcos pela legenda e pela subida, os cartões).
+
 ## 0.3.1 (05/11/2026)
 **O modo empresa mínimo: as regras da empresa chegam pelo repositório da área** (decisão 2 de `laboratorio-os/2026-11-05-implantacao-luan.md`, aprovada pelo Arthur em 05/11/2026). Na primeira implantação numa empresa, a decisão do dono sobre o uso dos dados foi tomada no sistema dele e nunca chegou ao da pessoa, porque o canal era um texto para colar.
 - **O corte, por arquivo:** existe `*/contexto/regras-da-empresa.md` numa pasta logo abaixo da raiz? Se sim, a pasta é de alguém que trabalha numa empresa com o repositório da área dentro dela. Nenhuma pergunta nova na montagem.

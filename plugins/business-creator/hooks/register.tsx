@@ -51,6 +51,8 @@ const pergunta = atom({ plugin: 'business-creator', key: 'pergunta' } as const, 
 const filaAberta = atom({ plugin: 'business-creator', key: 'filaAberta' } as const, false)
 // Os workflows com os passos abertos na vertical (0.3.0), pelo caminho do cartão.
 const passosAbertos = atom({ plugin: 'business-creator', key: 'passosAbertos' } as const, [])
+// O marco da subida com a explicação aberta (0.3.2): o "i" da legenda abre num toque.
+const marcoAberto = atom({ plugin: 'business-creator', key: 'marcoAberto' } as const, null)
 // O pedido do workflow que um botão mandou abrir numa conversa nova: se a conversa nova não abrir, o painel
 // copia este pedido para ela colar (0.3.0).
 const aAbrir = atom({ plugin: 'business-creator', key: 'aAbrir' } as const, null)
@@ -460,7 +462,8 @@ function lerCartao(texto: string): Detalhe {
   const meio = antes && /^[A-ZÀ-Ú][a-zà-ú]/.test(antes) ? antes.charAt(0).toLowerCase() + antes.slice(1) : antes
   return {
     processo,
-    antes: meio && !meio.startsWith('<') ? meio : null,
+    // "não medido" e "a medir" (0.3.2: o antes não se pergunta mais) não são tempo: ficam de fora da frase.
+    antes: meio && !meio.startsWith('<') && !/^(não medido|a medir)/i.test(meio) ? meio : null,
     workflowNome,
     pedido,
     combinadoCartao,
@@ -887,6 +890,81 @@ function linhaDosMarcos(m: Marcos): string {
   return [`Mera ${m.mera.fechado ? '✓' : '○'}`, island, `Lobuche East ${m.lobuche.fechado ? '✓' : '○'}`].join(' · ')
 }
 
+// A subida desenhada (0.3.2, pedido do Arthur na rodada (a) de 05/11): o Base Camp no início, as três montanhas com
+// o nome, o Everest esmaecido no fim, o caminho feito em tinta até a bola laranja e, acima dela, um boneco caminhando
+// com "você está aqui". Toma o lugar da linha dos marcos; o traço anda só quando um marco fecha (a festa).
+const SUBIDA = [[14, 104], [70, 66], [110, 86], [150, 52], [188, 72], [225, 40], [290, 22]] as const
+
+function ondeEsta(m: Marcos): { ponto: [number, number]; ate: number } {
+  // "ate" é quantos vértices da SUBIDA ficam antes do ponto, no caminho feito.
+  const entre = (a: readonly number[], b: readonly number[], t: number): [number, number] => [
+    (a[0] ?? 0) + ((b[0] ?? 0) - (a[0] ?? 0)) * t,
+    (a[1] ?? 0) + ((b[1] ?? 0) - (a[1] ?? 0)) * t,
+  ]
+  if (!m.mera.fechado) return { ponto: entre(SUBIDA[0], SUBIDA[1], 0.55), ate: 1 }
+  if (!m.island.fechado && !m.lobuche.fechado) return { ponto: entre(SUBIDA[2], SUBIDA[3], 0.55), ate: 3 }
+  if (!m.lobuche.fechado || !m.island.fechado) return { ponto: entre(SUBIDA[4], SUBIDA[5], 0.55), ate: 5 }
+  return { ponto: [SUBIDA[5][0], SUBIDA[5][1]], ate: 6 }
+}
+
+function subidaSvg(m: Marcos, anima: boolean): string {
+  const { ponto, ate } = ondeEsta(m)
+  const [ax, ay] = ponto
+  const pts = (n: number) => SUBIDA.slice(0, n).map(p => p.join(' ')).join(' L')
+  const feito = `M${pts(ate)} L${ax.toFixed(1)} ${ay.toFixed(1)}`
+  const tudo = `M${pts(SUBIDA.length)}`
+  const monte = (x: number, y: number, meia: number, extra: string) =>
+    `<polygon points="${x - meia},104 ${x},${y} ${x + meia},104" ${extra}/>`
+  const marcoFeito = [m.mera.fechado, m.island.fechado, m.lobuche.fechado]
+  const picos: [number, number, string][] = [
+    [70, 66, 'Mera'],
+    [150, 52, 'Island'],
+    [225, 40, 'Lobuche East'],
+  ]
+  // O topo do desenho sobe quando o "você está aqui" passaria da borda (perto do cume da Lobuche East).
+  const topo = Math.min(14, Math.floor(ay - 48))
+  const alto = 120 - topo
+  let s =
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 ${topo} 320 ${alto}" width="300" height="${Math.round((alto * 300) / 320)}">` +
+    `<style>@media (prefers-reduced-motion: no-preference){.anda{animation:anda 1.6s ease-out both}}` +
+    `@keyframes anda{from{stroke-dashoffset:100}}text{font-family:Inter,-apple-system,sans-serif}</style>` +
+    `<rect x="0" y="${topo}" width="320" height="${alto}" fill="${PAPEL}"/>`
+  s += monte(290, 22, 40, `fill="${TRACO}" fill-opacity=".35"`)
+  picos.forEach(([x, y], i) => {
+    s += monte(x, y, 52 + i * 3, `fill="#FFFFFF" stroke="${TRACO}" stroke-width="1.2"`)
+  })
+  s += `<path d="${tudo}" fill="none" stroke="${TRACO}" stroke-width="1.8" stroke-dasharray="4 4"/>`
+  s += `<path d="${feito}" pathLength="100" stroke-dasharray="100" fill="none" stroke="${TINTA}" stroke-width="2.6" stroke-linecap="round"${anima ? ' class="anda"' : ''}/>`
+  s += `<rect x="9" y="99" width="10" height="10" fill="${TINTA}"/>`
+  picos.forEach(([x, y, nome], i) => {
+    s += marcoFeito[i]
+      ? `<circle cx="${x}" cy="${y}" r="4" fill="${TINTA}"/>`
+      : `<circle cx="${x}" cy="${y}" r="3.5" fill="#FFFFFF" stroke="${TRACO}" stroke-width="1.4"/>`
+    s += `<text x="${x}" y="100" text-anchor="middle" font-size="9" fill="${CINZA}">${nome}</text>`
+  })
+  s += `<text x="290" y="100" text-anchor="middle" font-size="9" fill="${CINZA}" fill-opacity=".7">Everest</text>`
+  // A bola laranja, o boneco caminhando acima dela e o "você está aqui" acima do boneco: fora das montanhas.
+  const x = ax.toFixed(1)
+  s += `<circle cx="${x}" cy="${ay.toFixed(1)}" r="5" fill="${SINAL}"/>`
+  // O montanhista em silhueta (mochila e bastão), com os pés logo acima da bola.
+  s +=
+    `<g transform="translate(${(ax - 9.5).toFixed(1)} ${(ay - 32).toFixed(1)}) scale(.95)" fill="${ROCHA}" stroke="${ROCHA}" stroke-linecap="round" stroke-linejoin="round">` +
+    `<circle cx="10" cy="3.4" r="3.1" stroke="none"/><rect x="3.6" y="7.6" width="5.4" height="8.4" rx="1.8" stroke="none" opacity=".75"/>` +
+    `<path d="M8.2 7.4 L12.6 7.6 L12 16.4 L8.4 16.4 Z" stroke-width="1"/><path d="M12.2 9 L15.6 12.6" fill="none" stroke-width="2"/>` +
+    `<path d="M16.6 6 L17.6 27.5" fill="none" stroke-width="1.3"/><path d="M9.4 16 L7.4 21.6 L5.2 27.4" fill="none" stroke-width="2.4"/>` +
+    `<path d="M11.4 16 L13.2 21.4 L15 27.4" fill="none" stroke-width="2.4"/></g>`
+  s += `<text x="${x}" y="${(ay - 37).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="600" fill="${ROCHA}">você está aqui</text>`
+  s += `<text x="4" y="117" font-size="9" fill="${CINZA}">início</text><text x="290" y="117" text-anchor="middle" font-size="9" fill="${CINZA}">fim</text>`
+  return s + '</svg>'
+}
+
+// A legenda de cada marco: o resultado antes do nome da montanha (o nome sozinho não diz nada a quem usa).
+const MARCOS_LEGENDA: { chave: 'mera' | 'island' | 'lobuche'; nome: string; resultado: string; explica: string }[] = [
+  { chave: 'mera', nome: 'Mera', resultado: 'o 1º workflow completo', explica: 'Mera: o primeiro workflow que sai pronto com um pedido só seu, aprovado.' },
+  { chave: 'island', nome: 'Island', resultado: 'a frente inteira', explica: 'Island: todos os workflows da frente da Mera completos, no mínimo 2.' },
+  { chave: 'lobuche', nome: 'Lobuche East', resultado: 'a 2ª frente', explica: 'Lobuche East: um workflow completo numa segunda frente.' },
+]
+
 // O fecho de um marco, só com fatos (sem confete): o workflow, desde quando, e o antes e a última vez, se houver.
 function fechoDoMarco(nome: string, w: Workflow | undefined, data: string | null): string {
   const base = `${nome}: ${w?.nome ?? 'o workflow'} sai pronto com um pedido seu${data ? `, desde ${data}` : ''}.`
@@ -1213,6 +1291,22 @@ async function copiar($: EngineInterface, texto: string, surface?: RenderSurface
   return copiado
 }
 
+// O texto do pedido 1 (0.3.2): a caixa da abertura do roteiro, sem as marcas de citação. O botão do painel copia este texto.
+async function copiarPedido1($: EngineInterface, surface: RenderSurface) {
+  const roteiro = await lerTexto($, `${$.plugin.root}/skills/montagem-do-base-camp/roteiro.md`)
+  const caixa = /```text\n([\s\S]*?)\n>?\s*```/.exec(roteiro)?.[1] ?? ''
+  const texto = caixa
+    .split('\n')
+    .map(l => l.replace(/^>\s?/, ''))
+    .join('\n')
+    .trim()
+  if (texto && (await copiar($, texto, surface))) {
+    $.ui.toast('Pedido 1 copiado. Cole na IA que você mais usa e traga a resposta para cá.', { timeoutMs: 7000 })
+    return
+  }
+  $.ui.toast('Não deu para copiar daqui: use o botão de copiar da caixa na conversa.', { timeoutMs: 8000 })
+}
+
 async function copiarResumo($: EngineInterface, surface: RenderSurface) {
   const dir = await read($, pasta)
   const texto = (await lerTexto($, `${dir}/resumo-para-o-arthur.md`)).replace(/<!--[\s\S]*?-->/g, '').trim()
@@ -1519,9 +1613,9 @@ export const register: Register = on => {
   // A dica fixa embaixo da caixa de texto, durante a montagem.
   on('ui.render', { component: 'PromptHint' }, async ($, e, next) => {
     if (e.props.isWorking || !(await emMontagem($))) return next(e)
-    const windows = (await $.env.get('OS')) === 'Windows_NT'
-    const dica = `Responda por voz: ${windows ? 'Windows + H' : 'tecla do microfone ou fn duas vezes'} · Travou? escreva travei`
-    if (e.surface === 'terminal') return next({ ...e, props: { ...e.props, tail: dica } })
+    // A voz é o microfone do próprio Claude, igual no Mac e no Windows (0.3.2); no terminal não há microfone.
+    if (e.surface === 'terminal') return next({ ...e, props: { ...e.props, tail: 'Travou? escreva travei' } })
+    const dica = 'Responda pelo microfone do Claude · Travou? escreva travei'
     return next({ ...e, props: { ...e.props, hint: e.props.hint ? `${e.props.hint} · ${dica}` : dica } })
   })
 
@@ -1726,6 +1820,7 @@ export const register: Register = on => {
       const abertos = await read($, passosAbertos)
       const aComecarAberto = await read($, filaAberta)
       const marcos = calcularMarcos(dado.workflows, dado.fila)
+      const marcoAbertoAgora = await read($, marcoAberto)
       const falhou = await read($, diarioFalhou)
       const zonaDoBaseCamp = aberto === 'resumo' || aberto === 'guia'
       // Um quadrado por passo, na cor da Situação: o sistema faz (cheio, em tinta), fica com ela (contorno),
@@ -1762,10 +1857,33 @@ export const register: Register = on => {
           </Box>
         ) : null
       const contagem = (w: Workflow) => (w.passos > 0 ? `${w.passosSistema} de ${w.passos}` : null)
-      const rodarNova = (nome: string, pedidoDele: string | null, k: string) =>
+      const rodarNova = (nome: string, pedidoDele: string | null, k: string, rotulo = 'Rodar em conversa nova') =>
         pendente ? null : (
-          <Button key={`nova-${k}`} label="Rodar em conversa nova" onPress={() => void abrirNova($, nome, pedidoDele)} />
+          <Button key={`nova-${k}`} label={rotulo} onPress={() => void abrirNova($, nome, pedidoDele)} />
         )
+      // A frente do workflow, pequena e em cinza ao lado do nome (0.3.2, pedido do Arthur: "sem poluir").
+      const nomeDaFrente = (w: Workflow) => (w.frente ? maiuscula(w.frente.replace(/[-_]/g, ' ')) : null)
+      const estadoCurto = (w: Workflow) => (w.estado === 'completo' ? 'completo ✓' : w.estado)
+      // A trilha da skill (0.3.2): um círculo por rodada aprovada sem correção (um pedido só, "sim"), até 2, e a
+      // caixa da skill, que acende quando o cartão já usa uma skill. Regra de 04/11: 2 rodadas sem correção.
+      const SEM_CORRECAO = 2
+      const trilhaSkill = (w: Workflow, k: string, agora = false) => {
+        const feitas = w.skill
+          ? SEM_CORRECAO
+          : Math.min(SEM_CORRECAO, w.rodadas.filter(r => r.aprovada === 'sim' && r.pedidos === 1).length)
+        return (
+          <Box key={`skill-${k}`} flexDirection="row" gap={1}>
+            {Array.from({ length: SEM_CORRECAO }, (_, i) => (
+              <Text key={`${k}-r${i}`} color={i < feitas ? TINTA : TRACO}>
+                {i < feitas ? '●' : '○'}
+              </Text>
+            ))}
+            <Text color={w.skill ? TINTA : CINZA} bold={w.skill} size="caption">
+              {w.skill ? '⚙ skill pronta' : agora ? '⚙ próximo: skill' : '⚙ skill'}
+            </Text>
+          </Box>
+        )
+      }
 
       // O cartão Agora.
       const etiquetaAgora = aguardaAprovacao ? 'AGORA · ESPERANDO VOCÊ NO CHAT' : 'AGORA'
@@ -1781,7 +1899,7 @@ export const register: Register = on => {
             : null
       // O próximo ponto de controle, um só (0.3.0): a lista dos três saiu.
       const proximo =
-        daVez && estado === 'completo' ? (!daVez.skill ? 'Próximo: virar habilidade' : !daVez.sozinho ? 'Próximo: chegar sozinho' : null) : null
+        daVez && estado === 'completo' && daVez.skill && !daVez.sozinho ? 'Próximo: chegar sozinho' : null
       // A última ação, curta: só o nome do arquivo, nunca o caminho.
       const ultimaCurta = acao ? (
         <Text color={CINZA} size="caption">
@@ -1802,21 +1920,34 @@ export const register: Register = on => {
         ...nuncaRodaram.map(w => ({ nome: w.nome, pedido: w.pedido })),
         ...dado.fila.map(f => ({ nome: maiuscula(f.nome), pedido: f.pedido })),
       ]
+      // Cada workflow num cartão com moldura, em 2 linhas (0.3.2): o nome, a frente, o estado e os botões; embaixo,
+      // os quadrados dos passos e, à direita, a trilha da skill. O Agora segue o único em tinta, com o botão primário.
       const linhaDoWorkflow = (w: Workflow, i: number) => {
         const k = `wf-${i}`
         const nomeDoArquivo = w.arquivo.split('/').pop()?.replace(/\.md$/, '').replace(/-/g, ' ') ?? w.arquivo
+        const frente = nomeDaFrente(w)
         return (
-          <Box key={k} flexDirection="column">
-            <Box flexDirection="row" flexWrap="wrap" gap={1}>
-              {fileira(w, `${k}-quadros`)}
-              <Text color={w.ilegivel ? SINAL : ROCHA}>
-                {w.ilegivel
-                  ? `${maiuscula(nomeDoArquivo)} · precisa de ajuste`
-                  : [w.nome + (w.estado === 'completo' ? ' ✓' : ''), contagem(w)].filter(Boolean).join(' · ')}
-              </Text>
-              {verPassos(w, k)}
-              {rodarNova(w.ilegivel ? maiuscula(nomeDoArquivo) : w.nome, w.pedido, k)}
+          <Box key={k} flexDirection="column" borderStyle="round" borderColor={TRACO} paddingX={1}>
+            <Box flexDirection="row" flexWrap="wrap" justifyContent="space-between" gap={1}>
+              <Box flexDirection="row" flexWrap="wrap" gap={1}>
+                <Text bold color={w.ilegivel ? SINAL : ROCHA}>{w.ilegivel ? `${maiuscula(nomeDoArquivo)} · precisa de ajuste` : w.nome}</Text>
+                {frente && <Text color={CINZA} size="caption">· {frente}</Text>}
+                {!w.ilegivel && <Text color={w.estado === 'completo' ? TINTA : CINZA} size="caption">{estadoCurto(w)}</Text>}
+              </Box>
+              <Box flexDirection="row" gap={1}>
+                {rodarNova(w.ilegivel ? maiuscula(nomeDoArquivo) : w.nome, w.pedido, k, 'Rodar')}
+                {verPassos(w, k)}
+              </Box>
             </Box>
+            {!w.ilegivel && (
+              <Box flexDirection="row" flexWrap="wrap" justifyContent="space-between" gap={1}>
+                <Box flexDirection="row" gap={1}>
+                  {fileira(w, `${k}-quadros`)}
+                  {contagem(w) && <Text color={CINZA} size="caption">o sistema faz {contagem(w)}</Text>}
+                </Box>
+                {trilhaSkill(w, k)}
+              </Box>
+            )}
             {listaDePassos(w, k)}
           </Box>
         )
@@ -1827,12 +1958,18 @@ export const register: Register = on => {
           {cabecalho}
           <Box flexDirection="column" borderStyle="round" borderColor={TINTA} padding={1}>
             <Text color={TINTA} size="caption">{etiquetaAgora}</Text>
-            <Text bold color={TINTA}>{nomeDaVez + (estado === 'completo' ? ' ✓' : '')}</Text>
+            <Box flexDirection="row" flexWrap="wrap" gap={1}>
+              <Text bold color={TINTA}>{nomeDaVez + (estado === 'completo' ? ' ✓' : '')}</Text>
+              {daVez && nomeDaFrente(daVez) && <Text color={CINZA} size="caption">· {nomeDaFrente(daVez)}</Text>}
+            </Box>
             {daVez && daVez.passos > 0 && (
-              <Box flexDirection="row" flexWrap="wrap" gap={1}>
-                {fileira(daVez, 'agora-quadros')}
-                <Text color={ROCHA}>{`o sistema faz ${daVez.passosSistema} de ${daVez.passos} passos`}</Text>
-                {verPassos(daVez, 'agora')}
+              <Box flexDirection="row" flexWrap="wrap" justifyContent="space-between" gap={1}>
+                <Box flexDirection="row" flexWrap="wrap" gap={1}>
+                  {fileira(daVez, 'agora-quadros')}
+                  <Text color={ROCHA}>{`o sistema faz ${daVez.passosSistema} de ${daVez.passos} passos`}</Text>
+                  {verPassos(daVez, 'agora')}
+                </Box>
+                {trilhaSkill(daVez, 'agora', true)}
               </Box>
             )}
             {daVez && listaDePassos(daVez, 'agora')}
@@ -1861,7 +1998,24 @@ export const register: Register = on => {
             </Box>
           )}
           <Box flexDirection="column">
-            <Text color={ROCHA}>{linhaDosMarcos(marcos)}</Text>
+            {/* A subida desenhada no lugar da linha dos marcos (0.3.2); no terminal, que não desenha, a linha. */}
+            <Text color={CINZA} size="caption">A SUBIDA</Text>
+            {figura(subidaSvg(marcos, Boolean(fest)), 'A subida: o Base Camp, a Mera, a Island, a Lobuche East e o Everest, com você no caminho', 300, Boolean(fest)) ?? (
+              <Text color={ROCHA}>{linhaDosMarcos(marcos)}</Text>
+            )}
+            <Box flexDirection="row" flexWrap="wrap" gap={1}>
+              {MARCOS_LEGENDA.map(l => {
+                const marco = marcos[l.chave]
+                const extra = l.chave === 'island' && !marco.fechado && marcos.mera.fechado ? `: ${marcos.island.feitos} de ${marcos.island.total}` : ''
+                return (
+                  <Box key={`marco-${l.chave}`} flexDirection="row" gap={1}>
+                    <Text color={ROCHA} size="caption">{`${l.nome} · ${l.resultado}${extra}${marco.fechado ? ' ✓' : ''}`}</Text>
+                    <Button key={`i-${l.chave}`} dimColor label="i" onPress={() => void update($, marcoAberto, a => (a === l.chave ? null : l.chave))} />
+                  </Box>
+                )
+              })}
+            </Box>
+            {marcoAbertoAgora && <Text color={ROCHA} size="caption">{MARCOS_LEGENDA.find(l => l.chave === marcoAbertoAgora)?.explica}</Text>}
             {falhou && <Text color={SINAL} size="caption">O diário não está gravando. Escreva travei.</Text>}
             <Box flexDirection="row" flexWrap="wrap" gap={1}>
               <Text color={CINZA} size="caption">{dado.tempoTotal ? `Base Camp montado em ${dado.tempoTotal}` : 'Base Camp montado'}</Text>
@@ -1905,7 +2059,9 @@ export const register: Register = on => {
     const testeFalhou = dado.campos.some(c => c.estado === 'falhou')
     // No curto, o retrato montado pede o confirmo e a tarefa feita pede o "ficou bom": o botão principal
     // aparece nesses dois momentos mesmo sem a frase de aprovação, e manda o "pode, aprovado" de sempre.
-    const retratoMontado = curto && atualBloco?.codigo === '1' && dado.campos.length > 0 && sabidos === dado.campos.length
+    // O botão aparece quando o retrato está na tela (o resumo existe), falte ou não um campo (0.3.2: no teste de 05/11 ele
+    // sumia por um campo faltando, e a pessoa escreveu "continuar" duas vezes).
+    const retratoMontado = curto && atualBloco?.codigo === '1' && Boolean(dado.resumo && dado.resumo.cartoes.length > 0)
     const tarefaFeita = curto && ehEntrega && dado.feita
     const materialChegou = ehComeco && dado.campos.some(c => c.codigo === 'D.2' && c.estado === 'ok')
     // Os botões dizem o resultado, não a ação (0.2.16); as frases que eles mandam não mudam.
@@ -1918,6 +2074,16 @@ export const register: Register = on => {
         // Na escolha do workflow, os botões das opções são o caminho: sem um Continuar azul ao lado do recomendado.
         <Button key="continuar" variant="primary" label={rotuloContinuar} onPress={() => void enviar($, 'continuar')} />
       ) : null
+    // O começo (0.3.2): o primário é copiar o pedido 1 até ele chegar; com o pedido 2, "Montar o meu retrato".
+    const pedido1Chegou = dado.campos.some(c => c.codigo === 'D.1' && c.estado === 'ok')
+    const comecoCurto = ehComeco && curto
+    const principalDoComeco = !comecoCurto
+      ? principal
+      : materialChegou
+        ? principal
+        : !pedido1Chegou
+          ? <Button key="copiar-pedido-1" variant="primary" label="Copiar o pedido 1" onPress={press => void copiarPedido1($, press.surface)} />
+          : null
     const etiquetaCampos = ehEntrega ? 'O QUE ESTE PASSO ENTREGA' : ehComeco ? 'O SEU COMEÇO' : curto ? 'O QUE JÁ ESTÁ MONTADO' : 'O QUE ESTA ETAPA JÁ TEM'
 
     return (
@@ -1940,7 +2106,27 @@ export const register: Register = on => {
           ) : (
             <Text bold color={ROCHA}>{perguntaDaVez ? `Sua vez: ${perguntaDaVez}` : 'Sua vez: responda na conversa.'}</Text>
           )}
-          {atualBloco && PARA_QUE[atualBloco.codigo] && !aprov && <Text color={CINZA} size="caption">{PARA_QUE[atualBloco.codigo]}</Text>}
+          {atualBloco && PARA_QUE[atualBloco.codigo] && !aprov && !comecoCurto && <Text color={CINZA} size="caption">{PARA_QUE[atualBloco.codigo]}</Text>}
+          {comecoCurto && (
+            // O mapa dos 3 passos e os 2 pedidos com o estado (0.3.2): o caminho desenhado, no lugar da explicação na conversa.
+            <Box flexDirection="column">
+              <Box flexDirection="row" flexWrap="wrap" gap={1}>
+                {['1 · Você manda', '2 · Você confirma o retrato', '3 · O primeiro workflow roda'].map((p, i) => (
+                  <Box key={`mapa-${i}`} flexDirection="row" gap={1}>
+                    <Box borderStyle="round" borderColor={i === 0 ? TINTA : TRACO} paddingX={1}>
+                      <Text bold={i === 0} color={i === 0 ? ROCHA : CINZA} size="caption">{i === 0 ? `● ${p}` : p}</Text>
+                    </Box>
+                    {i < 2 && <Text color={TRACO}>→</Text>}
+                  </Box>
+                ))}
+              </Box>
+              <Text color={pedido1Chegou ? TINTA : ROCHA}>{pedido1Chegou ? '✓' : '○'} Pedido 1 · a outra IA{pedido1Chegou ? ' · recebido' : ''}</Text>
+              <Text color={materialChegou ? TINTA : ROCHA}>
+                {materialChegou ? '✓' : '○'} Pedido 2 · você, por voz{materialChegou ? ' · recebido' : ''}
+              </Text>
+              {!materialChegou && <Text color={CINZA} size="caption">Fale pelo microfone do Claude, na caixa de mensagem.</Text>}
+            </Box>
+          )}
           {escolhaDoWorkflow && (
             <Box flexDirection="column" gap={1}>
               <Text color={CINZA} size="caption">O SEU PRIMEIRO WORKFLOW · ESCOLHA UM (O PRIMEIRO É O RECOMENDADO)</Text>
@@ -1960,7 +2146,10 @@ export const register: Register = on => {
             </Box>
           )}
           <Box flexDirection="row" flexWrap="wrap" gap={1}>
-            {!ocupado && !pendente && principal}
+            {!ocupado && !pendente && principalDoComeco}
+            {comecoCurto && !pedido1Chegou && !materialChegou && !ocupado && !pendente && (
+              <Button key="sem-outra-ia" label="Não uso outra IA" onPress={() => void enviar($, 'não uso outra IA')} />
+            )}
             {corrigirBotao}
             {!ocupado && !pendente && <Button key="travei" label="Travei" onPress={() => void enviar($, 'travei')} />}
             {lembrete && !pendente && (
@@ -1975,9 +2164,9 @@ export const register: Register = on => {
           {lembrete && <Text color={SINAL}>Parado há 4 min? Pode ser o app.</Text>}
           {ultima}
         </Box>
-        {(dado.campos.length > 0 || (dado.resumo && dado.resumo.cartoes.length > 0)) && (
+        {((dado.campos.length > 0 && !comecoCurto) || (dado.resumo && dado.resumo.cartoes.length > 0)) && (
           <Box flexDirection="column" gap={1}>
-            {dado.campos.length > 0 &&
+            {dado.campos.length > 0 && !comecoCurto &&
               (sabidos === dado.campos.length ? (
                 <Text color={TINTA}>
                   ✓ {ehEntrega ? 'Tudo o que este passo entrega já está pronto.' : ehComeco ? 'O começo está completo.' : curto ? 'O retrato está montado: é só confirmar.' : 'Tudo o que esta etapa precisa já está anotado.'}
