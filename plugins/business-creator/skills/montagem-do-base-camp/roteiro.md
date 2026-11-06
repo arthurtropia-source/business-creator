@@ -122,7 +122,7 @@
 2.2 [leve] **Ao clique ("primeiro workflow: <pedido>") ou ao nome, antes de qualquer resposta, grave a escolha em todos os lugares** (a última escolha dela manda; se ela pedir um workflow fora da lista, é esse):
 - o cartão do workflow, pelo modelo `workflow.md`, **com as linhas Pedido e Combinado preenchidas**: o começo, a entrega e os passos como ela contou (quem faz: ela, como é hoje); o "antes" só se ela disse o tempo (marcado "pela fala dela" ou "pela outra IA"); se não disse, "não medido" (decisão do Arthur, 05/11/2026: não perguntar quanto tempo as tarefas levam); o que não veio fica "a completar nas rodadas";
 - a linha `- **Primeiro workflow:** \`<caminho do cartão>\`` no `base-camp.md`, logo abaixo da linha **Montagem:** (é assim que o painel e o Campo 1 o encontram), e, na seção "O primeiro workflow", a linha **Escolhido:** (sem traço): `**Escolhido:** <pedido> · em <data hora>`;
-- a tabela "Workflows" da ficha da frente (no leve, do `AGENTS.md`): o escolhido como o primeiro, "incompleto: rodada 1 em andamento"; as outras duas opções como os próximos, "na fila: só abre quando o primeiro estiver completo";
+- a tabela "Workflows" da ficha da frente (no leve, do `AGENTS.md`): o escolhido como o primeiro, "incompleto: rodada 1 em andamento"; as outras duas opções como os próximos (também em "Os próximos" do cartão, com "O que faz": a entrega da opção, em uma frase);
 - no `AGENTS.md` da raiz, a linha do primeiro workflow com o caminho do cartão.
 
 **Em seguida, na mesma resposta, a rodada 1.** O sistema roda o workflow pelo cartão, passo a passo, com o que já está na pasta e na conversa:

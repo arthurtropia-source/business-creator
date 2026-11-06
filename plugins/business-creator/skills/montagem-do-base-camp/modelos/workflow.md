@@ -45,6 +45,6 @@ Tire estes comentários e as instruções entre <>.
 | <PROC.antes, ou "não medido"> | <quantas> | <o tempo vezes as vezes> | <data> | medido hoje / lembrança da última vez / estimativa, pela fala dela / pela outra IA |
 
 ## Os próximos (para depois deste)
-| Workflow | Pedido | A primeira entrega |
-|---|---|---|
-| <as outras duas opções do passo 2, e o que ficou na fila por depender de sistema ou de dado de terceiro> | | |
+| Workflow | Pedido | O que faz | O que trava |
+|---|---|---|---|
+| <as outras duas opções do passo 2, e o que ficou na fila por depender de sistema ou de dado de terceiro> | <as 2 a 5 palavras> | <a proposta em uma frase: o que entrega, para quem e quando; ex.: "Todo dia, um e-mail com o preço da sua loja cruzado com o das lojas da concorrência."> | <vazio, ou o que impede de rodar hoje: "depende do BI"> |

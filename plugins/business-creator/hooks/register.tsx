@@ -73,6 +73,10 @@ const PAPEL = '#F5F1E8'
 const CINZA = '#6B675E'
 const SINAL = '#FF6F1A'
 const TRACO = '#B8B2A3'
+// O branco do card sobre o papel do painel e o fundo das etiquetas (0.3.5: o painel igual ao desenho aprovado).
+const BRANCO = '#FFFFFF'
+const ETIQUETA = '#ECE8DE'
+const ETIQUETA_TINTA = '#E3E6F2'
 
 // A marca de quem entrega (decisões dele, 26/10/2026): a Business Creator powered
 // by SEM IA™, nos dois níveis, já antes de a comunidade abrir, para construir a
@@ -425,21 +429,39 @@ function lerCartao(texto: string): Detalhe {
   }
   const passos = quadros.length
   const passosSistema = quadros.filter(q => q === 'sistema').length
-  // A tabela "Os próximos": o nome (coluna Workflow) e o pedido, sem as linhas de modelo.
+  // A tabela "Os próximos": o nome (coluna Workflow), o pedido e, pelo cabeçalho, "O que faz", "O que trava" e "A primeira
+  // entrega" (0.3.5; no cartão de antes, a terceira coluna é a primeira entrega ou o que trava).
   const proximos: NaFila[] = []
+  let colunas: string[] = []
   for (const l of secao(texto, 'Os próximos').split('\n')) {
     const t = l.trim()
     if (!t.startsWith('|') || /^\|\s*:?-+/.test(t)) continue
-    const [nome = '', pedidoDaFila = '', entregaDaFila = ''] = celulas(t).map(c => c.replace(/\*\*/g, '').trim())
-    if (!nome || nome.startsWith('<') || /^workflow$/i.test(nome)) continue
+    const cel = celulas(t).map(c => c.replace(/\*\*/g, '').trim())
+    if (/^workflow$/i.test(cel[0] ?? '')) {
+      colunas = cel.map(c => c.toLowerCase())
+      continue
+    }
+    const [nome = '', pedidoDaFila = ''] = cel
+    if (!nome || nome.startsWith('<')) continue
+    const coluna = (titulo: RegExp) => {
+      const i = colunas.findIndex(c => titulo.test(c))
+      const v = i >= 0 ? (cel[i] ?? '') : ''
+      return v && !v.startsWith('<') ? v : null
+    }
+    const faz = coluna(/^o que faz/)
+    const trava = coluna(/^o que trava/)
+    const entrega = coluna(/primeira entrega/) ?? (colunas.length === 0 && cel[2] && !cel[2].startsWith('<') ? cel[2] : null)
     // A frente dita no nome ("Fechar o dia (frente Life Plan)", "Validação da lâmina (Feira Nova)") vale para a linha (0.3.2):
     // sem ela, a linha é da frente do cartão. O nome fica sem os parênteses.
     const dita = /\s*\((?:frente\s+)?([^()]+)\)\s*$/i.exec(nome)
+    const ehTrava = (v: string | null) => Boolean(v && /^(depende|só |so |falta)/i.test(v))
     proximos.push({
       nome: dita ? nome.slice(0, dita.index).trim() : nome,
       pedido: pedidoDaFila && !pedidoDaFila.startsWith('<') ? pedidoDaFila.replace(/^["“”'`]+|["“”'`]+$/g, '') : null,
       ...(dita ? { frente: dita[1]?.trim() ?? null } : {}),
-      entrega: entregaDaFila && !entregaDaFila.startsWith('<') ? entregaDaFila : null,
+      entrega: ehTrava(entrega) ? null : entrega,
+      faz,
+      trava: trava ?? (ehTrava(entrega) ? entrega : null),
     })
   }
   // A tabela "As rodadas": uma linha por rodada, fora o cabeçalho, o separador e as linhas de modelo.
@@ -1877,29 +1899,37 @@ export const register: Register = on => {
       const nomeDaFrente = (w: { frente?: string | null }) =>
         w.frente ? maiuscula(w.frente.replace(/[-_]/g, ' ').replace(/[.;:,\s]+$/, '').trim()) : null
       const estadoCurto = (w: Workflow) => (w.estado === 'completo' ? 'completo ✓' : w.estado)
-      // A trilha da skill (0.3.2): um círculo por rodada aprovada sem correção (um pedido só, "sim"), até 2, e a
-      // caixa da skill, que acende quando o cartão já usa uma skill. Regra de 04/11: 2 rodadas sem correção.
+      // A etiqueta: o texto pequeno sobre um fundo claro (0.3.5).
+      const etiqueta = (texto: string, k: string, tinta = false) => (
+        <Text key={k} color={tinta ? TINTA : CINZA} backgroundColor={tinta ? ETIQUETA_TINTA : ETIQUETA} size="caption">{` ${texto} `}</Text>
+      )
+      // A trilha da skill (0.3.2; o desenho de 0.3.5): um círculo numerado por rodada aprovada sem correção (um pedido só,
+      // "sim"), cheio em tinta quando conta, e a caixa da skill. Regra de 04/11: 2 rodadas sem correção.
       const SEM_CORRECAO = 2
+      const CHEIO = ['❶', '❷']
+      const VAZIO = ['①', '②']
       const trilhaSkill = (w: Workflow, k: string, agora = false) => {
         const feitas = w.skill
           ? SEM_CORRECAO
           : Math.min(SEM_CORRECAO, w.rodadas.filter(r => r.aprovada === 'sim' && r.pedidos === 1).length)
         return (
-          <Box key={`skill-${k}`} flexDirection="row" gap={1}>
+          <Box key={`skill-${k}`} flexDirection="row" alignItems="center" gap={1}>
             {Array.from({ length: SEM_CORRECAO }, (_, i) => (
               <Text key={`${k}-r${i}`} color={i < feitas ? TINTA : TRACO}>
-                {i < feitas ? '●' : '○'}
+                {`${i < feitas ? CHEIO[i] : VAZIO[i]} ─`}
               </Text>
             ))}
-            <Text color={w.skill ? TINTA : CINZA} bold={w.skill} size="caption">
-              {w.skill ? '⚙ skill pronta' : agora ? '⚙ próximo: skill' : '⚙ skill'}
-            </Text>
+            <Box key={`${k}-caixa`} borderStyle="round" borderColor={w.skill ? TINTA : TRACO} paddingX={1}>
+              <Text color={w.skill ? TINTA : CINZA} weight={w.skill ? 'semibold' : 'regular'} size="caption">
+                {w.skill ? '⚙ skill pronta' : agora ? '⚙ próximo: skill' : '⚙ skill'}
+              </Text>
+            </Box>
           </Box>
         )
       }
 
       // O cartão Agora.
-      const etiquetaAgora = aguardaAprovacao ? 'AGORA · ESPERANDO VOCÊ NO CHAT' : 'AGORA'
+      const etiquetaAgora = aguardaAprovacao ? 'AGORA · ESPERANDO VOCÊ NO CHAT' : 'AGORA · O SEU WORKFLOW PRINCIPAL'
       const nomeDaVez = daVez?.nome ?? dado.workflowNome ?? (pedido ? maiuscula(pedido) : 'O seu primeiro workflow')
       const linhaDaVez = aguardaAprovacao
         ? /^em andamento/i.test(rodadas[rodadas.length - 1]?.tempo ?? '')
@@ -1929,9 +1959,16 @@ export const register: Register = on => {
       const outros = dado.workflows.filter(w => w !== daVez)
       const jaRodaram = outros.filter(w => w.rodadas.length > 0 || w.ilegivel)
       const nuncaRodaram = outros.filter(w => w.rodadas.length === 0 && !w.ilegivel)
-      const aComecar: { nome: string; pedido: string | null; frente: string | null; entrega: string | null }[] = [
-        ...nuncaRodaram.map(w => ({ nome: w.nome, pedido: w.pedido, frente: w.frente, entrega: w.processo })),
-        ...dado.fila.map(f => ({ nome: maiuscula(f.nome), pedido: f.pedido, frente: f.frente ?? null, entrega: f.entrega ?? null })),
+      const aComecar: { nome: string; pedido: string | null; frente: string | null; faz: string | null; trava: string | null }[] = [
+        ...nuncaRodaram.map(w => ({ nome: w.nome, pedido: w.pedido, frente: w.frente, faz: w.processo, trava: null })),
+        ...dado.fila.map(f => ({
+          nome: maiuscula(f.nome),
+          pedido: f.pedido,
+          frente: f.frente ?? null,
+          // A proposta: o "O que faz"; num cartão de antes, a primeira entrega, que é o mais perto dela.
+          faz: f.faz ?? (f.entrega ? `A primeira entrega: ${f.entrega}.` : null),
+          trava: f.trava ?? null,
+        })),
       ]
       const descricaoAberta = await read($, filaDescricao)
       // Cada workflow num cartão com moldura, em 2 linhas (0.3.2): o nome, a frente, o estado e os botões; embaixo,
@@ -1941,14 +1978,14 @@ export const register: Register = on => {
         const nomeDoArquivo = w.arquivo.split('/').pop()?.replace(/\.md$/, '').replace(/-/g, ' ') ?? w.arquivo
         const frente = nomeDaFrente(w)
         return (
-          <Box key={k} flexDirection="column" borderStyle="round" borderColor={TRACO} paddingX={1}>
-            <Box flexDirection="row" flexWrap="wrap" justifyContent="space-between" gap={1}>
-              <Box flexDirection="row" flexWrap="wrap" gap={1}>
-                <Text bold color={w.ilegivel ? SINAL : ROCHA}>{w.ilegivel ? `${maiuscula(nomeDoArquivo)} · precisa de ajuste` : w.nome}</Text>
+          <Box key={k} flexDirection="column" borderStyle="round" borderColor={TRACO} backgroundColor={BRANCO} paddingX={1}>
+            <Box flexDirection="row" justifyContent="space-between" alignItems="center" gap={1}>
+              <Box flexDirection="row" flexWrap="wrap" alignItems="center" flexShrink={1} gap={1}>
+                <Text weight="bold" color={w.ilegivel ? SINAL : ROCHA}>{w.ilegivel ? `${maiuscula(nomeDoArquivo)} · precisa de ajuste` : w.nome}</Text>
                 {frente && <Text color={CINZA} size="caption">· {frente}</Text>}
-                {!w.ilegivel && <Text color={w.estado === 'completo' ? TINTA : CINZA} size="caption">{estadoCurto(w)}</Text>}
+                {!w.ilegivel && etiqueta(estadoCurto(w), `${k}-estado`, w.estado === 'completo')}
               </Box>
-              <Box flexDirection="row" gap={1}>
+              <Box flexDirection="row" flexShrink={0} gap={1}>
                 {rodarNova(w.ilegivel ? maiuscula(nomeDoArquivo) : w.nome, w.pedido, k, 'Rodar')}
                 {verPassos(w, k)}
               </Box>
@@ -1970,23 +2007,26 @@ export const register: Register = on => {
       return (
         <Box {...fundo}>
           {cabecalho}
-          <Box flexDirection="column" borderStyle="round" borderColor={TINTA} padding={1}>
+          <Box flexDirection="column" borderStyle="round" borderColor={TINTA} backgroundColor={BRANCO} padding={1}>
             <Text color={TINTA} size="caption">{etiquetaAgora}</Text>
-            <Box flexDirection="row" flexWrap="wrap" gap={1}>
-              <Text bold color={TINTA}>{nomeDaVez + (estado === 'completo' ? ' ✓' : '')}</Text>
-              {daVez && nomeDaFrente(daVez) && <Text color={CINZA} size="caption">· {nomeDaFrente(daVez)}</Text>}
+            <Box flexDirection="row" flexWrap="wrap" justifyContent="space-between" alignItems="center" gap={1}>
+              <Box flexDirection="row" flexWrap="wrap" alignItems="center" gap={1}>
+                <Text weight="bold" color={ROCHA}>{maiuscula(nomeDaVez) + (estado === 'completo' && !daVez ? ' ✓' : '')}</Text>
+                {daVez && nomeDaFrente(daVez) && <Text color={CINZA} size="caption">· {nomeDaFrente(daVez)}</Text>}
+              </Box>
+              {daVez && etiqueta(estadoCurto(daVez), 'agora-estado', estado === 'completo')}
             </Box>
             {daVez && daVez.passos > 0 && (
               <Box flexDirection="row" flexWrap="wrap" justifyContent="space-between" gap={1}>
                 <Box flexDirection="row" flexWrap="wrap" gap={1}>
                   {fileira(daVez, 'agora-quadros')}
-                  <Text color={ROCHA}>{`o sistema faz ${daVez.passosSistema} de ${daVez.passos} passos`}</Text>
+                  <Text color={CINZA} size="caption">{`o sistema faz ${daVez.passosSistema} de ${daVez.passos} passos`}</Text>
                 </Box>
                 {trilhaSkill(daVez, 'agora', true)}
               </Box>
             )}
             {daVez && listaDePassos(daVez, 'agora')}
-            {linhaDaVez && <Text color={ROCHA}>{linhaDaVez}</Text>}
+            {linhaDaVez && <Text color={CINZA} size="caption">{linhaDaVez}</Text>}
             {/* O primário e o "ver os passos" na mesma linha (0.3.2): a linha dos quadrados fica livre para a trilha. */}
             <Box flexDirection="row" flexWrap="wrap" gap={1}>
               {rodarAqui}
@@ -2005,29 +2045,25 @@ export const register: Register = on => {
                   <Button key="fila" label={`A começar: ${aComecar.length}`} onPress={() => void update($, filaAberta, a => !a)} />
                   {aComecarAberto &&
                     aComecar.map((f, i) => (
-                      // Um card de uma linha por workflow a começar (0.3.4, pedido do Arthur): o nome (o toque abre o que ele se
-                      // propõe a fazer), a frente e, à direita, Rodar e Descartar. O que trava ("depende do BI") vira etiqueta.
-                      <Box key={`comecar-${i}`} flexDirection="column" borderStyle="round" borderColor={TRACO} paddingX={1}>
-                        <Box flexDirection="row" justifyContent="space-between" gap={1}>
-                          <Box flexDirection="row" flexWrap="wrap" gap={1}>
-                            <Button key={`desc-${i}`} dimColor label={f.nome} onPress={() => void update($, filaDescricao, a => (a === f.nome ? null : f.nome))} />
+                      // Um card de uma linha por workflow a começar (0.3.4; o desenho de 0.3.5): o nome em negrito, que abre a
+                      // proposta (o que ele faz, não o estado); a frente; o que trava, em etiqueta; à direita, Rodar e Descartar.
+                      <Box key={`comecar-${i}`} flexDirection="column" borderStyle="round" borderColor={TRACO} backgroundColor={BRANCO} paddingX={1}>
+                        <Box flexDirection="row" justifyContent="space-between" alignItems="center" gap={1}>
+                          <Box flexDirection="row" flexWrap="wrap" alignItems="center" flexShrink={1} gap={1}>
+                            <Button key={`desc-${i}`} plain label={f.nome} onPress={() => void update($, filaDescricao, a => (a === f.nome ? null : f.nome))}>
+                              <Text weight="bold" color={ROCHA} underline={descricaoAberta === f.nome}>{f.nome}</Text>
+                            </Button>
                             {nomeDaFrente(f) && <Text color={CINZA} size="caption">· {nomeDaFrente(f)}</Text>}
-                            {f.entrega && /^(depende|só |so )/i.test(f.entrega) && <Text color={CINZA} size="caption">{f.entrega}</Text>}
+                            {f.trava && etiqueta(f.trava, `comecar-${i}-trava`)}
                           </Box>
-                          <Box flexDirection="row" gap={1}>
+                          <Box flexDirection="row" flexShrink={0} gap={1}>
                             {rodarNova(f.nome, f.pedido, `comecar-${i}`, 'Rodar')}
                             {!pendente && <Button key={`descartar-${i}`} dimColor label="Descartar" onPress={() => void enviar($, `descartar o workflow ${f.nome}`)} />}
                           </Box>
                         </Box>
                         {descricaoAberta === f.nome && (
-                          <Text color={ROCHA} size="caption">
-                            {f.entrega && !/^(depende|só |so )/i.test(f.entrega)
-                              ? `Entrega: ${f.entrega}.${f.pedido ? ` O pedido: ${f.pedido}.` : ''}`
-                              : f.entrega
-                                ? `Ainda não roda: ${f.entrega}.${f.pedido ? ` O pedido: ${f.pedido}.` : ''}`
-                                : f.pedido
-                                  ? `O pedido: ${f.pedido}.`
-                                  : 'Ainda sem descrição: o sistema completa na primeira rodada.'}
+                          <Text color={ROCHA} backgroundColor="#FFF1A8" size="caption">
+                            {` ${f.faz ?? 'O sistema escreve o que este workflow faz na próxima conversa.'} `}
                           </Text>
                         )}
                       </Box>

@@ -57,6 +57,9 @@ export type NaFila = {
   frente?: string | null
   // A terceira coluna de "Os próximos" (0.3.4): a primeira entrega, ou o que trava ("depende do BI").
   entrega?: string | null
+  // As colunas "O que faz" (a proposta, em uma frase) e "O que trava" (0.3.5).
+  faz?: string | null
+  trava?: string | null
 }
 
 // Um passo do cartão, para o "ver os passos" (0.3.0): o nome, quem faz e, no "ainda não dá", o motivo.

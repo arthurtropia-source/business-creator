@@ -1,5 +1,8 @@
 import { expect, mock, test } from 'claude-code/testing'
 
+// Negrito pelo peso (0.3.5: weight) ou pelo bold de antes.
+const forte = (e: { props: Record<string, unknown> } | undefined) => e?.props.bold === true || e?.props.weight === 'bold' || e?.props.weight === 'semibold'
+
 // Uma pasta de Base Camp no meio da montagem: o começo e a etapa 1 aprovados, a
 // etapa 2 em andamento. Nada aqui lê o disco: os hooks abaixo fazem as vezes do
 // engine e respondem às leituras de arquivo e às chamadas do mod.
@@ -277,7 +280,7 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     const ui = await $.ui.mount({ ...PANE, surface })
     // Em cima, a marca de quem entrega (a mesma nos dois níveis); logo abaixo, a
     // etapa; o rodapé assina igual. O Base Camp nunca entra no logo.
-    if (surface === 'terminal') expect((await ui.find({ type: 'Text', text: /^BUSINESS CREATOR$/ }))?.props.bold).toBe(true)
+    if (surface === 'terminal') expect(forte(await ui.find({ type: 'Text', text: /^BUSINESS CREATOR$/ }))).toBe(true)
     else expect((await ui.findAll({ type: 'Svg' })).map(s => s.props.alt)).toContain('Business Creator powered by SEM IA™')
     expect(await ui.find({ type: 'Text', text: /^Montagem do Base Camp$/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /^Business Creator powered by SEM IA™ · Um sistema, qualquer IA\.$/ })).toBeDefined()
@@ -408,8 +411,8 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     const ui = await $.ui.mount({ ...PANE, surface })
     // O painel de trabalho cortado (0.3.0): o cartão Agora com o nome, os passos em quadrados com a conta, o
     // combinado e um botão só, Rodar. O título do painel é o sistema dela (sem o nome no resumo, "O seu sistema").
-    expect(await ui.find({ type: 'Text', text: /^AGORA$/ })).toBeDefined()
-    expect((await ui.find({ type: 'Text', text: /^Mensagem de retorno$/ }))?.props.bold).toBe(true)
+    expect(await ui.find({ type: 'Text', text: /^AGORA( · O SEU WORKFLOW PRINCIPAL)?$/ })).toBeDefined()
+    expect(forte(await ui.find({ type: 'Text', text: /^Mensagem de retorno$/ }))).toBe(true)
     expect(await ui.find({ type: 'Text', text: /^o sistema faz 2 de 4 passos$/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /^Combinado: quando chegar um pedido de orçamento, abra esta pasta e escreva mensagem de retorno$/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /^O seu sistema$/ })).toBeDefined()
@@ -462,7 +465,7 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
 
     const ui = await $.ui.mount({ ...PANE, surface })
     // Sem o cartão do workflow: o nome genérico, "ainda não rodou" e o botão de sempre (0.2.17).
-    expect((await ui.find({ type: 'Text', text: /^O seu primeiro workflow$/ }))?.props.bold).toBe(true)
+    expect(forte(await ui.find({ type: 'Text', text: /^O seu primeiro workflow$/ }))).toBe(true)
     expect(await ui.find({ type: 'Text', text: /^Ainda não rodou\.$/ })).toBeDefined()
     expect((await ui.find({ type: 'Button', key: 'rodar-workflow' }))?.props.label).toBe('Rodar o meu primeiro workflow')
     // O resumo, a cópia e o recado do programa ficam dentro do "Ver o resumo" (0.3.0).
@@ -608,10 +611,10 @@ for (const surface of ['desktop', 'terminal'] as const) {
     await $.session.start({ cwd: '/os', surface, isInteractive: true })
 
     const ui = await $.ui.mount({ ...PANE, surface })
-    expect((await ui.find({ type: 'Text', text: /^O sistema de Ana$/ }))?.props.bold).toBe(true)
+    expect(forte(await ui.find({ type: 'Text', text: /^O sistema de Ana$/ }))).toBe(true)
     expect(await ui.find({ type: 'Text', text: /^Montagem do Base Camp$/ })).toBeUndefined()
     expect(await ui.find({ type: 'Text', text: /AGORA · PASSO 3 DE 3 · O PRIMEIRO WORKFLOW/ })).toBeDefined()
-    expect((await ui.find({ type: 'Text', text: /^Sua vez: escolha o seu primeiro workflow\.$/ }))?.props.bold).toBe(true)
+    expect(forte(await ui.find({ type: 'Text', text: /^Sua vez: escolha o seu primeiro workflow\.$/ }))).toBe(true)
     expect(await ui.find({ type: 'Text', text: /Sua vez: responda na conversa/ })).toBeUndefined()
     expect(await ui.find({ type: 'Text', text: /roda a primeira vez e combina a próxima/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /O SEU PRIMEIRO WORKFLOW · ESCOLHA UM \(O PRIMEIRO É O RECOMENDADO\)/ })).toBeDefined()
@@ -696,7 +699,7 @@ test('a pasta de antes da 0.2.17 continua lendo: a tarefa feita, o pedido do "Co
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
   // A rodada em andamento espera por ela no chat: o cartão diz onde está e não tem botão (0.3.0).
   expect(await ui.find({ type: 'Text', text: /^AGORA · ESPERANDO VOCÊ NO CHAT$/ })).toBeDefined()
-  expect((await ui.find({ type: 'Text', text: /^Fechar o dia$/ }))?.props.bold).toBe(true)
+  expect(forte(await ui.find({ type: 'Text', text: /^Fechar o dia$/ }))).toBe(true)
   expect(await ui.find({ type: 'Text', text: /^A rodada está em andamento no chat\.$/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /^o sistema faz 2 de 3 passos$/ })).toBeDefined()
   expect(await ui.find({ type: 'Button', key: 'rodar-workflow' })).toBeUndefined()
@@ -713,7 +716,7 @@ test('a pasta de antes da 0.2.17 continua lendo: a tarefa feita, o pedido do "Co
   await $.turn.start({ text: 'pode, aprovado', turnId: 't1' })
   await $.turn.complete({ answer: 'Aprovado.', durationMs: 1000, isAborted: false, turnId: 't1', reason: 'answer' })
   const depois = await $.ui.mount({ ...PANE, surface: 'desktop' })
-  expect(await depois.find({ type: 'Text', text: /^AGORA$/ })).toBeDefined()
+  expect(await depois.find({ type: 'Text', text: /^AGORA( · O SEU WORKFLOW PRINCIPAL)?$/ })).toBeDefined()
   expect(await depois.find({ type: 'Text', text: /^Combinado: .*monitor de preço de ontem/ })).toBeDefined()
   expect((await depois.find({ type: 'Button', key: 'rodar-workflow' }))?.props.label).toBe('Rodar fechar o dia')
   await depois.press({ key: 'rodar-workflow' })
@@ -759,7 +762,9 @@ test('o workflow completo no cartão: o ✓ no nome, a Mera fechada e o próximo
   await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
 
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
-  expect((await ui.find({ type: 'Text', text: /^Mensagem de retorno ✓$/ }))?.props.bold).toBe(true)
+  // O completo vai na etiqueta, não no nome (0.3.5).
+  expect(forte(await ui.find({ type: 'Text', text: /^Mensagem de retorno$/ }))).toBe(true)
+  expect(await ui.find({ type: 'Text', text: /^ completo ✓ $/ })).toBeDefined()
   // O próximo ponto de controle é a skill, na trilha ao lado dos quadrados (0.3.2): nenhuma rodada sem correção ainda.
   expect(await ui.find({ type: 'Text', text: /^⚙ próximo: skill$/ })).toBeDefined()
   expect((await ui.find({ type: 'Button', key: 'rodar-workflow' }))?.props.label).toBe('Rodar mensagem de retorno')
@@ -817,7 +822,7 @@ test('o painel de trabalho: o Agora sem botão enquanto a entrega espera, a list
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
   // O Agora é o que espera por ela no chat: nenhum botão (aprovar e corrigir são respostas no chat).
   expect(await ui.find({ type: 'Text', text: /^AGORA · ESPERANDO VOCÊ NO CHAT$/ })).toBeDefined()
-  expect((await ui.find({ type: 'Text', text: /^Pedido da semana$/ }))?.props.bold).toBe(true)
+  expect(forte(await ui.find({ type: 'Text', text: /^Pedido da semana$/ }))).toBe(true)
   expect(await ui.find({ type: 'Text', text: /^o sistema faz 2 de 4 passos$/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /^A entrega está no chat para você conferir\.$/ })).toBeDefined()
   expect((await ui.findAll({ type: 'Button' })).filter(b => b.props.variant === 'primary')).toEqual([])
@@ -829,7 +834,7 @@ test('o painel de trabalho: o Agora sem botão enquanto a entrega espera, a list
   // A lista: o que já rodou, uma linha com a conta e o mesmo botão; o cartão que não se lê, "precisa de ajuste".
   expect(await ui.find({ type: 'Text', text: /^OS SEUS WORKFLOWS$/ })).toBeDefined()
   // Cada workflow num cartão (0.3.2): o nome, a frente, o estado e, embaixo, a conta e a trilha da skill.
-  expect((await ui.find({ type: 'Text', text: /^Mensagem de retorno$/ }))?.props.bold).toBe(true)
+  expect(forte(await ui.find({ type: 'Text', text: /^Mensagem de retorno$/ }))).toBe(true)
   expect(await ui.find({ type: 'Text', text: /^o sistema faz 2 de 4$/ })).toBeDefined()
   // O Agora é da loja, que usa a skill estoque: a trilha acesa; o da lista ainda não tem skill.
   expect(await ui.find({ type: 'Text', text: /^⚙ skill pronta$/ })).toBeDefined()
@@ -871,10 +876,10 @@ test('A começar: a frente dita no nome vale para ele, o nome abre a descrição
   expect(await ui.find({ type: 'Button', label: 'Fechar o dia' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /^· Casa$/ })).toBeDefined()
   expect((await ui.findAll({ type: 'Button' })).filter(b => String(b.props.key).startsWith('nova-comecar')).every(b => b.props.label === 'Rodar')).toBe(true)
-  expect(await ui.find({ type: 'Text', text: /^Entrega: o dia fechado\. O pedido: fechar o dia\.$/ })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /^ A primeira entrega: o dia fechado\. $/ })).toBeUndefined()
   const desc = (await ui.findAll({ type: 'Button' })).find(b => b.props.label === 'Fechar o dia')
   await ui.press({ key: String(desc?.props.key) })
-  expect(await ui.find({ type: 'Text', text: /^Entrega: o dia fechado\. O pedido: fechar o dia\.$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^ A primeira entrega: o dia fechado\. $/ })).toBeDefined()
   const descartar = (await ui.findAll({ type: 'Button' })).find(b => b.props.label === 'Descartar' && b.props.key === `descartar-${String(desc?.props.key).replace('desc-', '')}`)
   await ui.press({ key: String(descartar?.props.key) })
   expect(enviados).toContain('descartar o workflow Fechar o dia')
@@ -1034,6 +1039,6 @@ test('a gravação do diário que falha aparece numa linha do painel, e nada mai
   await $.turn.complete({ answer: 'Conferido.', durationMs: 1000, isAborted: false, turnId: 's2', reason: 'answer' })
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
   expect(await ui.find({ type: 'Text', text: /^O diário não está gravando\. Escreva travei\.$/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /^AGORA$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^AGORA( · O SEU WORKFLOW PRINCIPAL)?$/ })).toBeDefined()
   await ui.unmount()
 })

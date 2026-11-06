@@ -2,6 +2,15 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.3.5 (06/11/2026)
+**O painel igual ao desenho aprovado, e a proposta de cada workflow** (pedido do Arthur, 06/11/2026: "está parecido, mas não está igual"; "eu preciso de uma proposta"). O desenho aprovado saiu da árvore que o próprio código do painel devolve, montado com uma pasta de teste (`propostas/2026-11-06-painel-0.3.5-como-fica.html`, fora do git).
+- **Cards brancos** sobre o papel do painel (o Agora, os workflows e os de "A começar"); **títulos em negrito**; o **estado numa etiqueta** ("completo ✓", "em andamento"); o nome do Agora com maiúscula, e o ✓ só na etiqueta.
+- **A trilha da skill com círculos numerados:** ❶ ❷ cheios em tinta quando a rodada contou, ① ② vazios quando falta, e a caixa "⚙ skill" com moldura.
+- **"A começar":** o nome é texto em negrito que se toca (sem a pílula cinza) e abre **a proposta**, numa faixa amarela; o que trava fica numa etiqueta. Nome longo quebra a linha, e os botões ficam dentro do card.
+- **A coluna "O que faz"** na tabela "Os próximos" do cartão (modelo `workflow.md`: Workflow | Pedido | O que faz | O que trava): a proposta em uma frase. A `campo-1` completa o cabeçalho e a frase dos cartões antigos antes de rodar, sem inventar ("a completar com você"); a montagem escreve a frase das opções que ficam na fila. O painel lê pelo cabeçalho e continua lendo a tabela antiga.
+- **O limite do app, que fica diferente do desenho em HTML:** os botões são os nativos (cinza; o principal, preto), e a moldura é contínua.
+- **Testes:** 56.
+
 ## 0.3.4 (06/11/2026)
 **"A começar" em cards, com a descrição, o Rodar e o Descartar** (pedido do Arthur, 06/11/2026: "uma leve descrição do que é e de qual é a proposta"; "duas opções: rodar e descartar"; o que não faz sentido sai da fila "para abrir espaço para entrar num outro").
 - **Cada workflow de "A começar" num card de uma linha:** o nome, a frente e, quando a terceira coluna de "Os próximos" diz o que trava ("depende do BI"), a etiqueta; à direita, **Rodar** (a conversa nova, como antes) e **Descartar**.
