@@ -2,6 +2,15 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.3.3 (06/11/2026)
+**O painel de trabalho arrumado, pelo print do Arthur na 0.3.2** (06/11/2026: a lista "A começar" desalinhada, a frente dentro do nome, a trilha da skill embaixo dos quadrados e a legenda dos marcos espalhada).
+- **A frente dita no nome de um próximo** ("Fechar o dia (frente Life Plan)", "Validação da lâmina (Feira Nova)") vale para ele: o nome perde os parênteses, a frente aparece pequena ao lado, e a Island deixa de contar o que é de outra frente (no print, "1 de 6" contava workflows do Life Plan e da Feira Nova na frente da marca).
+- **"A começar" em linhas alinhadas:** o nome e a frente à esquerda, o botão pequeno **Rodar** à direita, sem quebrar.
+- **No Agora, o "ver os passos" desce para a linha do botão principal**, e a trilha da skill fica à direita dos quadrados, como no desenho.
+- **A frente sem o ponto final** ("Marca pessoal", não "Marca pessoal."), também na conta dos marcos.
+- **A legenda dos marcos numa linha:** "Mera (1º workflow) ✓ · Island (a frente) 1 de 2 · Lobuche East (2ª frente)", com um botão só, **o que é**, que abre as três explicações.
+- **Testes:** 56 (novo: a frente dita no nome).
+
 ## 0.3.2 (05/11/2026)
 **A abertura desenhada e o painel de trabalho com cartões** (as melhorias da rodada (a) do teste do Data Room, aprovadas pelo Arthur em 05/11/2026, "sim, todas": `propostas/2026-11-05-abertura-visual.md` v1.2 e `propostas/2026-11-05-melhorias-rodada-a.md` v1.4, fora do git). A rodada (b) do Data Room roda nesta versão.
 - **A abertura curta:** três linhas e a caixa do pedido 1 ("Boas-vindas ao seu Base Camp. São 3 passos, uns 30 minutos, e você só responde. O caminho está no painel ao lado."). Saem a metáfora do acampamento, o "dá para parar" e o atalho de voz do sistema.

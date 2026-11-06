@@ -432,9 +432,10 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     // A subida desenhada no lugar da linha dos marcos (0.3.2), com a legenda do resultado e o "i" num toque.
     if (surface === 'terminal') expect(await ui.find({ type: 'Text', text: /^Mera ○ · Island ○ · Lobuche East ○$/ })).toBeDefined()
     else expect((await ui.findAll({ type: 'Svg' })).some(s => /^A subida/.test(String(s.props.alt)) && /você está aqui/.test(String(s.props.source)))).toBe(true)
-    expect(await ui.find({ type: 'Text', text: /^Mera · o 1º workflow completo$/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /^Mera \(1º workflow\) · Island \(a frente\) · Lobuche East \(2ª frente\)$/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /^Mera: o primeiro workflow/ })).toBeUndefined()
-    await ui.press({ key: 'i-mera' })
+    await ui.press({ key: 'i-marcos' })
+    expect(await ui.find({ type: 'Text', text: /^Lobuche East: um workflow completo/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /^Mera: o primeiro workflow/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /^Base Camp montado em 27 min$/ })).toBeDefined()
     // A trilha e a subida ficam dentro do "Ver o resumo" (decisão 2, 04/11).
@@ -763,8 +764,7 @@ test('o workflow completo no cartão: o ✓ no nome, a Mera fechada e o próximo
   expect(await ui.find({ type: 'Text', text: /^⚙ próximo: skill$/ })).toBeDefined()
   expect((await ui.find({ type: 'Button', key: 'rodar-workflow' }))?.props.label).toBe('Rodar mensagem de retorno')
   // Os marcos: a Mera fechada; a Island conta os workflows da frente (um só, ainda não fecha).
-  expect(await ui.find({ type: 'Text', text: /^Mera · o 1º workflow completo ✓$/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /^Island · a frente inteira: 1 de 1$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Mera \(1º workflow\) ✓ · Island \(a frente\) 1 de 1 · Lobuche East \(2ª frente\)$/ })).toBeDefined()
   // Na subida (dentro do "Ver o resumo"), o Campo 1 fica feito: na linha e na trilha (o quadrado cheio, em tinta).
   await ui.press({ key: 'ver-resumo' })
   expect((await ui.find({ type: 'Text', text: /Começo/ }))?.text).toBe('✓ Base   ✓ Começo   ✓ O retrato   ✓ O primeiro workflow   ✓ Campo 1')
@@ -851,6 +851,26 @@ test('o painel de trabalho: o Agora sem botão enquanto a entrega espera, a list
   await ui.unmount()
 })
 
+test('a frente dita no nome do próximo vale para ele: a linha mostra a frente e a Island não o conta', async ($, on) => {
+  const loja = CARTAO_LOJA.replace('a conferir', 'sim').replace('**Estado:** em andamento', '**Estado:** completo, em 05/11/2026')
+    .replace('| Conferir a nota | conferir a nota | a nota batida com o pedido |', '| Conferir a nota | conferir a nota | a nota batida |\n| Fechar o dia (frente Casa) | fechar o dia | o dia fechado |')
+  pasta(on, {
+    '/os/base-camp.md': COM_CARTAO('completo'),
+    [`/os/${CAMINHO_DO_CARTAO}`]: CARTAO,
+    '/os/frentes/loja/workflows/pedido-da-semana.md': loja,
+    '/os/resumo-para-o-arthur.md': RESUMO,
+  }, [])
+  await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  // A Mera é da loja; a Island conta o cartão da loja e o "Conferir a nota", não o "Fechar o dia", que é da Casa.
+  expect(await ui.find({ type: 'Text', text: /Island \(a frente\) 1 de 2/ })).toBeDefined()
+  await ui.press({ key: 'fila' })
+  expect(await ui.find({ type: 'Text', text: /^Fechar o dia$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^· Casa$/ })).toBeDefined()
+  expect((await ui.findAll({ type: 'Button' })).filter(b => String(b.props.key).startsWith('nova-comecar')).every(b => b.props.label === 'Rodar')).toBe(true)
+  await ui.unmount()
+})
+
 test('a conversa nova que não abriu: o painel copia o pedido; a que abriu, não copia nada', async ($, on) => {
   const enviados: string[] = []
   const falhou = 'Não consegui abrir a conversa nova. Copiei o pedido: abra uma conversa nova e cole.'
@@ -899,7 +919,7 @@ test('os marcos: a Island fecha com a frente inteira, a Lobuche East com outra f
   pasta(on, arquivos, enviados)
   await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
   let ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
-  expect(await ui.find({ type: 'Text', text: /^Mera · o 1º workflow completo$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Mera \(1º workflow\) · Island/ })).toBeDefined()
   await ui.unmount()
 
   // O primeiro completo fecha a Mera, com o fecho em fatos: o antes do cartão e o tempo da última vez.
@@ -908,8 +928,7 @@ test('os marcos: a Island fecha com a frente inteira, a Lobuche East com outra f
   await $.turn.complete({ answer: 'Completo.', durationMs: 1000, isAborted: false, turnId: 'm1', reason: 'answer' })
   expect(enviados).toContain('[aviso] Mera: Mensagem de retorno sai pronto com um pedido seu, desde 05/11/2026. Antes, 3 horas; na última vez, 7 min.')
   ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
-  expect(await ui.find({ type: 'Text', text: /^Mera · o 1º workflow completo ✓$/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /^Island · a frente inteira: 1 de 2$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Mera \(1º workflow\) ✓ · Island \(a frente\) 1 de 2 · Lobuche East \(2ª frente\)$/ })).toBeDefined()
   await ui.unmount()
 
   // O segundo da mesma frente fecha a Island; um completo noutra frente fecha a Lobuche East.
@@ -918,8 +937,7 @@ test('os marcos: a Island fecha com a frente inteira, a Lobuche East com outra f
   await $.turn.start({ text: 'aprovado', turnId: 'm2' })
   await $.turn.complete({ answer: 'Completo.', durationMs: 1000, isAborted: false, turnId: 'm2', reason: 'answer' })
   ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
-  expect(await ui.find({ type: 'Text', text: /^Island · a frente inteira ✓$/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /^Lobuche East · a 2ª frente ✓$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Mera \(1º workflow\) ✓ · Island \(a frente\) ✓ · Lobuche East \(2ª frente\) ✓$/ })).toBeDefined()
   // No fim, o "você está aqui" no cume da Lobuche East, sem sair do desenho.
   const fim = (await ui.findAll({ type: 'Svg' })).find(s => /^A subida/.test(String(s.props.alt)))?.props.source ?? ''
   expect(fim).toContain('<circle cx="225.0" cy="40.0" r="5" fill="#FF6F1A"/>')
