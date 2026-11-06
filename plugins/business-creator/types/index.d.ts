@@ -55,6 +55,8 @@ export type NaFila = {
   nome: string
   pedido: string | null
   frente?: string | null
+  // A terceira coluna de "Os próximos" (0.3.4): a primeira entrega, ou o que trava ("depende do BI").
+  entrega?: string | null
 }
 
 // Um passo do cartão, para o "ver os passos" (0.3.0): o nome, quem faz e, no "ainda não dá", o motivo.
@@ -219,6 +221,8 @@ declare module 'claude-code' {
       passosAbertos: string[]
       // O marco com a explicação aberta, pelo "i" da legenda da subida (0.3.2).
       marcoAberto: string | null
+      // O workflow de "A começar" com a descrição aberta, pelo nome (0.3.4).
+      filaDescricao: string | null
       aAbrir: string | null
       conversa: Conversa | null
       diarioFalhou: boolean

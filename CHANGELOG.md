@@ -2,6 +2,13 @@
 
 Cada versão é aprovada pelo Arthur depois de testada numa pasta limpa, fora do OS (decisão 4 da proposta de 29/10/2026).
 
+## 0.3.4 (06/11/2026)
+**"A começar" em cards, com a descrição, o Rodar e o Descartar** (pedido do Arthur, 06/11/2026: "uma leve descrição do que é e de qual é a proposta"; "duas opções: rodar e descartar"; o que não faz sentido sai da fila "para abrir espaço para entrar num outro").
+- **Cada workflow de "A começar" num card de uma linha:** o nome, a frente e, quando a terceira coluna de "Os próximos" diz o que trava ("depende do BI"), a etiqueta; à direita, **Rodar** (a conversa nova, como antes) e **Descartar**.
+- **O toque no nome abre a descrição:** "Entrega: <a primeira entrega>. O pedido: <pedido>." ou "Ainda não roda: <o que trava>." (a terceira coluna de "Os próximos"; no cartão que nunca rodou, o "O quê").
+- **Descartar** manda "descartar o workflow <nome>", e a `campo-1` tira da fila sem rodar nada: a linha de "Os próximos" vai para "## Descartados" no mesmo cartão, com a data; o cartão que nunca rodou vai para `workflows/descartados/`. Nada se apaga; para voltar, "rodar o workflow <nome>".
+- **Testes:** 56 (o de "A começar" refeito com a descrição e o Descartar).
+
 ## 0.3.3 (06/11/2026)
 **O painel de trabalho arrumado, pelo print do Arthur na 0.3.2** (06/11/2026: a lista "A começar" desalinhada, a frente dentro do nome, a trilha da skill embaixo dos quadrados e a legenda dos marcos espalhada).
 - **A frente dita no nome de um próximo** ("Fechar o dia (frente Life Plan)", "Validação da lâmina (Feira Nova)") vale para ele: o nome perde os parênteses, a frente aparece pequena ao lado, e a Island deixa de contar o que é de outra frente (no print, "1 de 6" contava workflows do Life Plan e da Feira Nova na frente da marca).

@@ -1,6 +1,6 @@
 ---
 name: campo-1
-description: Conduz o Campo 1 da primeira montanha, depois do Base Camp - rodar o primeiro workflow da pessoa, rodada a rodada, corrigindo até ele sair pronto com um pedido só dela, e gravar no cartão do workflow o que o sistema aprendeu. Use quando a pessoa escrever o pedido de um workflow que tem cartão em workflows/ com estado incompleto ou em andamento (o pedido está na linha Pedido do cartão: "fechar o dia", "monitor de preço de ontem"), ou "vamos rodar o primeiro workflow", "Campo 1", "rodar o workflow X", "abrir o workflow X numa conversa nova" (o botão do painel), "aprovado" ou "quero corrigir" logo depois de uma rodada.
+description: Conduz o Campo 1 da primeira montanha, depois do Base Camp - rodar o primeiro workflow da pessoa, rodada a rodada, corrigindo até ele sair pronto com um pedido só dela, e gravar no cartão do workflow o que o sistema aprendeu. Use quando a pessoa escrever o pedido de um workflow que tem cartão em workflows/ com estado incompleto ou em andamento (o pedido está na linha Pedido do cartão: "fechar o dia", "monitor de preço de ontem"), ou "vamos rodar o primeiro workflow", "Campo 1", "rodar o workflow X", "abrir o workflow X numa conversa nova" (o botão do painel), "aprovado" ou "quero corrigir" logo depois de uma rodada. Também quando chegar "descartar o workflow <nome>" (o botão do painel): tirar esse workflow da fila.
 ---
 
 # Campo 1: rodar até sair com um pedido só
@@ -24,6 +24,13 @@ Quando chegar "abrir o workflow <nome> numa conversa nova" (o clique de "Rodar e
 2. **Abra a conversa nova pela ferramenta do app**, sempre primeiro: procure a ferramenta de abrir sessão (`start_session`; se ela aparecer só pelo nome, carregue-a antes de chamar). Chame com `initiation: "offer"`, o título "Workflow: <nome>" e, como mensagem inicial, o pedido do workflow. O app mostra a ela o cartão "Nova sessão / Fazer aqui". Responda em uma linha: "Abri o pedido numa conversa nova: é só aprovar no cartão."
 3. **Só se a ferramenta não existir nesta sessão, ou a chamada der erro,** responda exatamente: "Não consegui abrir a conversa nova. Copiei o pedido: abra uma conversa nova e cole. O pedido: **<o pedido do workflow>**." O painel reconhece essa frase e copia o pedido em negrito. Nunca use esta saída sem ter tentado o passo 2.
 4. **Não rode nada nesta conversa.** "Fazer aqui" só vale numa conversa que ainda não rodou nenhum workflow; se ela escolher "Fazer aqui" numa conversa que já rodou um, diga em uma linha que este workflow precisa de uma conversa só dele e ofereça de novo.
+
+## Descartar (o botão do painel)
+O botão **Descartar** de "A começar" manda "descartar o workflow <nome>" (0.3.4, pedido do Arthur: o que não faz sentido sai da fila, para abrir espaço ao que o uso real mostrar que se repete). Não rode nada e não pergunte:
+- **Uma linha de "Os próximos"** de um cartão: tire a linha da tabela e grave-a, com a data, numa seção `## Descartados` no fim do mesmo cartão (crie, se faltar): `- <nome> · <pedido> · descartado em <data>`. Nada se apaga.
+- **Um cartão que nunca rodou** (sem linha em "As rodadas"): mova o arquivo para a pasta `descartados/` dentro da mesma pasta `workflows/` e tire a linha dele da tabela "Workflows" da ficha da frente.
+- **Um cartão que já rodou** não se descarta pelo botão (o painel não o mostra em "A começar"); se ela pedir escrevendo, confirme em uma linha antes.
+- Responda em uma linha: "Tirei <nome> da fila. Se mudar de ideia, é só pedir **rodar o workflow <nome>**."
 
 ## Antes de rodar
 - **Um workflow por conversa, com recusa.** Se esta conversa já rodou um workflow e chegar o pedido de outro, não rode: siga "Abrir numa conversa nova" acima.

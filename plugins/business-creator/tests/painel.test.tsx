@@ -840,10 +840,11 @@ test('o painel de trabalho: o Agora sem botão enquanto a entrega espera, a list
   // "A começar": o cartão que nunca rodou e a fila (as opções não escolhidas e "Conferir a nota"), sem repetir
   // o que já tem cartão; recolhido até o toque.
   expect((await ui.find({ type: 'Button', key: 'fila' }))?.props.label).toBe('A começar: 4')
-  expect(await ui.find({ type: 'Text', text: /^Fechar o caixa$/ })).toBeUndefined()
+  const nomes = async () => (await ui.findAll({ type: 'Button' })).map(b => b.props.label)
+  expect(await nomes()).not.toContain('Fechar o caixa')
   await ui.press({ key: 'fila' })
-  expect(await ui.find({ type: 'Text', text: /^Fechar o caixa$/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /^Conferir a nota$/ })).toBeDefined()
+  expect(await nomes()).toContain('Fechar o caixa')
+  expect(await nomes()).toContain('Conferir a nota')
   // O botão da lista pede a conversa nova; os botões somem até a resposta.
   await ui.press({ key: 'nova-wf-0' })
   expect(enviados).toContain('abrir o workflow Mensagem de retorno numa conversa nova')
@@ -851,7 +852,8 @@ test('o painel de trabalho: o Agora sem botão enquanto a entrega espera, a list
   await ui.unmount()
 })
 
-test('a frente dita no nome do próximo vale para ele: a linha mostra a frente e a Island não o conta', async ($, on) => {
+test('A começar: a frente dita no nome vale para ele, o nome abre a descrição, e Rodar e Descartar', async ($, on) => {
+  const enviados: string[] = []
   const loja = CARTAO_LOJA.replace('a conferir', 'sim').replace('**Estado:** em andamento', '**Estado:** completo, em 05/11/2026')
     .replace('| Conferir a nota | conferir a nota | a nota batida com o pedido |', '| Conferir a nota | conferir a nota | a nota batida |\n| Fechar o dia (frente Casa) | fechar o dia | o dia fechado |')
   pasta(on, {
@@ -859,15 +861,23 @@ test('a frente dita no nome do próximo vale para ele: a linha mostra a frente e
     [`/os/${CAMINHO_DO_CARTAO}`]: CARTAO,
     '/os/frentes/loja/workflows/pedido-da-semana.md': loja,
     '/os/resumo-para-o-arthur.md': RESUMO,
-  }, [])
+  }, enviados)
   await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
   // A Mera é da loja; a Island conta o cartão da loja e o "Conferir a nota", não o "Fechar o dia", que é da Casa.
   expect(await ui.find({ type: 'Text', text: /Island \(a frente\) 1 de 2/ })).toBeDefined()
   await ui.press({ key: 'fila' })
-  expect(await ui.find({ type: 'Text', text: /^Fechar o dia$/ })).toBeDefined()
+  // O nome é um botão que abre a descrição; ao lado, Rodar e Descartar (0.3.4).
+  expect(await ui.find({ type: 'Button', label: 'Fechar o dia' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /^· Casa$/ })).toBeDefined()
   expect((await ui.findAll({ type: 'Button' })).filter(b => String(b.props.key).startsWith('nova-comecar')).every(b => b.props.label === 'Rodar')).toBe(true)
+  expect(await ui.find({ type: 'Text', text: /^Entrega: o dia fechado\. O pedido: fechar o dia\.$/ })).toBeUndefined()
+  const desc = (await ui.findAll({ type: 'Button' })).find(b => b.props.label === 'Fechar o dia')
+  await ui.press({ key: String(desc?.props.key) })
+  expect(await ui.find({ type: 'Text', text: /^Entrega: o dia fechado\. O pedido: fechar o dia\.$/ })).toBeDefined()
+  const descartar = (await ui.findAll({ type: 'Button' })).find(b => b.props.label === 'Descartar' && b.props.key === `descartar-${String(desc?.props.key).replace('desc-', '')}`)
+  await ui.press({ key: String(descartar?.props.key) })
+  expect(enviados).toContain('descartar o workflow Fechar o dia')
   await ui.unmount()
 })
 

@@ -53,6 +53,8 @@ const filaAberta = atom({ plugin: 'business-creator', key: 'filaAberta' } as con
 const passosAbertos = atom({ plugin: 'business-creator', key: 'passosAbertos' } as const, [])
 // O marco da subida com a explicação aberta (0.3.2): o "i" da legenda abre num toque.
 const marcoAberto = atom({ plugin: 'business-creator', key: 'marcoAberto' } as const, null)
+// O workflow de "A começar" com a descrição aberta (0.3.4): o toque no nome abre o que ele se propõe a fazer.
+const filaDescricao = atom({ plugin: 'business-creator', key: 'filaDescricao' } as const, null)
 // O pedido do workflow que um botão mandou abrir numa conversa nova: se a conversa nova não abrir, o painel
 // copia este pedido para ela colar (0.3.0).
 const aAbrir = atom({ plugin: 'business-creator', key: 'aAbrir' } as const, null)
@@ -428,7 +430,7 @@ function lerCartao(texto: string): Detalhe {
   for (const l of secao(texto, 'Os próximos').split('\n')) {
     const t = l.trim()
     if (!t.startsWith('|') || /^\|\s*:?-+/.test(t)) continue
-    const [nome = '', pedidoDaFila = ''] = celulas(t).map(c => c.replace(/\*\*/g, '').trim())
+    const [nome = '', pedidoDaFila = '', entregaDaFila = ''] = celulas(t).map(c => c.replace(/\*\*/g, '').trim())
     if (!nome || nome.startsWith('<') || /^workflow$/i.test(nome)) continue
     // A frente dita no nome ("Fechar o dia (frente Life Plan)", "Validação da lâmina (Feira Nova)") vale para a linha (0.3.2):
     // sem ela, a linha é da frente do cartão. O nome fica sem os parênteses.
@@ -437,6 +439,7 @@ function lerCartao(texto: string): Detalhe {
       nome: dita ? nome.slice(0, dita.index).trim() : nome,
       pedido: pedidoDaFila && !pedidoDaFila.startsWith('<') ? pedidoDaFila.replace(/^["“”'`]+|["“”'`]+$/g, '') : null,
       ...(dita ? { frente: dita[1]?.trim() ?? null } : {}),
+      entrega: entregaDaFila && !entregaDaFila.startsWith('<') ? entregaDaFila : null,
     })
   }
   // A tabela "As rodadas": uma linha por rodada, fora o cabeçalho, o separador e as linhas de modelo.
@@ -1926,10 +1929,11 @@ export const register: Register = on => {
       const outros = dado.workflows.filter(w => w !== daVez)
       const jaRodaram = outros.filter(w => w.rodadas.length > 0 || w.ilegivel)
       const nuncaRodaram = outros.filter(w => w.rodadas.length === 0 && !w.ilegivel)
-      const aComecar: { nome: string; pedido: string | null; frente: string | null }[] = [
-        ...nuncaRodaram.map(w => ({ nome: w.nome, pedido: w.pedido, frente: w.frente })),
-        ...dado.fila.map(f => ({ nome: maiuscula(f.nome), pedido: f.pedido, frente: f.frente ?? null })),
+      const aComecar: { nome: string; pedido: string | null; frente: string | null; entrega: string | null }[] = [
+        ...nuncaRodaram.map(w => ({ nome: w.nome, pedido: w.pedido, frente: w.frente, entrega: w.processo })),
+        ...dado.fila.map(f => ({ nome: maiuscula(f.nome), pedido: f.pedido, frente: f.frente ?? null, entrega: f.entrega ?? null })),
       ]
+      const descricaoAberta = await read($, filaDescricao)
       // Cada workflow num cartão com moldura, em 2 linhas (0.3.2): o nome, a frente, o estado e os botões; embaixo,
       // os quadrados dos passos e, à direita, a trilha da skill. O Agora segue o único em tinta, com o botão primário.
       const linhaDoWorkflow = (w: Workflow, i: number) => {
@@ -2001,13 +2005,31 @@ export const register: Register = on => {
                   <Button key="fila" label={`A começar: ${aComecar.length}`} onPress={() => void update($, filaAberta, a => !a)} />
                   {aComecarAberto &&
                     aComecar.map((f, i) => (
-                      // Uma linha por workflow a começar (0.3.2): o nome e a frente à esquerda, o botão pequeno à direita.
-                      <Box key={`comecar-${i}`} flexDirection="row" justifyContent="space-between" gap={1}>
-                        <Box flexDirection="row" flexWrap="wrap" gap={1}>
-                          <Text color={ROCHA}>{f.nome}</Text>
-                          {nomeDaFrente(f) && <Text color={CINZA} size="caption">· {nomeDaFrente(f)}</Text>}
+                      // Um card de uma linha por workflow a começar (0.3.4, pedido do Arthur): o nome (o toque abre o que ele se
+                      // propõe a fazer), a frente e, à direita, Rodar e Descartar. O que trava ("depende do BI") vira etiqueta.
+                      <Box key={`comecar-${i}`} flexDirection="column" borderStyle="round" borderColor={TRACO} paddingX={1}>
+                        <Box flexDirection="row" justifyContent="space-between" gap={1}>
+                          <Box flexDirection="row" flexWrap="wrap" gap={1}>
+                            <Button key={`desc-${i}`} dimColor label={f.nome} onPress={() => void update($, filaDescricao, a => (a === f.nome ? null : f.nome))} />
+                            {nomeDaFrente(f) && <Text color={CINZA} size="caption">· {nomeDaFrente(f)}</Text>}
+                            {f.entrega && /^(depende|só |so )/i.test(f.entrega) && <Text color={CINZA} size="caption">{f.entrega}</Text>}
+                          </Box>
+                          <Box flexDirection="row" gap={1}>
+                            {rodarNova(f.nome, f.pedido, `comecar-${i}`, 'Rodar')}
+                            {!pendente && <Button key={`descartar-${i}`} dimColor label="Descartar" onPress={() => void enviar($, `descartar o workflow ${f.nome}`)} />}
+                          </Box>
                         </Box>
-                        {rodarNova(f.nome, f.pedido, `comecar-${i}`, 'Rodar')}
+                        {descricaoAberta === f.nome && (
+                          <Text color={ROCHA} size="caption">
+                            {f.entrega && !/^(depende|só |so )/i.test(f.entrega)
+                              ? `Entrega: ${f.entrega}.${f.pedido ? ` O pedido: ${f.pedido}.` : ''}`
+                              : f.entrega
+                                ? `Ainda não roda: ${f.entrega}.${f.pedido ? ` O pedido: ${f.pedido}.` : ''}`
+                                : f.pedido
+                                  ? `O pedido: ${f.pedido}.`
+                                  : 'Ainda sem descrição: o sistema completa na primeira rodada.'}
+                          </Text>
+                        )}
                       </Box>
                     ))}
                 </Box>
