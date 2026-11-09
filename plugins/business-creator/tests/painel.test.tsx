@@ -480,6 +480,27 @@ for (const surface of ['desktop', 'terminal', 'vscode', 'mobile'] as const) {
     await ui.unmount()
   })
 
+  test(`a pasta provisória do app não prende o painel (${surface})`, async ($, on) => {
+    pasta(on, MEIO('completo'), [])
+    await $.session.start({ cwd: 'C:\\Users\\m\\.claude\\spares\\spare-hyWHdB', surface, isInteractive: true })
+    await $.session.start({ cwd: '/os', surface, isInteractive: true })
+
+    const ui = await $.ui.mount({ ...PANE, surface })
+    expect(await ui.find({ type: 'Text', text: /^Montagem do Base Camp$/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /ainda não tem um Base Camp/ })).toBeUndefined()
+    await ui.unmount()
+  })
+
+  test(`a pasta sem Base Camp gravada dá lugar à que tem (${surface})`, async ($, on) => {
+    pasta(on, MEIO('completo'), [])
+    await $.session.start({ cwd: '/outra', surface, isInteractive: true })
+    await $.session.start({ cwd: '/os', surface, isInteractive: true })
+
+    const ui = await $.ui.mount({ ...PANE, surface })
+    expect(await ui.find({ type: 'Text', text: /^Montagem do Base Camp$/ })).toBeDefined()
+    await ui.unmount()
+  })
+
   test(`pasta sem Base Camp (${surface})`, async ($, on) => {
     pasta(on, {}, [])
     await $.session.start({ cwd: '/outra', surface, isInteractive: true })

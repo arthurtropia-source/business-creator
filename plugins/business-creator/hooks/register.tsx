@@ -1397,6 +1397,11 @@ function sugestao(resposta: string): string | null {
   return null
 }
 
+// A pasta provisória que o app desktop usa antes de abrir a conversa na pasta de verdade (Mac e Windows).
+function provisoria(caminho: string): boolean {
+  return /[\\/]\.claude[\\/]spares[\\/]/i.test(caminho)
+}
+
 async function naPastaDaSessao($: EngineInterface): Promise<boolean> {
   const dir = await read($, pasta)
   return Boolean(dir) && dir === (await read($, sessao))
@@ -1418,7 +1423,17 @@ export const register: Register = on => {
       argumentHint: '[pasta]',
     })
     await update($, sessao, () => e.cwd)
-    if (!(await read($, pasta))) await update($, pasta, () => e.cwd)
+    // A pasta do painel (0.3.9): o app desktop abre a conversa numa pasta provisória (.claude/spares/spare-*)
+    // antes da pasta de verdade; essa nunca fica gravada. E a gravada dá lugar à nova quando só a nova tem o
+    // base-camp.md (no teste de 09/11, o painel ficou preso na provisória, que depois some).
+    const gravada = await read($, pasta)
+    if (
+      !provisoria(e.cwd) &&
+      (!gravada ||
+        provisoria(gravada) ||
+        (gravada !== e.cwd && !(await existe($, `${gravada}/base-camp.md`)) && (await existe($, `${e.cwd}/base-camp.md`))))
+    )
+      await update($, pasta, () => e.cwd)
     if (!(await read($, logo))) {
       const { base64 } = await $.fs.read(`${$.plugin.root}/assets/${LOGO.arquivo}`, { as: 'bytes' })
       const [x, y, largura, altura] = LOGO.tinta

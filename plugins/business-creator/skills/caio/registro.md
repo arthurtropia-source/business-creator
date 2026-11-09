@@ -34,6 +34,15 @@ Tire estes comentários ao criar. Datas em dd/mm; horas em hh:mm, pelo relógio 
 - **O que você fez nas últimas semanas:** "<pedido do diário, agrupado>" (<n> vezes); <...>
 <No modo empresa, mais uma linha: **A base da empresa:** `<repositório>/`, <o que o AGENTS.md dele diz que se faz ali, em uma linha>.>
 
+<!-- ===== dia/panorama.md (o inventário de chegada: feito uma vez, no primeiro "bom dia" de uma pasta que já tem história) ===== -->
+# O panorama da chegada
+> Feito pelo CAIO em <data>, pela lista das conversas do app desta pasta e pelos nomes dos arquivos, sem abrir conversa nenhuma. Não se refaz: a passagem de cada dia diz o que mudou.
+
+- **Roda sozinho:** <rotina ou tarefa agendada · quando · a última vez que rodou, se o app mostra> | nada
+- **Parado, esperando alguém:** <conversa ou tarefa · desde quando · esperando quem> | nada
+- **Se repete à mão:** <pedido · quantas vezes · em que área> | nada
+- **Conversas terminadas que se acumulam:** <n> (<n> de rodadas agendadas, <n> de trabalho avulso)
+
 <!-- ===== dia/passagem.md (reescrito em cada "fecha o dia") ===== -->
 # Passagem para <data do dia seguinte>
 > Gravada no "fecha o dia" de <data>. O CAIO de amanhã começa por aqui.

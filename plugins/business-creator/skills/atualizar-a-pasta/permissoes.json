@@ -36,7 +36,8 @@
       "PowerShell(powershell -NoProfile -ExecutionPolicy Bypass -File frentes*)",
       "mcp__business-creator__teste_do_base_camp",
       "mcp__ccd_session__start_session",
-      "mcp__ccd_session_mgmt__list_sessions"
+      "mcp__ccd_session_mgmt__list_sessions",
+      "mcp__ccd_session_mgmt__archive_session"
     ],
     "ask": [
       "Bash(rm *)",
