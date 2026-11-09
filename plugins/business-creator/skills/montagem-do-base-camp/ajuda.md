@@ -40,6 +40,9 @@
 ## Apareceu uma caixa com botões no meio da tela
 "É uma pergunta com opções: é só clicar na que você quer. Se nenhuma servir, escolha 'Outra' e escreva."
 
+## O CAIO (depois do Base Camp)
+"Comece o dia numa conversa nova escrevendo bom dia e diga o que precisa fazer, do seu jeito, até tudo de uma vez. O que é rápido sai ali; para o que é maior, o app mostra um cartão: escolha Nova sessão e a tarefa roda numa conversa só dela (ou diga 'pode abrir direto'). Quando ela termina, o CAIO anota. O que é seu decidir fica numerado, e você responde 'D-03: A'. No fim, escreva fecha o dia."
+
 ## Os botões do painel: Confirmar o retrato, os três workflows, Rodar, Rodar em conversa nova e ver os passos
 "O botão azul diz o que acontece quando você clica. Confirmar o retrato vale como o seu 'pode': o que está no painel fica como está. No passo 3, os três botões são os workflows que o sistema propôs, o primeiro é o recomendado: o clique escolhe e já roda a primeira vez. Depois do Base Camp montado, a entrega você aprova ou corrige escrevendo na conversa ('aprovado', ou o que mudar), porque é lá que ela está. No painel, Rodar (com o seu pedido, as palavras que você vai escrever toda vez, como 'fechar o dia') roda o workflow nesta conversa; Rodar em conversa nova abre outro workflow numa conversa só dele, e você aprova no cartão que o app mostra; ver os passos mostra, um embaixo do outro, cada passo e quem faz, para você ver onde ainda precisa mexer."
 

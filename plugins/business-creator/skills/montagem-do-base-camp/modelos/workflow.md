@@ -26,7 +26,7 @@ Tire estes comentários e as instruções entre <>.
 | # | Passo | Quem faz | Com quê | Situação |
 |---|---|---|---|---|
 | 1 | <o que se faz, em palavras dela> | <ela / o sistema / outra pessoa (a função)> | <a planilha, o e-mail, a rotina `rotinas/<nome>`, a skill <nome>> | <como é hoje / o sistema fez / ficou com ela / ainda não dá: <por quê>> |
-<Na montagem: os passos como ela contou (PROC.passos), todos com "ela" e "como é hoje". Passo que ela não soube dizer: "a completar nas rodadas". A cada rodada, as colunas Quem faz e Situação mudam para o que aconteceu de fato.>
+<Na montagem: os passos como ela contou (PROC.passos), todos com "ela" e "como é hoje". Passo que ela não soube dizer: "a completar nas rodadas". A cada rodada, as colunas Quem faz e Situação de todos os passos são reescritas com o que aconteceu de fato, só com os valores da lista (o painel não conta outro valor).>
 
 ## O que pode travar
 - <PROC.dependencias. "Nada, por enquanto" se for o caso.>

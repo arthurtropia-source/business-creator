@@ -5,7 +5,7 @@ description: Leva para a versão atual do método uma pasta que já tinha o Base
 
 # Atualizar a pasta para a versão atual
 
-> Plugin Business Creator 0.2.18 (03/11/2026); o modo empresa (passo 5b) na 0.3.1 (05/11/2026). Nasceu da primeira cliente, que montou o Base Camp com o kit em zip (v1.6) e passa para o plugin sem refazer a montagem (decisão do Arthur, 03/11/2026: atualizar a pasta dela sem zerar; os arquivos dela continuam valendo).
+> Plugin Business Creator 0.2.18 (03/11/2026); o modo empresa (passo 5b) na 0.3.1 (05/11/2026); o CAIO (passo 5c) na 0.3.7 (09/11/2026). Nasceu da primeira cliente, que montou o Base Camp com o kit em zip (v1.6) e passa para o plugin sem refazer a montagem (decisão do Arthur, 03/11/2026: atualizar a pasta dela sem zerar; os arquivos dela continuam valendo).
 
 A pessoa já tem o sistema montado. Ela não refaz nada: o que ela escreveu e aprovou continua valendo. Esta skill só acrescenta o que as versões novas do método trazem e tira da pasta as cópias antigas do kit, que agora chegam pelo plugin.
 
@@ -18,7 +18,8 @@ A atualização está pronta quando:
 5. a ficha da frente, o `AGENTS.md` da raiz e o `como-usar.md` têm as seções novas, com o que já se sabe dela;
 6. o `base-camp.md` tem a linha **Atualizada:** e a nota em "Pedidos sobre o kit".
 7. **no modo empresa** (existe `*/contexto/regras-da-empresa.md`; skill `montagem-do-base-camp`, `modo-empresa.md`): o `AGENTS.md` da raiz tem a seção "A empresa onde eu trabalho", a ficha da frente de trabalho aponta para o repositório, e o `.claude/settings.json` tem as permissões da área e a atualização da base.
-Se a pasta já tem a linha **Atualizada:** no `base-camp.md`, nada disso se faz, **a não ser o item 7**: se o arquivo de regras da empresa existe e o `AGENTS.md` da raiz ainda não tem a seção "A empresa onde eu trabalho", faça só o passo 5b. Senão, diga em uma linha que ela já está na versão nova e responda ao que ela pediu.
+8. **o CAIO** (0.3.7): o `AGENTS.md` da raiz tem a seção "O meu dia", o `como-usar.md` começa o dia pelo **bom dia**, e o `.claude/settings.json` libera as ferramentas de abrir e acompanhar conversas (as linhas de `permissoes.json` que começam por `mcp__ccd_`).
+Se a pasta já tem a linha **Atualizada:** no `base-camp.md`, nada disso se faz, **a não ser os itens 7 e 8**: se o arquivo de regras da empresa existe e o `AGENTS.md` da raiz ainda não tem a seção "A empresa onde eu trabalho", faça o passo 5b; se o `AGENTS.md` da raiz ainda não tem a seção "O meu dia", faça o passo 5c; depois, a mensagem do passo 7, com a linha **Atualizada:** reescrita para a versão de agora. Se os dois já estão lá, diga em uma linha que ela já está na versão nova e responda ao que ela pediu.
 
 ## Regras que não se negociam
 - **Nada da pessoa se apaga, se move ou se reescreve.** Os arquivos dela (o retrato, as fichas, a memória, as planilhas, os modelos) só ganham seções; o texto dela fica como está. As únicas coisas que mudam de lugar são as 3 cópias do kit, e vão para `montagem/kit-anterior/`, nunca para a lixeira.
@@ -76,10 +77,16 @@ Se não existir `contexto/computador.md`, faça o inventário pela skill `rotina
 - No cartão do primeiro workflow, se "O que pode travar" tem a linha "Dados da empresa: falta registrar quem autoriza o uso neste sistema", troque por "Dados da empresa: valem as regras de `<repositório>/contexto/regras-da-empresa.md` (desde <data>)". Nas Pendências da ficha, a mesma pergunta sai, com "resolvida pelo arquivo de regras da empresa em <data>".
 - Na mensagem final, a linha: "o seu sistema passou a trabalhar junto com a base da <Empresa>: as regras dos dados vêm de lá, sempre atualizadas".
 
+### 5c. O CAIO (0.3.7)
+- **`AGENTS.md` da raiz:** acrescente a seção "O meu dia" do modelo `AGENTS-raiz.md` da skill `montagem-do-base-camp`, logo antes de "Como este sistema cresce", como está no modelo (só o nome dela muda). Nada mais muda no arquivo.
+- **`como-usar.md`:** troque o passo 1 de "Todo dia, em 3 passos" pelo do modelo `como-usar.md` (o **bom dia** numa conversa nova) e a seção "O seu dia por aqui" pela do modelo. O resto do guia fica.
+- **`.claude/settings.json`:** acrescente em `permissions.allow` as linhas de `permissoes.json` que começam por `mcp__ccd_` e ainda não estão lá, sem tirar nenhuma. Uma linha antes: "Agora o app vai pedir o seu ok para liberar o CAIO a abrir as conversas das tarefas. Pode aprovar." Se ela recusar, siga e anote em "Pedidos sobre o kit": "CAIO sem a liberação de abrir conversas".
+- Não crie a pasta `dia/`: o CAIO cria no primeiro **bom dia**.
+
 ### 6. As seções novas
 Acrescente só o que falta, pelo modelo atual da skill `montagem-do-base-camp`, no lugar que o modelo indica, com o que já se sabe dela (o que não se sabe fica "Nenhuma ainda"):
 - **Ficha da frente do workflow** (`frentes/<frente>/AGENTS.md`): Workflows (o primeiro, com o cartão; os outros processos que ela citou, como os próximos), Palavras minhas, Pendências (com as da máquina e as perguntas que o `resumo-para-o-arthur.md` deixou abertas), Rotinas (o que já existir em `rotinas/` da frente; senão, "Nenhuma ainda") e Modelos aprovados. Crie as pastas `rotinas/` e `modelos/` da frente só quando houver o que gravar nelas.
-- **`AGENTS.md` da raiz:** O meu computador; e, em "Como este sistema cresce", as linhas do modelo que faltam (cada frente é um conjunto de workflows; um workflow por conversa, vários abertos ao mesmo tempo, cada um com o seu cartão, com o caminho do primeiro, e o outro numa conversa nova; se a pasta já tem a linha antiga "um workflow de cada vez" ou a da 0.2.19, sem a conversa nova, ela é trocada por esta; a primeira montanha; tarefa que se repete sem cartão; rotina não se perde; o que eu aprovo vira arquivo; nada fica no ar; toda tarefa tem linha de chegada). As regras dela ficam como estão; se uma linha nova repete uma dela, fique com a dela.
+- **`AGENTS.md` da raiz:** O meu computador; O meu dia (passo 5c); e, em "Como este sistema cresce", as linhas do modelo que faltam (cada frente é um conjunto de workflows; um workflow por conversa, vários abertos ao mesmo tempo, cada um com o seu cartão, com o caminho do primeiro, e o outro numa conversa nova; se a pasta já tem a linha antiga "um workflow de cada vez" ou a da 0.2.19, sem a conversa nova, ela é trocada por esta; a primeira montanha; tarefa que se repete sem cartão; rotina não se perde; o que eu aprovo vira arquivo; nada fica no ar; toda tarefa tem linha de chegada). As regras dela ficam como estão; se uma linha nova repete uma dela, fique com a dela.
 - **`como-usar.md`:** "O seu primeiro workflow" (no lugar de "O seu combinado" e "O próximo passo: o Campo 1", que viram esta seção só), o pedido em "Pedidos que já funcionam", "Permissões: quando o app pede o seu ok" e, em "Se travar", a linha do **tente novamente**.
 - **`resumo-para-o-arthur.md`:** uma seção "Atualização para o plugin (<data>)", em até 5 linhas: de que versão veio, o que entrou, o pedido do primeiro workflow e o que ficou pendente. Sem dado da empresa.
 
@@ -90,7 +97,9 @@ Acrescente só o que falta, pelo modelo atual da skill `montagem-do-base-camp`, 
 > - a pasta já não pede o seu ok a cada passo (apagar, baixar da internet e mandar algo para fora continuam pedindo);
 > - o sistema conhece o seu computador (`contexto/computador.md`);
 > - o seu primeiro workflow ganhou um cartão, com o pedido **<pedido>** (se quiser outras palavras, diga);
+> - o seu dia passa a começar por uma conversa só: você diz o que precisa fazer, do seu jeito, e eu faço ou abro uma conversa para cada tarefa, anoto tudo e só te chamo para decidir. O seu workflow (**<pedido>**) entra por ela também;
 > - <o que ficou pendente, em uma linha, se houver; ex.: "falta registrar quem autoriza os dados da empresa: o sistema pergunta na primeira rodada">.
 > ---
-> **Abra uma conversa nova nesta pasta e escreva <pedido>.**"
+> **Abra uma conversa nova nesta pasta e escreva bom dia. Depois, me diga o que você precisa fazer hoje.**"
+- Numa pasta que já estava atualizada (só os passos 5b e 5c), a mensagem tem só as linhas do que entrou agora, e o mesmo fim.
 - A conversa nova é necessária: as permissões, o painel e o jeito de responder novos só valem a partir dela.

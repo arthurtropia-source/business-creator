@@ -403,7 +403,8 @@ function lerCartao(texto: string): Detalhe {
         ? 'em andamento'
         : 'incompleto'
   // A tabela "Os passos": as linhas com número. Desde a 0.2.19 o painel conta pela Situação, o que de fato
-  // aconteceu ("o sistema fez"; "o sistema faz" nos cartões de antes), não pela coluna Quem faz.
+  // aconteceu ("o sistema fez"; "o sistema faz" nos cartões de antes), não pela coluna Quem faz. Só a lista do modelo conta:
+  // "como é hoje" e "ficou com ela" ficam com ela; o resto (0.3.6) vira "?" no quadrado, para o cartão ser corrigido.
   const quadros: Quadro[] = []
   const lista: Passo[] = []
   const furos: Furo[] = []
@@ -422,9 +423,13 @@ function lerCartao(texto: string): Detalhe {
       const motivo = corte < 0 ? '' : situacao.slice(corte + 1).trim()
       furos.push({ passo, motivo })
       lista.push({ nome: passo, quadro: 'nao', motivo })
-    } else {
+    } else if (/^(como [ée] hoje|fic(ou|a) com (ela|voc[êe])|a completar)\b/i.test(situacao)) {
       quadros.push('ela')
       lista.push({ nome: passo, quadro: 'ela', motivo: '' })
+    } else {
+      // Fora da lista do modelo (0.3.6, o caso "primeira vez feita junto"): à vista, com o texto, e não conta como dela.
+      quadros.push('fora')
+      lista.push({ nome: passo, quadro: 'fora', motivo: situacao })
     }
   }
   const passos = quadros.length
@@ -1863,8 +1868,8 @@ export const register: Register = on => {
         w.quadros.length > 0 ? (
           <Box key={k} flexDirection="row">
             {w.quadros.map((q, i) => (
-              <Text key={`${k}-${i}`} color={q === 'sistema' ? TINTA : q === 'nao' ? SINAL : ROCHA}>
-                {q === 'sistema' ? '■' : q === 'nao' ? '✕' : '□'}
+              <Text key={`${k}-${i}`} color={q === 'sistema' ? TINTA : q === 'nao' || q === 'fora' ? SINAL : ROCHA}>
+                {q === 'sistema' ? '■' : q === 'nao' ? '✕' : q === 'fora' ? '?' : '□'}
               </Text>
             ))}
           </Box>
@@ -1882,14 +1887,29 @@ export const register: Register = on => {
         abertos.includes(w.arquivo) ? (
           <Box key={`lista-${k}`} flexDirection="column">
             {w.lista.map((p, i) => (
-              <Text key={`${k}-passo-${i}`} color={p.quadro === 'nao' ? SINAL : ROCHA}>
-                {`${p.quadro === 'sistema' ? '■' : p.quadro === 'nao' ? '✕' : '□'} ${i + 1}. ${p.nome} · ${
-                  p.quadro === 'sistema' ? 'o sistema faz' : p.quadro === 'nao' ? `ainda não dá${p.motivo ? `: ${p.motivo}` : ''}` : 'fica com você'
+              <Text key={`${k}-passo-${i}`} color={p.quadro === 'nao' || p.quadro === 'fora' ? SINAL : ROCHA}>
+                {`${p.quadro === 'sistema' ? '■' : p.quadro === 'nao' ? '✕' : p.quadro === 'fora' ? '?' : '□'} ${i + 1}. ${p.nome} · ${
+                  p.quadro === 'sistema'
+                    ? 'o sistema faz'
+                    : p.quadro === 'nao'
+                      ? `ainda não dá${p.motivo ? `: ${p.motivo}` : ''}`
+                      : p.quadro === 'fora'
+                        ? `a corrigir no cartão: "${p.motivo || 'sem Situação'}" não é o sistema fez, ficou com ela nem ainda não dá`
+                        : 'fica com você'
                 }`}
               </Text>
             ))}
           </Box>
         ) : null
+      // Passo com a Situação fora da lista (0.3.6): uma linha no cartão, com o pedido que corrige.
+      const avisoFora = (w: Workflow, k: string) => {
+        const n = w.quadros.filter(q => q === 'fora').length
+        return n > 0 ? (
+          <Text key={`${k}-fora`} color={SINAL} size="caption">
+            {`? ${n === 1 ? '1 passo sem registro certo' : `${n} passos sem registro certo`}: escreva "corrija a Situação dos passos do ${w.nome}"`}
+          </Text>
+        ) : null
+      }
       const contagem = (w: Workflow) => (w.passos > 0 ? `${w.passosSistema} de ${w.passos}` : null)
       const rodarNova = (nome: string, pedidoDele: string | null, k: string, rotulo = 'Rodar em conversa nova') =>
         pendente ? null : (
@@ -1999,6 +2019,7 @@ export const register: Register = on => {
                 {trilhaSkill(w, k)}
               </Box>
             )}
+            {!w.ilegivel && avisoFora(w, k)}
             {listaDePassos(w, k)}
           </Box>
         )
@@ -2025,6 +2046,7 @@ export const register: Register = on => {
                 {trilhaSkill(daVez, 'agora', true)}
               </Box>
             )}
+            {daVez && avisoFora(daVez, 'agora')}
             {daVez && listaDePassos(daVez, 'agora')}
             {linhaDaVez && <Text color={CINZA} size="caption">{linhaDaVez}</Text>}
             {/* O primário e o "ver os passos" na mesma linha (0.3.2): a linha dos quadrados fica livre para a trilha. */}

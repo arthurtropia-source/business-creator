@@ -1042,3 +1042,47 @@ test('a gravação do diário que falha aparece numa linha do painel, e nada mai
   expect(await ui.find({ type: 'Text', text: /^AGORA( · O SEU WORKFLOW PRINCIPAL)?$/ })).toBeDefined()
   await ui.unmount()
 })
+
+// A Situação fora da lista (0.3.6): o cartão gravou "primeira vez feita junto" em passos que o sistema já fazia,
+// e o painel os contava, calado, como dela. Agora o passo vira "?", não entra na conta e o cartão traz o aviso.
+const CARTAO_FORA = `# Workflow: Acordo da semana
+- **O quê:** Os acordos da semana, conferidos
+- **Frente:** loja
+- **Pedido:** acordo da semana
+- **Estado:** em andamento
+
+## Os passos
+| # | Passo | Quem faz | Com quê | Situação |
+|---|---|---|---|---|
+| 1 | Separar os pedidos | ela | o portal | ficou com ela |
+| 2 | Ler a planilha | o sistema | a planilha | primeira vez feita junto |
+| 3 | Conferir os acordos | o sistema | a planilha | primeira vez feita junto |
+| 4 | Montar os rascunhos | o sistema | o e-mail | o sistema fez |
+
+## As rodadas
+| Data | Do começo à entrega em | Pedidos dela até a entrega | Entrega aprovada? | Observação |
+|---|---|---|---|---|
+| 04/11/2026 | 30 min | 3 | sim | |
+`
+
+test('a Situação fora da lista aparece como "?", fora da conta, com o aviso que corrige', async ($, on) => {
+  const enviados: string[] = []
+  pasta(on, {
+    '/os/base-camp.md': COM_CARTAO('completo'),
+    [`/os/${CAMINHO_DO_CARTAO}`]: CARTAO,
+    '/os/frentes/loja/workflows/acordo-da-semana.md': CARTAO_FORA,
+    '/os/resumo-para-o-arthur.md': RESUMO,
+  }, enviados)
+  await $.session.start({ cwd: '/os', surface: 'desktop', isInteractive: true })
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  // Os passos 2 e 3 não contam como dela: a conta é só do que o sistema fez.
+  expect(await ui.find({ type: 'Text', text: /^o sistema faz 1 de 4 passos$/ })).toBeDefined()
+  expect((await ui.findAll({ type: 'Text', text: /^\?$/ })).length).toBe(2)
+  expect(await ui.find({ type: 'Text', text: /^\? 2 passos sem registro certo: escreva "corrija a Situação dos passos do Acordo da semana"$/ })).toBeDefined()
+  await ui.press({ key: 'ver-agora' })
+  expect(
+    await ui.find({ type: 'Text', text: /^\? 2\. Ler a planilha · a corrigir no cartão: "primeira vez feita junto" não é o sistema fez, ficou com ela nem ainda não dá$/ }),
+  ).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^□ 1\. Separar os pedidos · fica com você$/ })).toBeDefined()
+  await ui.unmount()
+})

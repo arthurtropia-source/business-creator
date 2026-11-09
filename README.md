@@ -20,6 +20,7 @@ Sem a pasta, no app: clique no **+** ao lado da caixa de texto, **Plugins**, **A
 ## O que vem nele
 - `business-creator:montagem-do-base-camp`: a montagem em 3 passos (o começo, o retrato, e o primeiro workflow, que você escolhe entre 3 e já roda) e a reserva de perguntas do uso real.
 - O painel do Base Camp (`/base-camp`); depois do Base Camp, o painel de trabalho, com todos os seus workflows (um por conversa, vários abertos).
+- `business-creator:caio`: o CAIO. Depois do Base Camp, você começa o dia escrevendo **bom dia** e diz o que precisa fazer; o sistema faz o que é rápido, abre uma conversa para cada tarefa maior, anota tudo num caderno do dia (`dia/`), só te chama para decidir e, quando uma tarefa se repete, propõe o workflow. No fim, **fecha o dia**.
 - `business-creator:campo-1`: o Campo 1 da primeira montanha: rodar o seu primeiro workflow, rodada a rodada, corrigindo, até ele sair pronto com um pedido só seu.
 - `business-creator:atualizar-a-pasta`: para quem montou o Base Camp numa versão anterior (o kit em zip, por exemplo): escreva **atualizar o meu sistema** e a pasta recebe o que a versão nova traz, sem apagar nada seu.
 - `business-creator:rotinas-e-computador`: as regras para o trabalho de verdade no computador, depois do Base Camp (rotina gravada, conferência, Windows e Mac).

@@ -9,7 +9,7 @@ Tire estes comentários e as instruções entre <>.
 > O seu guia de bolso, escrito no seu Base Camp em <data>. Business Creator powered by SEM IA™ · Um sistema, qualquer IA.
 
 ## Todo dia, em 3 passos
-1. **Abra esta pasta no app do Claude** (aba Code) e comece uma conversa.
+1. **Abra esta pasta no app do Claude** (aba Code), comece uma conversa nova e escreva **bom dia**. É a sua conversa com o CAIO: ele diz o que espera por você e faz, ou abre uma conversa para cada tarefa.
 2. **Diga o que você quer e o que é "pronto".** Ex.: "<um pedido da frente prioritária dela, com o formato de pronto; ex.: escreva a proposta para o cliente novo, em Word, com o resumo dos problemas no começo>".
 3. **Corrija sem dó.** Quando algo vier errado, diga o que mudar e acrescente "daqui pra frente faça assim": vira regra no seu caderno de lições (`memoria.md`), e o sistema não repete o erro.
 
@@ -26,7 +26,8 @@ Quando <o gatilho, com as palavras dela>, abra esta pasta e escreva **<pedido>**
 Para cada assunto novo, abra uma conversa nova nesta pasta. O sistema já sabe quem você é em toda conversa; conversa longa demais fica lenta e gasta mais do seu plano. Cada workflow roda na sua conversa: no painel, "Rodar em conversa nova" abre uma para ele, e você só aprova.
 
 ## O seu dia por aqui
-Faça o seu trabalho por esta pasta, qualquer tarefa. O sistema anota cada conversa num diário da frente (`frentes/<frente>/diario/`): o pedido, os arquivos e o tempo, nunca o conteúdo. O diário é seu, fica no seu computador e pode ser apagado quando você quiser; serve para mostrar, depois, o que se repete.
+Faça o seu trabalho por esta pasta, qualquer tarefa, a partir da conversa com o CAIO: diga tudo o que precisa fazer, do seu jeito, até de uma vez. O que é rápido sai ali; o que é maior ganha uma conversa só para ele, e você só escolhe **Nova sessão** no cartão do app (ou diga "pode abrir direto"). Cada tarefa vira uma linha no seu caderno do dia (`dia/`), com onde ficou a entrega; o que é seu decidir fica em `dia/fila.md`, e você responde "D-03: A". Quando uma tarefa se repete, o sistema propõe transformá-la num workflow. No fim, escreva **fecha o dia**: ele anota o que ficou para amanhã.
+O painel também anota cada conversa num diário da frente (`frentes/<frente>/diario/`): o pedido, os arquivos e o tempo, nunca o conteúdo. O caderno do dia e o diário são seus, ficam no seu computador e podem ser apagados quando você quiser.
 
 ## O que nunca acontece sem você
 Nada sai do computador sem o seu ok: e-mail, mensagem, publicação, compra, dinheiro. Na dúvida, o sistema entrega como rascunho.
@@ -36,6 +37,7 @@ Nada sai do computador sem o seu ok: e-mail, mensagem, publicação, compra, din
 - `contexto/`: quem você é e como você trabalha.
 - `frentes/`: uma ficha para cada coisa que você toca. <só no completo>
 - `memoria.md`: o seu caderno de lições.
+- `dia/`: o caderno do dia: as tarefas de cada mês, as decisões que esperam por você e a passagem para amanhã.
 - `frentes/<frente>/workflows/`: um cartão para cada workflow, o caminho de uma tarefa sua do começo à entrega. <no leve: `workflows/`>
 - `contexto/computador.md`: o que o seu computador tem, para o sistema usar as ferramentas certas.
 - `rotinas/` e `modelos/` (dentro de cada frente): os passo a passos que o sistema guardou e os textos que você aprovou.

@@ -40,8 +40,9 @@ export type Rodada = {
   obs: string
 }
 
-// Um passo do cartão, pela coluna Situação (0.2.19): "o sistema fez" = o sistema faz; "ainda não dá" = não dá; o resto fica com ela.
-export type Quadro = 'sistema' | 'ela' | 'nao'
+// Um passo do cartão, pela coluna Situação (0.2.19): "o sistema fez" = o sistema faz; "ainda não dá" = não dá;
+// "como é hoje" e "ficou com ela" = fica com ela. Desde a 0.3.6, um valor fora da lista é "fora", à vista, e não conta como dela.
+export type Quadro = 'sistema' | 'ela' | 'nao' | 'fora'
 
 // Um passo "ainda não dá", com o motivo (o texto depois dos dois-pontos da Situação).
 export type Furo = {

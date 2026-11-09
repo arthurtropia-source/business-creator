@@ -22,4 +22,5 @@ O marketplace `sem-ia` e o plugin `business-creator`: o método do Business Crea
 1. Mudar o arquivo, subir o `version`, anotar no `CHANGELOG.md`.
 2. `claude plugin validate .` e, se mexeu no painel, `claude plugin test plugins/business-creator`.
 3. Testar numa pasta limpa fora do OS e mostrar ao Arthur.
+   - **Mudança no painel:** o desenho que ele aprova sai da árvore que o código do painel devolve (um teste monta o painel com uma pasta de teste e imprime a árvore; o desenho a lê com o visual nativo do app), não de um HTML livre. O que o app não permite (botões nativos, moldura tracejada) fica escrito no desenho. Correção do Arthur, 06/11/2026: "está parecido, mas não está igual".
 4. Com o ok dele: commit e push.
