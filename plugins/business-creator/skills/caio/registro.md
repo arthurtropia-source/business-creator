@@ -22,6 +22,18 @@ Tire estes comentários ao criar. Datas em dd/mm; horas em hh:mm, pelo relógio 
 - D-01 · 10/11 · <assunto em poucas palavras> · <A: ... (recomendo) / B: ...> · responder: <aqui | na conversa "<título>"> · aberta
 <Ao responder: troque "aberta" por "respondida em <data>: <a resposta>". Ela pode estacionar uma: "estacionada em <data>". Só ela estaciona ou encerra.>
 
+<!-- ===== dia/mapa-da-pasta.md (refeito no primeiro "bom dia", a cada 7 dias e quando ela pedir) ===== -->
+# O mapa da sua pasta
+> Feito pelo CAIO em <data>, só com os nomes dos arquivos e as fichas das frentes, sem abrir o conteúdo. Serve para cada pedido começar do que já existe.
+
+## <Frente>
+- **Workflows:** <nome> (**<pedido>**, <estado>); <...> | nenhum ainda
+- **Rotinas guardadas:** `<caminho>`: <o que faz, pela ficha> | nenhuma ainda
+- **Modelos aprovados:** `<caminho>`: <o que é> | nenhum ainda
+- **Onde ficam as entregas:** `<pasta>/` (a mais recente: `<arquivo>`, <data>)
+- **O que você fez nas últimas semanas:** "<pedido do diário, agrupado>" (<n> vezes); <...>
+<No modo empresa, mais uma linha: **A base da empresa:** `<repositório>/`, <o que o AGENTS.md dele diz que se faz ali, em uma linha>.>
+
 <!-- ===== dia/passagem.md (reescrito em cada "fecha o dia") ===== -->
 # Passagem para <data do dia seguinte>
 > Gravada no "fecha o dia" de <data>. O CAIO de amanhã começa por aqui.
