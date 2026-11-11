@@ -18,12 +18,12 @@ Você recebe do Arthur a sua pasta (`meu-os`), que já sabe onde buscar o plugin
 Sem a pasta, no app: clique no **+** ao lado da caixa de texto, **Plugins**, **Add marketplace** com `arthurtropia-source/business-creator`, depois **Add plugin** e escolha `business-creator`. Num terminal: `claude plugin install business-creator --marketplace arthurtropia-source/business-creator`.
 
 ## O que vem nele
-- `business-creator:montagem-do-base-camp`: a montagem em 3 passos (o começo, o retrato, e o primeiro workflow, que você escolhe entre 3 e já roda) e a reserva de perguntas do uso real.
-- O painel do Base Camp (`/base-camp`); depois do Base Camp, o painel de trabalho, com todos os seus workflows (um por conversa, vários abertos).
-- `business-creator:caio`: o CAIO. Depois do Base Camp, você começa o dia escrevendo **bom dia** e diz o que precisa fazer; ele conhece o trabalho que já está na sua pasta e faz o sistema crescer com ele (o que se repete vira workflow; o que sai sempre igual vira habilidade); o sistema faz o que é rápido, abre uma conversa para cada tarefa maior, anota tudo num caderno do dia (`dia/`), só te chama para decidir e, quando uma tarefa se repete, propõe o workflow. No fim, **fecha o dia**.
-- `business-creator:campo-1`: o Campo 1 da primeira montanha: rodar o seu primeiro workflow, rodada a rodada, corrigindo, até ele sair pronto com um pedido só seu.
+- `business-creator:montagem-do-base-camp`: a montagem em 2 passos (o começo e o retrato). Com o retrato confirmado, o seu sistema existe.
+- `business-creator:caio`: o CAIO. Você começa o dia escrevendo **bom dia** e diz o que precisa fazer; ele faz o que é rápido, abre uma conversa para cada tarefa maior, anota tudo num caderno do dia (`dia/`), guarda no lugar certo o que você ensina e só te chama para decidir. No fim, **fecha o dia**.
+- O painel do Base Camp (`/base-camp`): mostra a montagem em 2 passos. Depois do Base Camp montado, fica só a linha "Comece o dia numa conversa nova: escreva bom dia.", o resumo da montagem recolhido e o rodapé. Quem já tem cartão de workflow de uma versão anterior continua com o painel de trabalho de antes.
 - `business-creator:atualizar-a-pasta`: para quem montou o Base Camp numa versão anterior (o kit em zip, por exemplo): escreva **atualizar o meu sistema** e a pasta recebe o que a versão nova traz, sem apagar nada seu.
 - `business-creator:rotinas-e-computador`: as regras para o trabalho de verdade no computador, depois do Base Camp (rotina gravada, conferência, Windows e Mac).
 - O estilo de resposta `base-camp`, que entra sozinho quando o plugin está ligado.
+- `business-creator:campo-1`: só para quem já tem cartão de workflow de uma versão anterior.
 
 Por Arthur Tropia. Mudanças em `CHANGELOG.md`.

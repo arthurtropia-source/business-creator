@@ -1,4 +1,4 @@
-# medir-o-dia.py · versao 1 (plugin Business Creator 0.3.7)
+# medir-o-dia.py · versao 2 (plugin Business Creator 0.4.0)
 #
 # O que faz: mede um dia de trabalho nesta pasta, so com contagens, a partir do historico das conversas
 # que o app do Claude guarda no computador (~/.claude/projects/). Nada do conteudo sai: nem pedido, nem
@@ -12,7 +12,7 @@
 # Uso (a partir da pasta da pessoa):
 #   Mac:     python3 rotinas/medir-o-dia.py [AAAA-MM-DD]
 #   Windows: python rotinas\medir-o-dia.py [AAAA-MM-DD]   (ou: py rotinas\medir-o-dia.py)
-#   Conferir a copia: python rotinas\medir-o-dia.py --versao   (imprime "medir-o-dia versao 1")
+#   Conferir a copia: python rotinas\medir-o-dia.py --versao   (imprime "medir-o-dia versao 2")
 # Sem data, mede o dia de hoje. So a biblioteca padrao do Python.
 #
 # As definicoes (iguais as da avaliacao da primeira implantacao, 30/10/2026, para comparar):
@@ -25,16 +25,38 @@
 #   (a espera e "no maximo": inclui o tempo de rodar o que foi aprovado, que nao se separa no historico)
 # - falhas tecnicas: resultados de ferramenta com erro; "em sequencia" e o mesmo tipo de ferramenta
 #   falhando 3 vezes ou mais seguidas na mesma conversa.
+#
+# Versao 2: quatro contagens novas, no fim da medida (secao "O uso (versao 2)"), todas sem conteudo:
+# - minutos ate a primeira entrega: do inicio da montagem (base-camp.md, linha "D · O comeco", coluna
+#   Inicio, DD/MM/AAAA HH:MM) ate a primeira tarefa entregue do dia (primeira linha do dia em
+#   dia/tarefas-AAAA-MM.md com " · entregue:"); so quando o dia medido e o dia em que a montagem
+#   comecou; sem base-camp.md, sem a hora ou sem entrega no dia, a linha nao aparece;
+# - tarefas entregues nos ultimos 7 dias: o dia medido e os 6 anteriores, 7 numeros do mais antigo ao
+#   mais novo (o caderno e um arquivo por mes, a janela pode pegar dois);
+# - palavras do metodo nas respostas do sistema, no dia medido: so o texto das respostas do assistente
+#   (nao conta chamada nem resultado de ferramenta, nem mensagem da pessoa), sem diferenciar maiuscula,
+#   palavra inteira: workflow, cartao, rodada, Campo 1, Campo 2, Campo 3, Mera, Island, Lobuche, skill,
+#   prompt, token, sessao; sai o total e, entre parenteses, so as palavras com contagem maior que zero;
+# - Dia 1: n de 4, so quando o dia medido e o dia em que a montagem comecou ou terminou ("Concluida em"
+#   do base-camp.md): (a) os arquivos do sistema existem, (b) o base-camp.md tem "Quem sou eu: passou",
+#   (c) ha tarefa entregue no dia, (d) esta medida foi gravada; depois do numero, o que faltou em palavras
+#   fixas, e a parte, se dia/passagem.md existe (nao entra no numero);
+# - feito fora do sistema: as linhas do dia com "via: fora" no caderno (o que a pessoa contou que fez
+#   ou vai fazer fora daqui). Essas linhas nao entram em nenhuma contagem da tabela (tarefas registradas,
+#   entregues, esperando, travadas, em andamento, toques por tarefa) nem nas entregas dos 7 dias.
+# O trecho "levou: <n> min" da linha nao entra na medida.
+# Se uma contagem nova falhar, as de antes saem do mesmo jeito.
 
 import json
 import os
 import re
 import sys
+import unicodedata
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 PAUSA = timedelta(minutes=15)
-VERSAO = 1
+VERSAO = 2
 ESPERA_MAX = timedelta(hours=2)  # uma janela esquecida aberta a noite toda nao vira "espera do dia"
 
 
@@ -201,7 +223,8 @@ def medir(pasta: Path, dia: date):
 
 
 def registro(pasta: Path, dia: date):
-    r = {"tarefas": 0, "entregues": 0, "esperando": 0, "travadas": 0, "em_andamento": 0, "decisoes_abertas": 0}
+    r = {"tarefas": 0, "entregues": 0, "esperando": 0, "travadas": 0, "em_andamento": 0, "decisoes_abertas": 0,
+         "fora": 0}
     arq = pasta / "dia" / f"tarefas-{dia:%Y-%m}.md"
     marca = f"{dia:%d/%m}"
     if arq.exists():
@@ -209,9 +232,14 @@ def registro(pasta: Path, dia: date):
             if not linha.startswith(f"- {marca}"):
                 continue
             r["tarefas"] += 1
-            # o resultado e o campo logo depois do "via:"; "repete" e "virou" vem depois e nao contam
+            # o resultado e o campo logo depois do "via:"; "levou", "com", "repete" e "virou" vem depois e nao contam
             campos = [c.strip().lower() for c in linha.split(" · ")]
             i = next((k for k, c in enumerate(campos) if c.startswith("via:")), None)
+            if i is not None and campos[i].startswith("via: fora"):
+                # feito fora do sistema: so a contagem propria, fora das da tabela
+                r["tarefas"] -= 1
+                r["fora"] += 1
+                continue
             resultado = campos[i + 1] if i is not None and i + 1 < len(campos) else ""
             if resultado.startswith("entregue"):
                 r["entregues"] += 1
@@ -226,6 +254,200 @@ def registro(pasta: Path, dia: date):
         r["decisoes_abertas"] = sum(1 for l in fila.read_text(encoding="utf-8").splitlines()
                                     if l.startswith("- ") and "· aberta" in l)
     return r
+
+
+# ---------------------------------------------------------------- versao 2: contagens novas
+
+PALAVRAS = [
+    ("workflow", r"workflows?"), ("cartão", r"cart(?:ão|ões)"), ("rodada", r"rodadas?"),
+    ("Campo 1", r"campo\s+1"), ("Campo 2", r"campo\s+2"), ("Campo 3", r"campo\s+3"),
+    ("Mera", r"mera"), ("Island", r"island"), ("Lobuche", r"lobuche"),
+    ("skill", r"skills?"), ("prompt", r"prompt"), ("token", r"tokens?"), ("sessão", r"sess(?:ão|ões)"),
+]
+PALAVRAS_RE = [(nome, re.compile(r"(?<!\w)" + padrao + r"(?!\w)", re.IGNORECASE)) for nome, padrao in PALAVRAS]
+DATA_HORA = re.compile(r"(\d{1,2})/(\d{1,2})/(\d{4})\s+(\d{1,2}):(\d{2})")
+LINHA_HORA = re.compile(r"^- (\d{2})/(\d{2}) (\d{2}):(\d{2})")
+
+
+def ler_texto(arq: Path):
+    try:
+        return arq.read_text(encoding="utf-8", errors="replace")
+    except (OSError, ValueError):
+        return None
+
+
+def texto_do_assistente(d) -> str:
+    if d.get("type") != "assistant":
+        return ""
+    conteudo = (d.get("message") or {}).get("content")
+    if isinstance(conteudo, str):
+        return conteudo
+    if isinstance(conteudo, list):
+        return "\n".join(b.get("text", "") for b in conteudo
+                         if isinstance(b, dict) and b.get("type") == "text" and isinstance(b.get("text"), str))
+    return ""
+
+
+def contar_palavras(pasta: Path, dia: date):
+    cont = {nome: 0 for nome, _ in PALAVRAS}
+    for f in historicos(pasta):
+        for _, d in ler_conversa(f, dia):
+            texto = unicodedata.normalize("NFC", texto_do_assistente(d))
+            if not texto:
+                continue
+            for nome, rx in PALAVRAS_RE:
+                cont[nome] += len(rx.findall(texto))
+    return cont
+
+
+def base_camp(pasta: Path):
+    """Do base-camp.md: inicio (datetime ou None), data de conclusao (date ou None), nivel completo, quem sou eu passou."""
+    texto = ler_texto(pasta / "base-camp.md")
+    if texto is None:
+        return None
+    b = {"inicio": None, "concluida": None, "completo": False, "quem_sou_eu": False}
+    linhas = texto.splitlines()
+    cabecalho = None
+    for l in linhas:
+        s = l.strip()
+        if s.startswith("|") and "início" in s.lower() and not s.startswith("| D"):
+            cabecalho = [c.strip().lower() for c in s.strip("|").split("|")]
+        if s.startswith("| D · O começo |"):
+            celulas = [c.strip() for c in s.strip("|").split("|")]
+            alvo = None
+            if cabecalho:
+                idx = next((k for k, c in enumerate(cabecalho) if c.startswith("início")), None)
+                if idx is not None and idx < len(celulas):
+                    alvo = celulas[idx]
+            else:
+                alvo = s
+            m = DATA_HORA.search(alvo or "")
+            if m:
+                try:
+                    b["inicio"] = datetime(int(m.group(3)), int(m.group(2)), int(m.group(1)),
+                                           int(m.group(4)), int(m.group(5)))
+                except ValueError:
+                    pass
+        if s.startswith("- **Concluída em:**"):
+            m = re.search(r"(\d{1,2})/(\d{1,2})/(\d{4})", s)
+            if m:
+                try:
+                    b["concluida"] = date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+                except ValueError:
+                    pass
+        if "**Nível:** completo" in s:
+            b["completo"] = True
+        if s.startswith("- **Quem sou eu:** passou"):
+            b["quem_sou_eu"] = True
+    return b
+
+
+def linha_fora(linha: str) -> bool:
+    return any(c.strip().lower().startswith("via: fora") for c in linha.split(" · "))
+
+
+def linha_entregue(linha: str) -> bool:
+    if linha_fora(linha):
+        return False
+    if " · entregue:" in linha:
+        return True
+    campos = [c.strip().lower() for c in linha.split(" · ")]
+    i = next((k for k, c in enumerate(campos) if c.startswith("via:")), None)
+    return i is not None and i + 1 < len(campos) and campos[i + 1].startswith("entregue")
+
+
+def linhas_do_dia(pasta: Path, dia: date, cache: dict):
+    chave = f"{dia:%Y-%m}"
+    if chave not in cache:
+        texto = ler_texto(pasta / "dia" / f"tarefas-{chave}.md")
+        cache[chave] = texto.splitlines() if texto is not None else []
+    marca = f"- {dia:%d/%m}"
+    return [l for l in cache[chave] if l.startswith(marca)]
+
+
+def entregues_em(pasta: Path, dia: date, cache: dict) -> int:
+    return sum(1 for l in linhas_do_dia(pasta, dia, cache) if linha_entregue(l))
+
+
+def primeira_entrega(pasta: Path, dia: date, cache: dict):
+    horas = []
+    for l in linhas_do_dia(pasta, dia, cache):
+        if linha_entregue(l):
+            m = LINHA_HORA.match(l)
+            if m:
+                try:
+                    horas.append(datetime(dia.year, dia.month, dia.day, int(m.group(3)), int(m.group(4))))
+                except ValueError:
+                    pass
+    return min(horas) if horas else None
+
+
+def arquivos_do_sistema(pasta: Path, bc):
+    """Lista fixa do que falta dos arquivos do sistema (vazia = tudo certo)."""
+    falta = []
+    agents = ler_texto(pasta / "AGENTS.md")
+    if agents is None or "sistema em montagem" in agents.lower() or "montagem em andamento" in agents.lower():
+        falta.append("AGENTS.md")
+    for rel in ("contexto/sobre-mim.md", "contexto/como-trabalhar-comigo.md", "contexto/computador.md", "memoria.md"):
+        if not (pasta / rel).is_file():
+            falta.append(rel)
+    if bc and bc["completo"]:
+        try:
+            achou = any(p.is_file() for p in (pasta / "frentes").glob("*/AGENTS.md"))
+        except OSError:
+            achou = False
+        if not achou:
+            falta.append("frentes/*/AGENTS.md")
+    return falta
+
+
+def uso_v2(pasta: Path, dia: date, fora=None):
+    """As linhas da secao da versao 2. Cada contagem falha sozinha: se uma quebrar, as outras saem."""
+    linhas = []
+    cache, bc = {}, None
+    try:
+        bc = base_camp(pasta)
+    except Exception:
+        bc = None
+    try:
+        if bc and bc["inicio"] and bc["inicio"].date() == dia:
+            primeira = primeira_entrega(pasta, dia, cache)
+            if primeira is not None and primeira >= bc["inicio"]:
+                linhas.append(f"- Minutos do início da montagem até a primeira tarefa entregue: "
+                              f"{minutos(primeira - bc['inicio'])} min")
+    except Exception:
+        pass
+    try:
+        serie = [entregues_em(pasta, dia - timedelta(days=k), cache) for k in range(6, -1, -1)]
+        linhas.append("- Tarefas entregues nos últimos 7 dias (do mais antigo ao mais novo): "
+                      + " ".join(str(n) for n in serie))
+    except Exception:
+        pass
+    try:
+        cont = contar_palavras(pasta, dia)
+        total = sum(cont.values())
+        achadas = ", ".join(f"{nome} {n}" for nome, _ in PALAVRAS for n in [cont[nome]] if n > 0)
+        linhas.append(f"- Palavras do método nas respostas: {total}" + (f" ({achadas})" if achadas else ""))
+    except Exception:
+        pass
+    if fora is not None:
+        linhas.append(f'- Feito fora do sistema (linhas "via: fora"): {fora}')
+    try:
+        if bc and ((bc["inicio"] and bc["inicio"].date() == dia) or bc["concluida"] == dia):
+            faltas = []
+            sistema = arquivos_do_sistema(pasta, bc)
+            if sistema:
+                faltas.append("os arquivos do sistema (" + ", ".join(sistema) + ")")
+            if not bc["quem_sou_eu"]:
+                faltas.append('o teste "quem sou eu"')
+            if entregues_em(pasta, dia, cache) < 1:
+                faltas.append("a primeira tarefa entregue")
+            n = 4 - len(faltas)  # o item (d), esta medida gravada, vale sempre que o script grava
+            linhas.append(f"- Dia 1: {n} de 4" + (f" (falta: {'; '.join(faltas)})" if faltas else ""))
+            linhas.append("- passagem: " + ("gravada" if (pasta / "dia" / "passagem.md").is_file() else "ainda não"))
+    except Exception:
+        pass
+    return linhas
 
 
 def minutos(td: timedelta) -> int:
@@ -270,6 +492,12 @@ def main():
 | Decisões esperando você no fim do dia | {r['decisoes_abertas']} |
 | Resumos automáticos de conversa longa | {m['resumos']} |
 """
+    try:
+        extra = uso_v2(pasta, dia, r["fora"])
+    except Exception:
+        extra = []
+    if extra:
+        texto += "\n## O uso (versão 2)\n" + "\n".join(extra) + "\n"
     destino = pasta / "dia" / f"medida-{dia:%Y-%m-%d}.md"
     destino.parent.mkdir(exist_ok=True)
     destino.write_text(texto, encoding="utf-8")

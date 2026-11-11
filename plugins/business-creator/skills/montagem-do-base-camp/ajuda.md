@@ -43,8 +43,8 @@
 ## O CAIO (depois do Base Camp)
 "Comece o dia numa conversa nova escrevendo bom dia e diga o que precisa fazer, do seu jeito, até tudo de uma vez. O que é rápido sai ali; para o que é maior, o app mostra um cartão: escolha Nova sessão e a tarefa roda numa conversa só dela (ou diga 'pode abrir direto'). Quando ela termina, o CAIO anota. O que é seu decidir fica numerado, e você responde 'D-03: A'. No fim, escreva fecha o dia."
 
-## Os botões do painel: Confirmar o retrato, os três workflows, Rodar, Rodar em conversa nova e ver os passos
-"O botão azul diz o que acontece quando você clica. Confirmar o retrato vale como o seu 'pode': o que está no painel fica como está. No passo 3, os três botões são os workflows que o sistema propôs, o primeiro é o recomendado: o clique escolhe e já roda a primeira vez. Depois do Base Camp montado, a entrega você aprova ou corrige escrevendo na conversa ('aprovado', ou o que mudar), porque é lá que ela está. No painel, Rodar (com o seu pedido, as palavras que você vai escrever toda vez, como 'fechar o dia') roda o workflow nesta conversa; Rodar em conversa nova abre outro workflow numa conversa só dele, e você aprova no cartão que o app mostra; ver os passos mostra, um embaixo do outro, cada passo e quem faz, para você ver onde ainda precisa mexer."
+## O botão do painel: Confirmar o retrato
+"O botão azul diz o que acontece quando você clica. Confirmar o retrato vale como o seu 'pode': o que está no painel fica como está."
 
 ## Quero responder por voz
 "Use o ditado do computador: no Mac, a tecla do microfone (ou fn duas vezes); no Windows, Windows + H. Fale à vontade, do jeito que vier: eu organizo. Se nada acontecer, o ditado está desligado: no Mac, abra Ajustes do Sistema, Teclado, e ligue o Ditado (ali aparece o atalho do seu Mac); no Windows, Configurações, Hora e idioma, Fala."
@@ -77,9 +77,8 @@
 - `frentes/`: uma pasta para cada coisa que você toca.
 - `memoria.md`: as lições que você ensina corrigindo.
 - `contexto/computador.md`: o que o seu computador tem (sistema, programas), para eu usar as ferramentas certas.
-- `frentes/<frente>/workflows/`: um cartão para cada workflow, o caminho de uma tarefa sua do começo à entrega. O primeiro você escolhe no fim do Base Camp, e ele roda na hora.
 - `frentes/<frente>/rotinas/` e `modelos/`: os passo a passos que o sistema guardou e os textos que você aprovou.
-- `como-usar.md`: o seu guia de bolso, com o combinado e os pedidos que já funcionam.
+- `como-usar.md`: o seu guia de bolso, com os pedidos para começar.
 - `resumo-para-o-arthur.md`: o resumo do seu Base Camp em uma página, para mandar ao Arthur se quiser.
 - `base-camp.md`: onde a montagem está.
 - `montagem/respostas.md`: as suas respostas, com as suas palavras.

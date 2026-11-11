@@ -61,6 +61,9 @@ const aAbrir = atom({ plugin: 'business-creator', key: 'aAbrir' } as const, null
 // A conversa de agora, para a linha do diário, e se a gravação falhou (0.3.0).
 const conversa = atom({ plugin: 'business-creator', key: 'conversa' } as const, null)
 const diarioFalhou = atom({ plugin: 'business-creator', key: 'diarioFalhou' } as const, false)
+// A conversa em que a montagem fechou (0.4.0): o código dela. Nela, o painel mostra o estado final da montagem;
+// numa conversa nova, a pasta concluída sem cartão.
+const montadaNa = atom({ plugin: 'business-creator', key: 'montadaNa' } as const, null)
 
 // A frase fixa da campo-1 quando a conversa nova não abre (0.3.0): o painel a reconhece e copia o pedido.
 const NAO_ABRIU = 'Não consegui abrir a conversa nova'
@@ -108,7 +111,12 @@ const ICONES = ['campo-1-rodar', 'campo-2-skill', 'campo-3-agendar']
 const PARA_QUE: Record<string, string> = {
   D: 'Dois pedidos: o que a IA que você mais usa sabe de você, e você com as suas palavras.',
   '1': 'O sistema monta o seu retrato de uma vez; você só confirma ou corrige.',
-  '2': 'Você escolhe o seu primeiro workflow; o sistema roda a primeira vez e combina a próxima.',
+}
+
+// A montagem curta (0.4.0): a tabela de 2 passos (o começo e o retrato) ou a de 3, de antes, em que o passo 2 é
+// marcado como pulado. A longa, de antes da 0.2.12, tem as etapas numeradas.
+function ehCurto(blocos: Bloco[]): boolean {
+  return blocos.length === 2 || blocos.length === 3
 }
 
 // Ao fechar uma etapa, o painel celebra a obra, não a pessoa.
@@ -714,25 +722,30 @@ function trilhaSvg(p: Painel, f: Festa | null): string {
     `@keyframes flui{to{stroke-dashoffset:-15}}@keyframes cume{50%{opacity:.35}}</style>` +
     `<rect width="320" height="132" fill="${PAPEL}"/>`
   s += `<path d="M6 126 L316 126" stroke="${TINTA}" stroke-opacity=".35" stroke-width="1.6"/>`
-  s += `<path d="M198 126 L244 72 L258 82 L288 30 L318 126" fill="${PAPEL}" stroke="${TINTA}" stroke-width="2.2" stroke-linejoin="round"/>`
-  const fluir = f && p.concluida ? ' class="flui"' : ''
-  s += `<path d="${rota}" fill="none" stroke="${TINTA}" stroke-opacity=".55" stroke-width="1.8" stroke-dasharray="1.5 6" stroke-linecap="round"${fluir}/>`
-  CAMPOS_NA_ROTA.forEach((t, i) => {
-    const [x, y] = naRota(t)
-    if (i === 0 && p.concluida) {
-      // Depois do Base Camp, o Campo 1 é o ponto atual (0.2.17): contorno enquanto o workflow não está
-      // completo, com o anel (que pulsa na festa); cheio em tinta quando está.
-      if (campo1Feito(p)) {
-        s += quadrado(x, y, 8, `fill="${TINTA}"`)
-      } else {
-        s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="none" stroke="${TINTA}" stroke-width="1.4" opacity=".25"${f ? ' class="pulso"' : ''}/>`
-        s += quadrado(x, y, 8, `fill="${PAPEL}" stroke="${TINTA}" stroke-width="2.2"`)
+  // A montagem em 2 passos (0.4.0), e qualquer pasta sem cartão depois dela: a trilha termina no Base Camp, com a
+  // bandeira; a montanha, a rota e os Campos 1, 2 e 3 saem do desenho.
+  const ateOBaseCamp = p.workflows.length === 0 && (p.blocos.length === 2 || p.concluida)
+  if (!ateOBaseCamp) {
+    s += `<path d="M198 126 L244 72 L258 82 L288 30 L318 126" fill="${PAPEL}" stroke="${TINTA}" stroke-width="2.2" stroke-linejoin="round"/>`
+    const fluir = f && p.concluida ? ' class="flui"' : ''
+    s += `<path d="${rota}" fill="none" stroke="${TINTA}" stroke-opacity=".55" stroke-width="1.8" stroke-dasharray="1.5 6" stroke-linecap="round"${fluir}/>`
+    CAMPOS_NA_ROTA.forEach((t, i) => {
+      const [x, y] = naRota(t)
+      if (i === 0 && p.concluida) {
+        // Depois do Base Camp, o Campo 1 é o ponto atual (0.2.17): contorno enquanto o workflow não está
+        // completo, com o anel (que pulsa na festa); cheio em tinta quando está.
+        if (campo1Feito(p)) {
+          s += quadrado(x, y, 8, `fill="${TINTA}"`)
+        } else {
+          s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="none" stroke="${TINTA}" stroke-width="1.4" opacity=".25"${f ? ' class="pulso"' : ''}/>`
+          s += quadrado(x, y, 8, `fill="${PAPEL}" stroke="${TINTA}" stroke-width="2.2"`)
+        }
+        return
       }
-      return
-    }
-    s += quadrado(x, y, 6, `fill="${PAPEL}" stroke="${TINTA}" stroke-width="1.6"`)
-  })
-  s += quadrado(288, 34, 12, `fill="${SINAL}"${f && p.concluida ? ' class="cume"' : ''}`)
+      s += quadrado(x, y, 6, `fill="${PAPEL}" stroke="${TINTA}" stroke-width="1.6"`)
+    })
+    s += quadrado(288, 34, 12, `fill="${SINAL}"${f && p.concluida ? ' class="cume"' : ''}`)
+  }
   s += `<path d="${caminho}" fill="none" stroke="${TINTA}" stroke-opacity=".35" stroke-width="2" stroke-dasharray="1.5 6" stroke-linecap="round"/>`
   if (prog > 0) {
     const fim = (100 - prog * 100).toFixed(1)
@@ -757,6 +770,11 @@ function trilhaSvg(p: Painel, f: Festa | null): string {
     s += quadrado(190, 118, 12, `fill="${TINTA}"`)
   } else {
     s += quadrado(190, 118, 12, `fill="${PAPEL}" stroke="${TINTA}" stroke-width="2.2"`)
+  }
+  if (ateOBaseCamp) {
+    // A bandeira do Base Camp: o mastro em tinta e o pano no laranja de sinal, o único da peça (pisca na festa).
+    s += `<path d="M190 112 L190 84" stroke="${TINTA}" stroke-width="2" stroke-linecap="round"/>`
+    s += `<path d="M190 85 L208 90 L190 96 Z" fill="${SINAL}"${f && p.concluida ? ' class="cume"' : ''}/>`
   }
   return s + '</svg>'
 }
@@ -1128,14 +1146,13 @@ async function carregar($: EngineInterface) {
       { rotulo: 'O mapa das suas frentes', ok: await existe($, `${dir}/montagem/mapa-das-frentes.md`) },
       { rotulo: 'Como você trabalha', ok: await existe($, `${dir}/contexto/como-trabalhar-comigo.md`) },
       { rotulo: 'O caderno de lições', ok: await existe($, `${dir}/memoria.md`) },
-      { rotulo: 'O primeiro workflow', ok: await existe($, cartao) },
       { rotulo: 'O arquivo principal', ok: principal },
       { rotulo: 'O guia de bolso', ok: guia },
     ]
     const atual = base.blocos.find(b => b.status === 'em andamento') ?? base.blocos.find(b => b.status === 'pendente')
     let campos: Campo[] = []
     const ultima = base.blocos[base.blocos.length - 1]?.codigo
-    const curto = base.blocos.length === 3
+    const curto = ehCurto(base.blocos)
     const ok = (x: boolean): Campo['estado'] => (x ? 'ok' : 'falta')
     // O teste "quem sou eu": passou, falta, ou não passou com o motivo (0.2.16).
     const teste = (codigo: string): Campo =>
@@ -1150,14 +1167,8 @@ async function carregar($: EngineInterface) {
         teste('1.teste'),
       ]
     } else if (curto && atual?.codigo === '2' && !base.concluida) {
-      // O primeiro workflow (0.2.17): a escolha dela, a primeira rodada entregue e o combinado.
-      campos = [
-        base.escolhido
-          ? { codigo: '2.escolha', rotulo: `O seu primeiro workflow: ${maiuscula(base.escolhido)}`, estado: 'ok' }
-          : { codigo: '2.escolha', rotulo: 'O seu primeiro workflow, escolhido', estado: 'falta' },
-        { codigo: '2.rodada', rotulo: 'A primeira rodada entregue', estado: ok(base.feita) },
-        { codigo: '2.combinado', rotulo: 'O combinado', estado: ok(Boolean(base.combinado)) },
-      ]
+      // O passo 2 de antes da 0.4.0, numa pasta antiga: um passo comum, sem campos (a montagem o marca como pulado).
+      campos = []
     } else if (atual && atual.codigo === ultima && !base.concluida) {
       // A última etapa não pergunta: entrega. O painel mostra o que falta entregar.
       const e = atual.codigo
@@ -1227,6 +1238,8 @@ async function celebrar($: EngineInterface, antes: Painel, depois: Painel) {
   }
   if (!antes.concluida && depois.concluida) {
     texto = OBRA.fim ?? null
+    const id = await idDaSessao($)
+    await update($, montadaNa, () => id || 'sem-id')
   } else if (!depois.concluida) {
     const fechou = depois.blocos.find(
       b => b.status === 'aprovado' && antes.blocos.find(a => a.codigo === b.codigo)?.status !== 'aprovado',
@@ -1241,6 +1254,15 @@ async function celebrar($: EngineInterface, antes: Painel, depois: Painel) {
   $.ui.toast(texto, { timeoutMs: depois.concluida ? 9000 : 6000 })
   await update($, festa, () => ({ texto, anterior: progresso(antes) }))
   $.clock.after(9000, () => void update($, festa, () => null))
+}
+
+// O código curto da conversa (os 4 últimos caracteres do id); '' se o app não responder.
+async function idDaSessao($: EngineInterface): Promise<string> {
+  try {
+    return (await $.session.id()).replace(/[^a-z0-9]/gi, '').slice(-4)
+  } catch {
+    return ''
+  }
 }
 
 // A hora pelo relógio do app (nos testes, um relógio que o teste move); se ele não responder, a do sistema.
@@ -1461,6 +1483,8 @@ export const register: Register = on => {
       estaSessao = ''
     }
     if (!anterior || !estaSessao || anterior.id !== estaSessao) await update($, conversa, () => null)
+    // O estado final da montagem só vale na conversa em que ela fechou (0.4.0).
+    if (!estaSessao || (await read($, montadaNa)) !== estaSessao) await update($, montadaNa, () => null)
     await update($, aAbrir, () => null)
     const dado = await carregar($)
     if (dado) void $.ui.open({ id: PANE, title: TITULO })
@@ -1681,8 +1705,8 @@ export const register: Register = on => {
     const atual = p.blocos.find(b => b.status === 'em andamento') ?? p.blocos.find(b => b.status === 'pendente')
     if (!atual) return next(e)
     const { Box, Text } = $.ui.resolve(e)
-    const curto = p.blocos.length === 3
-    const total = curto ? 3 : p.blocos.filter(b => b.codigo !== 'D').length
+    const curto = ehCurto(p.blocos)
+    const total = curto ? p.blocos.length : p.blocos.filter(b => b.codigo !== 'D').length
     const numero = curto ? p.blocos.findIndex(b => b.codigo === atual.codigo) + 1 : atual.codigo
     const etapa = atual.codigo === 'D' && !curto ? 'Começo' : `${curto ? 'Passo' : 'Etapa'} ${numero} de ${total} · ${atual.nome}`
     const ocupado = e.props.isWorking || (await read($, trabalhando))
@@ -1819,9 +1843,10 @@ export const register: Register = on => {
           '✓ Base',
           ...dado.blocos.map(b => {
             const atual = !dado.concluida && atualBloco?.codigo === b.codigo
-            return `${atual ? '●' : b.status === 'aprovado' || b.status === 'pulado' ? '✓' : '○'} ${b.codigo === 'D' ? 'Começo' : dado.blocos.length === 3 ? b.nome : b.codigo}`
+            return `${atual ? '●' : b.status === 'aprovado' || b.status === 'pulado' ? '✓' : '○'} ${b.codigo === 'D' ? 'Começo' : ehCurto(dado.blocos) ? b.nome : b.codigo}`
           }),
-          ...(dado.concluida ? [campo1Feito(dado) ? '✓ Campo 1' : '● Campo 1'] : []),
+          // O Campo 1 só entra para quem tem cartão (0.4.0).
+          ...(dado.concluida && dado.workflows.length > 0 ? [campo1Feito(dado) ? '✓ Campo 1' : '● Campo 1'] : []),
         ].join('   ')}
       </Text>
     )
@@ -1841,9 +1866,9 @@ export const register: Register = on => {
           <Box flexDirection="column">
             <Text color={CINZA}>Onde todo sistema começa: uma pasta, um arquivo e qualquer IA.</Text>
             {trilha}
-            <Text bold color={ROCHA}>{dado.blocos.length === 3 ? '3 passos, uns 30 minutos: você manda, confirma e escolhe o seu primeiro workflow, que já roda.' : `${dado.blocos.filter(b => b.codigo !== 'D').length} etapas, uma tarde, com parada no fim de cada uma.`}</Text>
+            <Text bold color={ROCHA}>{ehCurto(dado.blocos) ? '2 passos, uns 20 minutos: você manda e confirma o seu retrato.' : `${dado.blocos.filter(b => b.codigo !== 'D').length} etapas, uma tarde, com parada no fim de cada uma.`}</Text>
             <Text color={ROCHA}>
-              Você responde do seu jeito, até por voz. O sistema escreve cada arquivo e mostra para você aprovar. No fim, ele já roda o seu primeiro workflow para você.
+              Você responde do seu jeito, até por voz. O sistema escreve cada arquivo e mostra para você aprovar.
             </Text>
           </Box>
           <Box flexDirection="column">
@@ -1870,7 +1895,6 @@ export const register: Register = on => {
       const rodadas = daVez ? daVez.rodadas : dado.rodadas
       const aguardaAprovacao = rodadas[rodadas.length - 1]?.aprovada === 'pendente'
       const estado = daVez ? daVez.estado : dado.estado
-      const ehOPrimeiro = !daVez || daVez.arquivo === (dado.workflow ?? 'primeiro-processo.md')
       const abertos = await read($, passosAbertos)
       const aComecarAberto = await read($, filaAberta)
       const marcos = calcularMarcos(dado.workflows, dado.fila)
@@ -1963,6 +1987,54 @@ export const register: Register = on => {
         )
       }
 
+      // A zona recolhida de hoje: o Base Camp numa linha, com o resumo e o guia de bolso num toque.
+      const zonaRecolhida = (
+        <Box flexDirection="column">
+          {falhou && <Text color={SINAL} size="caption">O diário não está gravando. Escreva travei.</Text>}
+          <Box flexDirection="row" flexWrap="wrap" gap={1}>
+            <Text color={CINZA} size="caption">{dado.tempoTotal ? `Base Camp montado em ${dado.tempoTotal}` : 'Base Camp montado'}</Text>
+            <Button key="ver-resumo" label={zonaDoBaseCamp ? 'Fechar o resumo' : 'Ver o resumo'} onPress={() => void (zonaDoBaseCamp ? update($, doc, () => null) : abrirDoc($, 'resumo'))} />
+          </Box>
+          {zonaDoBaseCamp && (
+            <Box flexDirection="column">
+              {trilha}
+              {progresso}
+              {dado.testeFalhou !== null && (
+                <Text color={SINAL}>✕ O teste: quem sou eu não passou{dado.testeFalhou ? `: ${dado.testeFalhou}` : ''}</Text>
+              )}
+              <Box flexDirection="row" flexWrap="wrap" gap={1}>
+                <Button key="copiar-resumo" label="Copiar o resumo" onPress={press => void copiarResumo($, press.surface)} />
+                <Button key="guia" label={aberto === 'guia' ? 'Ver o resumo' : 'Ver o guia de bolso'} onPress={() => void abrirDoc($, aberto === 'guia' ? 'resumo' : 'guia')} />
+              </Box>
+              {docAberto}
+            </Box>
+          )}
+        </Box>
+      )
+
+      // A pasta sem cartão de workflow (0.4.0): nada da interface de workflow. Na conversa em que a montagem fechou,
+      // o estado final da montagem; nas outras, o título, a linha do bom dia e a zona recolhida. O painel do dia é
+      // outra etapa.
+      if (dado.workflows.length === 0 && dado.fila.length === 0) {
+        const montadaAqui = (await read($, montadaNa)) !== null
+        return (
+          <Box {...fundo}>
+            {cabecalho}
+            {montadaAqui ? (
+              <Box flexDirection="column" borderStyle="round" borderColor={TINTA} backgroundColor={BRANCO} padding={1}>
+                <Text color={TINTA} size="caption">AGORA · BASE CAMP MONTADO</Text>
+                <Text bold color={ROCHA}>O seu Base Camp está montado.</Text>
+                <Text color={ROCHA}>Abra uma conversa nova e escreva bom dia.</Text>
+              </Box>
+            ) : (
+              <Text color={CINZA}>Comece o dia numa conversa nova: escreva bom dia.</Text>
+            )}
+            {zonaRecolhida}
+            {rodape}
+          </Box>
+        )
+      }
+
       // O cartão Agora.
       const etiquetaAgora = aguardaAprovacao ? 'AGORA · ESPERANDO VOCÊ NO CHAT' : 'AGORA · O SEU WORKFLOW PRINCIPAL'
       const nomeDaVez = daVez?.nome ?? dado.workflowNome ?? (pedido ? maiuscula(pedido) : 'O seu primeiro workflow')
@@ -1984,11 +2056,10 @@ export const register: Register = on => {
           {acao.texto.replace(/(?:[A-Za-z]:)?(?:[^\s/\\]+[/\\])+([^\s/\\]+)/g, '$1')} · {acao.hora}
         </Text>
       ) : null
-      const rodarAqui = aguardaAprovacao || pendente ? null : pedido ? (
+      // Sem pedido, nenhum botão (0.4.0): o "Rodar o meu primeiro workflow" saiu com o passo do workflow.
+      const rodarAqui = aguardaAprovacao || pendente || !pedido ? null : (
         <Button key="rodar-workflow" variant="primary" label={rotuloCurto(`Rodar ${pedido}`)} onPress={() => void enviar($, pedido)} />
-      ) : ehOPrimeiro ? (
-        <Button key="rodar-workflow" variant="primary" label="Rodar o meu primeiro workflow" onPress={() => void enviar($, 'vamos rodar o primeiro workflow')} />
-      ) : null
+      )
 
       // A lista: os que já rodaram (ou que precisam de ajuste) e os que nunca rodaram, recolhidos.
       const outros = dado.workflows.filter(w => w !== daVez)
@@ -2129,26 +2200,7 @@ export const register: Register = on => {
             {marcoAbertoAgora && MARCOS_LEGENDA.map(l => (
               <Text key={`explica-${l.chave}`} color={CINZA} size="caption">{l.explica}</Text>
             ))}
-            {falhou && <Text color={SINAL} size="caption">O diário não está gravando. Escreva travei.</Text>}
-            <Box flexDirection="row" flexWrap="wrap" gap={1}>
-              <Text color={CINZA} size="caption">{dado.tempoTotal ? `Base Camp montado em ${dado.tempoTotal}` : 'Base Camp montado'}</Text>
-              <Button key="ver-resumo" label={zonaDoBaseCamp ? 'Fechar o resumo' : 'Ver o resumo'} onPress={() => void (zonaDoBaseCamp ? update($, doc, () => null) : abrirDoc($, 'resumo'))} />
-            </Box>
-            {zonaDoBaseCamp && (
-              <Box flexDirection="column">
-                {trilha}
-                {progresso}
-                {dado.testeFalhou !== null && (
-                  <Text color={SINAL}>✕ O teste: quem sou eu não passou{dado.testeFalhou ? `: ${dado.testeFalhou}` : ''}</Text>
-                )}
-                <Box flexDirection="row" flexWrap="wrap" gap={1}>
-                  <Button key="copiar-resumo" label="Copiar o resumo" onPress={press => void copiarResumo($, press.surface)} />
-                  <Button key="guia" label={aberto === 'guia' ? 'Ver o resumo' : 'Ver o guia de bolso'} onPress={() => void abrirDoc($, aberto === 'guia' ? 'resumo' : 'guia')} />
-                </Box>
-                {docAberto}
-                {!completo && <Text color={CINZA} size="caption">No programa, o Arthur sobe a Mera com você.</Text>}
-              </Box>
-            )}
+            {zonaRecolhida}
           </Box>
           {rodape}
         </Box>
@@ -2159,32 +2211,32 @@ export const register: Register = on => {
     const ver = await read($, verArquivo)
     const textoArquivo = await read($, arquivoTexto)
     const sabidos = dado.campos.filter(c => c.estado === 'ok').length
-    const curto = dado.blocos.length === 3
-    const total = curto ? 3 : dado.blocos.filter(b => b.codigo !== 'D').length
+    const curto = ehCurto(dado.blocos)
+    const total = curto ? dado.blocos.length : dado.blocos.filter(b => b.codigo !== 'D').length
     const numero = curto && atualBloco ? dado.blocos.findIndex(b => b.codigo === atualBloco.codigo) + 1 : atualBloco?.codigo
-    const ehEntrega = atualBloco !== undefined && atualBloco.codigo === dado.blocos[dado.blocos.length - 1]?.codigo
+    // A última etapa que entrega é só da montagem longa (0.4.0): na curta, o último passo é o retrato (ou, na pasta
+    // antiga de 3 linhas, o passo 2, que fica como um passo comum).
+    const ehEntrega = !curto && atualBloco !== undefined && atualBloco.codigo === dado.blocos[dado.blocos.length - 1]?.codigo
+    const passo2Antigo = curto && atualBloco?.codigo === '2'
     const ehComeco = atualBloco?.codigo === 'D'
     const lembrete = (await read($, parado)) && !ocupado
     const nomeAprov = aprov?.arquivo ? nomeDoArquivo(aprov.arquivo) : null
     const perguntaDaVez = ocupado ? null : await read($, pergunta)
-    // O passo 2 antes da escolha (0.2.17): as 3 opções de primeiro workflow viram botões no cartão Agora.
-    const escolhaDoWorkflow = curto && ehEntrega && !dado.escolhido && dado.opcoes.length > 0 && !ocupado && !pendente
     const testeFalhou = dado.campos.some(c => c.estado === 'falhou')
-    // No curto, o retrato montado pede o confirmo e a tarefa feita pede o "ficou bom": o botão principal
-    // aparece nesses dois momentos mesmo sem a frase de aprovação, e manda o "pode, aprovado" de sempre.
+    // No curto, o retrato montado pede o confirmo: o botão principal aparece mesmo sem a frase de aprovação, e manda
+    // o "pode, aprovado" de sempre.
     // O botão aparece quando o retrato está na tela (o resumo existe), falte ou não um campo (0.3.2: no teste de 05/11 ele
     // sumia por um campo faltando, e a pessoa escreveu "continuar" duas vezes).
     const retratoMontado = curto && atualBloco?.codigo === '1' && Boolean(dado.resumo && dado.resumo.cartoes.length > 0)
-    const tarefaFeita = curto && ehEntrega && dado.feita
     const materialChegou = ehComeco && dado.campos.some(c => c.codigo === 'D.2' && c.estado === 'ok')
     // Os botões dizem o resultado, não a ação (0.2.16); as frases que eles mandam não mudam.
-    const rotuloAprovar = curto && atualBloco?.codigo === '1' ? 'Confirmar o retrato' : tarefaFeita ? 'Fechar o Base Camp' : 'Aprovar'
+    const rotuloAprovar = curto && atualBloco?.codigo === '1' ? 'Confirmar o retrato' : 'Aprovar'
     const rotuloContinuar = curto && materialChegou ? 'Montar o meu retrato' : 'Continuar'
     const principal =
-      aprov || retratoMontado || tarefaFeita ? (
+      aprov || retratoMontado ? (
         <Button key="aprovar" variant="primary" label={rotuloAprovar} onPress={() => void enviar($, 'pode, aprovado')} />
-      ) : !perguntaDaVez && completo && !escolhaDoWorkflow ? (
-        // Na escolha do workflow, os botões das opções são o caminho: sem um Continuar azul ao lado do recomendado.
+      ) : (!perguntaDaVez && completo) || passo2Antigo ? (
+        // O passo 2 de uma pasta antiga (0.4.0) tem sempre o Continuar: a montagem o marca como pulado.
         <Button key="continuar" variant="primary" label={rotuloContinuar} onPress={() => void enviar($, 'continuar')} />
       ) : null
     // O começo (0.3.2): o primário é copiar o pedido 1 até ele chegar; com o pedido 2, "Montar o meu retrato".
@@ -2214,48 +2266,30 @@ export const register: Register = on => {
             <Text color={TINTA}>● {agora ?? 'O sistema está trabalhando'}…</Text>
           ) : aprov ? (
             <Text bold color={ROCHA}>Sua vez: aprove ou corrija{nomeAprov ? ` ${nomeAprov}` : ''}.</Text>
-          ) : escolhaDoWorkflow ? (
-            <Text bold color={ROCHA}>Sua vez: escolha o seu primeiro workflow.</Text>
           ) : (
             <Text bold color={ROCHA}>{perguntaDaVez ? `Sua vez: ${perguntaDaVez}` : 'Sua vez: responda na conversa.'}</Text>
           )}
           {atualBloco && PARA_QUE[atualBloco.codigo] && !aprov && !comecoCurto && <Text color={CINZA} size="caption">{PARA_QUE[atualBloco.codigo]}</Text>}
           {comecoCurto && (
-            // O mapa dos 3 passos e os 2 pedidos com o estado (0.3.2): o caminho desenhado, no lugar da explicação na conversa.
+            // O mapa dos 2 passos e os 2 pedidos com o estado (0.3.2; 0.4.0, 2 passos): o caminho desenhado, no lugar da
+            // explicação na conversa. Depois da última seta, em cinza, o que vem depois da montagem.
             <Box flexDirection="column">
               <Box flexDirection="row" flexWrap="wrap" gap={1}>
-                {['1 · Você manda', '2 · Você confirma o retrato', '3 · O primeiro workflow roda'].map((p, i) => (
+                {['1 · Você manda', '2 · Você confirma o retrato'].map((p, i) => (
                   <Box key={`mapa-${i}`} flexDirection="row" gap={1}>
                     <Box borderStyle="round" borderColor={i === 0 ? TINTA : TRACO} paddingX={1}>
                       <Text bold={i === 0} color={i === 0 ? ROCHA : CINZA} size="caption">{i === 0 ? `● ${p}` : p}</Text>
                     </Box>
-                    {i < 2 && <Text color={TRACO}>→</Text>}
+                    <Text color={TRACO}>→</Text>
                   </Box>
                 ))}
+                <Text key="mapa-depois" color={CINZA} size="caption">o seu primeiro dia, com o CAIO</Text>
               </Box>
               <Text color={pedido1Chegou ? TINTA : ROCHA}>{pedido1Chegou ? '✓' : '○'} Pedido 1 · a outra IA{pedido1Chegou ? ' · recebido' : ''}</Text>
               <Text color={materialChegou ? TINTA : ROCHA}>
                 {materialChegou ? '✓' : '○'} Pedido 2 · você, por voz{materialChegou ? ' · recebido' : ''}
               </Text>
               {!materialChegou && <Text color={CINZA} size="caption">Fale pelo microfone do Claude, na caixa de mensagem.</Text>}
-            </Box>
-          )}
-          {escolhaDoWorkflow && (
-            <Box flexDirection="column" gap={1}>
-              <Text color={CINZA} size="caption">O SEU PRIMEIRO WORKFLOW · ESCOLHA UM (O PRIMEIRO É O RECOMENDADO)</Text>
-              {dado.opcoes.map((o, i) => (
-                // A entrega em cima, como legenda; o botão leva o pedido, com a primeira letra em maiúscula, e manda
-                // "primeiro workflow: <pedido>" como está na linha.
-                <Box key={`opcao-${i}`} flexDirection="column">
-                  {o.entrega.length > 0 && <Text color={CINZA} size="caption">{o.entrega}</Text>}
-                  <Button
-                    key={`escolha-${i}`}
-                    variant={i === 0 ? 'primary' : undefined}
-                    label={rotuloCurto(maiuscula(o.pedido))}
-                    onPress={() => void enviar($, `primeiro workflow: ${o.pedido}`)}
-                  />
-                </Box>
-              ))}
             </Box>
           )}
           <Box flexDirection="row" flexWrap="wrap" gap={1}>

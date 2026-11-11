@@ -230,6 +230,8 @@ declare module 'claude-code' {
       aAbrir: string | null
       conversa: Conversa | null
       diarioFalhou: boolean
+      // O código da conversa em que a montagem fechou (0.4.0): nela, o estado final da montagem; null nas outras.
+      montadaNa: string | null
     }
   }
 }

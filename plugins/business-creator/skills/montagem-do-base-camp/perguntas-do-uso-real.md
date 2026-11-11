@@ -1,13 +1,13 @@
 # As perguntas do uso real (a reserva da montagem longa)
 
-> Versão 1.0 (01/11/2026), no plugin Business Creator 0.2.12. Eram as 32 perguntas das etapas 1 a 5 do roteiro 2.0; desde o Base Camp curto, **não se fazem na montagem**. O sistema pergunta no momento em que precisa, **uma pergunta por conversa**, no fim da resposta, depois de entregar o que ela pediu, e grava a resposta em `montagem/respostas.md` (o código de `campos.md`) e no arquivo certo. Tudo o que o retrato já respondeu, não se pergunta de novo.
+> Versão 1.0 (01/11/2026), no plugin Business Creator 0.2.12. Eram as 32 perguntas das etapas 1 a 5 do roteiro 2.0; desde o Base Camp curto, **não se fazem na montagem**. O sistema pergunta no momento em que precisa: **na conversa do CAIO, no máximo uma por dia; numa conversa de tarefa, no máximo uma, no fim**, depois de entregar o que ela pediu, e grava a resposta em `montagem/respostas.md` (o código de `campos.md`) e no arquivo certo. Tudo o que o retrato já respondeu, não se pergunta de novo.
 > A lista do que falta fica em "Falta isto" do `montagem/resumo.md`, que o painel mostra como "o que o sistema ainda vai aprender com você". Ao responder, tire da lista.
 
 ## A regra
 1. **Só quando a tarefa precisar.** Nada de perguntar para completar ficha: a pergunta nasce de uma entrega que ficaria melhor com a resposta.
-2. **Uma por conversa, no fim**, depois da entrega, em uma linha: "Para a próxima vez: <a pergunta>." Se ela não responder, não insista; volta noutra conversa.
+2. **Na conversa do CAIO, no máximo uma por dia; numa conversa de tarefa, no máximo uma, no fim**, depois da entrega, em uma linha: "Para a próxima vez: <a pergunta>." Se ela não responder, não insista; volta noutro dia ou noutra conversa.
 3. **Peça fatos**, uma vez recente, um exemplo; nunca autoavaliação.
-4. **A resposta vira arquivo na hora** (o `sobre-mim.md`, a ficha da frente, o cartão do workflow, o `como-trabalhar-comigo.md`) e, quando é regra, o `memoria.md`.
+4. **A resposta vira arquivo na hora**, no lugar que a tabela do organizador manda (`organizador.md`, da skill `caio`), e, quando é regra, o `memoria.md`.
 
 ## Quando o sistema for escrever em nome dela
 - "Me manda 2 ou 3 textos seus que têm a sua cara: uma mensagem, um e-mail, um post. Com eles eu escrevo do seu jeito." → `VOZ.textos`; escreva `contexto/estilo-de-escrita.md` (modelo `modelos/estilo-de-escrita.md`) e aponte do `AGENTS.md` da raiz.
@@ -17,12 +17,6 @@
 - "Onde ficam as informações mais importantes dela?" → `FERRAMENTAS.dados`.
 - "O que está parado ou atrasado nela, e o que está segurando?" → `FRENTE.<nome>.parado`.
 - "Quem mais está nela com você, e qual é o seu papel?" (só o papel, sem nomes de colegas ou clientes) → `FRENTE.<nome>.pessoas`.
-
-## Nas rodadas do workflow (a skill `campo-1` faz estas, uma por vez, e só quando a rodada precisa)
-- "Quanto tempo isso te tomava antes?" → `PROC.antes` (uma vez, no fim da rodada 1; a montagem já pergunta na mensagem final. Depois, se puder: "cronometre a próxima", para o medido no lugar da estimativa).
-- Só quando a entrega não dá para conferir: "O que não pode faltar para você dar por pronto?" → `PROC.pronto` (de preferência, o sistema escreve o "Pronto quando" pelo que a rodada mostrou, e ela corrige).
-- Só quando um passo não dá para fazer: a pergunta daquele passo, uma ("Cola aqui a mensagem dele?", "Qual dos dois fornecedores?"), na hora → `PROC.dependencias`, se for uma trava que se repete.
-- O detalhamento de um passo (o que entra, o critério, as exceções, o que sai) **não se pergunta**: entra pelas correções dela, rodada a rodada. A exceção é o plano B da skill `campo-1`: o passo que falhou duas vezes, com até 3 perguntas, uma por vez.
 
 ## Quando o sistema for decidir algo por ela, ou propor opções
 - "Quando você decide algo importante, como faz? Sozinho, conversa com alguém, pede opções, dorme em cima?" → `JEITO.decide`.

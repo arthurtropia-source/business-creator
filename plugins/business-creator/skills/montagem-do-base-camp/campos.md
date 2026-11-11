@@ -1,6 +1,6 @@
 # Mapa de campos
 
-> O que cada arquivo final precisa saber. Cada campo tem um código, o arquivo onde entra e o que conta como "preenchido". **Desde o Base Camp curto (01/11/2026), todos os campos são preenchidos no passo 1 (o retrato) a partir dos 2 pedidos do começo; a coluna "Vem de" diz de que pergunta da montagem longa o campo vinha, e hoje aponta para `perguntas-do-uso-real.md`**, onde essas perguntas moram, para o uso real. O que o retrato não conseguir preencher fica fora do arquivo (ou "a completar nas rodadas", no cartão do workflow) e entra em "Falta isto" do `montagem/resumo.md`.
+> O que cada arquivo final precisa saber. Cada campo tem um código, o arquivo onde entra e o que conta como "preenchido". **Desde o Base Camp curto (01/11/2026), todos os campos são preenchidos no passo 1 (o retrato) a partir dos 2 pedidos do começo; a coluna "Vem de" diz de que pergunta da montagem longa o campo vinha, e hoje aponta para `perguntas-do-uso-real.md`**, onde essas perguntas moram, para o uso real. O que o retrato não conseguir preencher fica fora do arquivo e entra em "Falta isto" do `montagem/resumo.md`.
 > Em `montagem/respostas.md`, cada campo é uma seção com o código no título (`## QUEM.trabalho`), e embaixo as respostas com a origem.
 > **[leve]** = o campo também entra no nível leve.
 
@@ -38,7 +38,7 @@
 | `JEITO.decide` | como ela decide | há um jeito descrito | 4.3 |
 | `JEITO.horarios` | quando e de onde trabalha nas frentes | há horários ou lugares | 4.4, 1.5 |
 | `AMBIENTE.computador` | Mac ou Windows e o resto: o sistema confere sozinho no inventário da 5.0 e grava em `contexto/computador.md` (não se pergunta) | a ficha existe | 5.0 |
-| `VOZ.textos` | 2 ou 3 textos dela, inteiros (desde 31/10/2026, pedidos no Campo 1, depois do primeiro workflow; fora da montagem) | há pelo menos 1 texto | Campo 1, D |
+| `VOZ.textos` | 2 ou 3 textos dela, inteiros (pedidos no uso real, quando o sistema for escrever em nome dela; fora da montagem) | há pelo menos 1 texto | uso real, D |
 
 ## memoria.md e as regras do AGENTS.md
 | Código | O que é | Preenchido quando | Vem de |
@@ -46,24 +46,15 @@
 | `REGRAS.lista` [leve] | as regras aprovadas, com o que ela tirou, mudou ou acrescentou | ela respondeu à 5.1 | 5.1 |
 | `REGRAS.sigilo` [leve] | o que não passa de uma frente para outra e o que nunca se guarda | há resposta (pode ser "nada") | 2.4, 5.1 |
 
-## O cartão do primeiro workflow (`frentes/<frente>/workflows/<nome>.md`; no leve, `workflows/<nome>.md`)
+## montagem/resumo.md (o cartão "O que se repete")
 | Código | O que é | Preenchido quando | Vem de |
 |---|---|---|---|
 | `PROC.candidatas` [leve] | até 5 tarefas repetidas, com o tempo de cada | há pelo menos 2 | 1.5, 3.1 |
-| `PROC.dinheiro` [leve] | quais geram ou poupam dinheiro | há resposta | 3.2, 2.3 |
-| `PROC.escolhido` [leve] | o workflow que ela escolheu entre as 3 opções do passo 2, com o pedido (a frase que ela escreve para rodar) | ela clicou ou nomeou | passo 2 |
-| `PROC.entrada` [leve] | de onde vêm as informações | há a fonte | 3.4 |
-| `PROC.saida` [leve] | o que sai no fim | há o formato do resultado | 3.4 |
-| `PROC.para-quem` [leve] | quem recebe | há uma pessoa ou "eu mesma" | 3.4 |
-| `PROC.passos` [leve] | os passos de hoje, do começo à entrega, numerados, com as palavras dela | há pelo menos 3 passos e ela confirmou a lista | 3.4a |
-| `PROC.antes` [leve] | o tempo de hoje, com a data e a origem (medido, lembrança ou estimativa) | há o número, a data e a origem | 3.5 |
-| `PROC.pronto` | como ela sabe que ficou certa | há pelo menos 1 critério | 3.6 |
-| `PROC.dependencias` [leve] | o que pode travar a tarefa (aprovação de alguém, acesso, informação que não está com ela) e o que fazer antes do Campo 1 | há resposta (pode ser "nada") | 3.7 |
 
-## base-camp.md (o primeiro workflow) e como-usar.md
+## base-camp.md (Para começar) e como-usar.md
 | Código | O que é | Preenchido quando | Vem de |
 |---|---|---|---|
-| `PRIMEIRA.workflows` [leve] | as 3 opções de workflow (pedido e primeira entrega), o escolhido, a rodada 1 e o combinado | há as 3, o escolhido rodou a rodada 1 e o combinado está gravado | passo 2 |
+| `PRIMEIRA.pedidos` [leve] | até 3 pedidos que saem prontos com o que ela já contou | há de 0 a 3 linhas em "Para começar" do `base-camp.md` | passo 1 |
 
 ## Lista de arquivos por nível
 | Arquivo | Leve | Completo |
@@ -76,7 +67,6 @@
 | `frentes/<nome>/AGENTS.md` | não (só o mapa no `AGENTS.md`) | sim, uma por frente |
 | `contexto/computador.md` (o inventário da 5.0) | sim | sim |
 | `memoria.md` | sim | sim |
-| o cartão do primeiro workflow (`frentes/<frente>/workflows/<nome>.md`; no leve, `workflows/`) | sim | sim |
 | `resumo-para-o-arthur.md` | sim | sim |
 | `como-usar.md` (o guia de bolso) | sim | sim |
 | `base-camp.md` (o estado) | sim | sim |

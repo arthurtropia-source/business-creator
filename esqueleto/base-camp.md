@@ -11,7 +11,6 @@
 |---|---|---|---|
 | D · O começo | pendente | | |
 | 1 · O retrato | pendente | | |
-| 2 · O primeiro workflow | pendente | | |
 
 <!-- Status possíveis: pendente, em andamento, aprovado, pulado. Horários no formato DD/MM/AAAA HH:MM. -->
 
@@ -19,11 +18,8 @@
 - **Quem sou eu:** não feito
 - **Separação entre frentes:** não feito
 
-## O primeiro workflow
-<!-- As 3 opções que o sistema propôs no passo 3, uma por linha: "- <pedido>: <a primeira entrega, em uma linha>", a recomendada primeiro. Depois, as linhas Escolhido, Rodada 1 e Combinado. O painel mostra as opções como botões e lê as linhas em negrito. -->
-
-## Os marcos
-<!-- O recibo dos marcos das montanhas (Mera, Island, Lobuche East), uma linha por marco, gravado pela skill campo-1 quando um workflow completo fecha um. O painel calcula os marcos pelos cartões; aqui fica só o recibo. -->
+## Para começar
+<!-- Até 3 pedidos que saem prontos com o que você já contou, um por linha: "- <pedido>: <o que você recebe, em meia linha>". O sistema escreve no fim do retrato; o CAIO mostra no primeiro dia, só se você pedir. -->
 
 ## Em aberto
 <!-- Pergunta que ficou sem resposta quando a conversa parou ou trocou. A próxima conversa começa por aqui e apaga o item quando ele for respondido. -->

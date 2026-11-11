@@ -16,7 +16,7 @@ Linhas fixas, que você lê pelo rótulo em negrito: **Empresa**, **Área**, **Q
 
 ## O que muda na montagem e na atualização da pasta
 1. **O `AGENTS.md` da raiz ganha a seção "A empresa onde eu trabalho"** (modelo `AGENTS-raiz.md`), com o caminho do arquivo de regras e do `AGENTS.md` do repositório. A regra dos dados da empresa (a 7 da casa) passa a ser: "Dados da empresa: valem as regras de `<repositório>/contexto/regras-da-empresa.md`". Nunca escreva ali o nome de quem autoriza nem o que está autorizado: isso fica no arquivo da empresa.
-2. **Cada frente de trabalho da área aponta para o repositório** (toda frente cujo trabalho é da empresa; se forem duas, as duas). Na ficha de cada uma (`frentes/<frente>/AGENTS.md`), logo abaixo de "O que é", a linha: "O trabalho desta frente mora em `<repositório>/` (o que está em **Onde fica o trabalho**). Antes de trabalhar nela, leia `<repositório>/AGENTS.md`: ele manda no trabalho da área. Aqui ficam só os cartões dos workflows, o diário e o que é meu." Os cartões, o diário e o painel continuam na pasta, no formato de sempre.
+2. **Cada frente de trabalho da área aponta para o repositório** (toda frente cujo trabalho é da empresa; se forem duas, as duas). Na ficha de cada uma (`frentes/<frente>/AGENTS.md`), logo abaixo de "O que é", a linha: "O trabalho desta frente mora em `<repositório>/` (o que está em **Onde fica o trabalho**). Antes de trabalhar nela, leia `<repositório>/AGENTS.md`: ele manda no trabalho da área. Aqui ficam só o caderno do dia, o diário e o que é meu." O caderno do dia, o diário e o painel continuam na pasta, no formato de sempre.
 3. **O `.claude/settings.json` da pasta ganha duas coisas**, numa edição só (o app pede o ok dela uma vez):
    - **as linhas de "Permissões da área"**, acrescentadas em `permissions.allow`, como estão no arquivo, sem tirar nenhuma das que já estão;
    - **a atualização da base ao abrir a conversa:** um gancho `SessionStart` com o comando de "Atualizar a base", no formato `{"hooks": {"SessionStart": [{"hooks": [{"type": "command", "command": "<o comando>", "timeout": 60}]}]}}`, juntado ao que já houver em `hooks`. O comando vem do arquivo, palavra por palavra; você não inventa outro.
@@ -25,10 +25,9 @@ Linhas fixas, que você lê pelo rótulo em negrito: **Empresa**, **Área**, **Q
 5. **O dado bruto** fica onde o arquivo diz (em geral, uma pasta do repositório que não sobe ao GitHub). Nunca na pasta pessoal. Se houver arquivo da empresa na pasta pessoal, não mova nem abra: anote em Pendências "arquivo da empresa na pasta pessoal: <nome>, vai para <onde o arquivo diz>", para ela mover com o ok do dono.
 6. **O que fica na pasta pessoal** segue o arquivo. O retrato continua sem número, sem nome de cliente, de fornecedor ou de colega, como em qualquer pasta.
 
-## O primeiro workflow, no modo empresa
-- **Os dados da empresa estão autorizados nos termos do arquivo.** Uma tarefa da área que o repositório já roda (um manual dele, uma rotina dele, uma análise que ele já faz) conta como "ao alcance": pode entrar nas 3 opções, e a rodada 1 roda pelo `AGENTS.md` do repositório, com as ferramentas dele.
-- **Continua valendo:** a rodada 1 entrega algo de verdade; nada sai do computador sem o ok dela, a não ser o que o `AGENTS.md` do repositório manda fazer sozinho (salvar o trabalho da área no repositório).
-- **A entrega da área fica no repositório**, onde o `AGENTS.md` dele manda; o cartão na pasta aponta para ela pelo caminho.
+## As primeiras tarefas, no modo empresa
+- Os dados da empresa estão autorizados nos termos do arquivo. Uma tarefa da área que o repositório já roda (um manual dele, uma rotina dele) conta como "ao alcance" e pode entrar nos pedidos de "Para começar".
+- Continua valendo: nada sai do computador sem o ok dela, a não ser o que o `AGENTS.md` do repositório manda fazer sozinho; a entrega da área fica no repositório, e o caderno do dia aponta para ela pelo caminho.
 
 ## O que dizer a ela
 Uma linha, na primeira vez, sem jargão: "O seu sistema trabalha junto com a base da <Empresa>: o que é da <Área> fica lá, e as regras da empresa para os dados vêm de lá também, sempre atualizadas."

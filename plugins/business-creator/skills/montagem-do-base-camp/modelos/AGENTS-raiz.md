@@ -2,7 +2,7 @@
 MODELO do arquivo-mestre do sistema da pessoa. Escreva no passo 1 (o retrato), na raiz da pasta, substituindo o AGENTS.md da montagem.
 Regras: em primeira pessoa (é ela falando com a IA); curto (até ~80 linhas); só o que ela aprovou; nenhuma menção à montagem, ao kit ou a esta pasta de modelos.
 Tire estes comentários e as instruções entre <>. Seção sem conteúdo aprovado sai inteira.
-No passo 1 (o retrato), grave o arquivo COM a seção "Montagem em andamento" logo abaixo do título (o texto está no fim deste modelo): ela garante que uma conversa nova, aberta no meio da etapa 6, retome a montagem. No Fim da montagem, tire só essa seção.
+No passo 1 (o retrato), grave o arquivo COM a seção "Montagem em andamento" logo abaixo do título (o texto está no fim deste modelo): ela garante que uma conversa nova, aberta no meio do passo 1, retome a montagem. Ao "confirmo" do passo 1, tire só essa seção.
 No nível leve (sem pasta por frente), as seções "Palavras minhas" e "Pendências" ficam aqui, com "nenhuma ainda".
 -->
 # <Nome>: o meu sistema de trabalho
@@ -29,11 +29,6 @@ Antes de trabalhar numa frente, leia o `AGENTS.md` dela.
 - **A que mais gera ou poupa dinheiro:** <FRENTES.dinheiro>.
 
 <só no leve>
-## Workflows
-| Workflow | Tipo | Estado | Do começo à entrega | Cartão |
-|---|---|---|---|---|
-| <o primeiro> | <cíclico / pontual> | <incompleto: falta o Campo 1> | <X → Y> | `workflows/<nome>.md` |
-
 ## Palavras minhas
 - <palavra que eu uso com sentido próprio, e o que quer dizer. "Nenhuma ainda.">
 
@@ -45,7 +40,7 @@ Antes de trabalhar numa frente, leia o `AGENTS.md` dela.
 ## A empresa onde eu trabalho
 - Trabalho na <Empresa>, na área <Área>. A base da área está em `<repositório>/`, que se atualiza sozinha quando abro uma conversa.
 - **Dados da empresa:** valem as regras de `<repositório>/contexto/regras-da-empresa.md`: quem autoriza, o que está autorizado, onde fica o trabalho e onde fica o dado bruto. Leia esse arquivo antes de qualquer trabalho com dado da empresa. Elas valem acima das minhas regras nesse assunto.
-- **O trabalho da área** segue `<repositório>/AGENTS.md`, que manda nele. Aqui ficam só os cartões dos meus workflows, o diário e o que é meu.
+- **O trabalho da área** segue `<repositório>/AGENTS.md`, que manda nele. Aqui ficam só o caderno do dia, o diário e o que é meu.
 </só no modo empresa>
 
 ## O meu computador
@@ -56,7 +51,7 @@ Antes de trabalhar numa frente, leia o `AGENTS.md` dela.
 |---|---|---|
 | <FERRAMENTAS.lista: e-mail, agenda, WhatsApp, planilhas, Drive, Notion; sistema da empresa só pelo tipo> | <para que ela usa, em poucas palavras> | <FERRAMENTAS.dados> |
 
-- Ainda não estão conectadas ao sistema: a conexão de cada uma se combina no Campo 1, uma de cada vez, começando pela leitura.
+- Ainda não estão conectadas ao sistema: a conexão de cada uma se combina no uso, uma de cada vez, começando pela leitura.
 
 ## Como me responder
 - <3 a 5 linhas tiradas de como-trabalhar-comigo.md: o essencial do formato, para valer em toda conversa.>
@@ -75,22 +70,22 @@ Antes de trabalhar numa frente, leia o `AGENTS.md` dela.
 - Quando eu te corrigir ou disser "daqui pra frente faça assim", registre a lição no `memoria.md`, com a data. Se a lição for de uma frente só, registre no `AGENTS.md` daquela frente.
 
 ## O meu dia
-- **Começo o dia pelo CAIO:** numa conversa nova, escrevo **bom dia** e digo ao CAIO o que preciso fazer, do meu jeito (skill `caio`). Ele sabe quem eu sou, as minhas frentes e o trabalho que já está nesta pasta (`dia/mapa-da-pasta.md`), e cuida por trás de o sistema crescer com o meu trabalho; faz na hora o que é rápido e abre uma conversa para cada tarefa maior, com o pedido completo; anota cada tarefa em `dia/`, me pede só o que é meu decidir, uma vez cada, e, quando uma tarefa se repete, guarda o jeito de fazer como workflow e me diz o pedido. Uma conversa com o CAIO por dia; no fim, **fecha o dia**.
-- **Conversa que começa com "Tarefa do CAIO"** foi aberta por ele: executa a tarefa até o pronto, não abre outras e não escreve em `dia/` (quem anota é o CAIO).
+- **Começo o dia pelo CAIO:** numa conversa nova, escrevo **bom dia** e digo o que preciso fazer, do meu jeito (skill `caio`). Ele sabe quem eu sou, as minhas frentes e o que já está nesta pasta; faz na hora o que é rápido e abre uma conversa para cada tarefa maior; anota cada tarefa em `dia/` e me pede só o que é meu decidir, uma vez cada.
+- **Tudo o que eu digo que ensina algo ao sistema vai para o lugar certo**, gravado antes da resposta: um fato sobre mim, uma regra, uma palavra minha, um modelo que aprovei. Uma linha por coisa, com a data.
+- Uma conversa com o CAIO por dia; no fim, **fecha o dia**.
+- **Conversa que começa com "Tarefa do CAIO"** foi aberta por ele: executa a tarefa até o pronto, não abre outras e não escreve em `dia/`.
 
 ## Como este sistema cresce
-- **Cada frente é um conjunto de workflows.** Workflow é o caminho de uma tarefa, do ponto de partida até a entrega. Cada um tem um cartão em `frentes/<frente>/workflows/` <no leve: `workflows/`>, com os passos, quem faz cada um, o que o sistema aprendeu e cada vez que rodou. Os passos são feitos por mim, por rotinas gravadas ou por skills, alimentadas pelos meus arquivos e pela memória.
-- **Um workflow por conversa; vários abertos ao mesmo tempo, cada um com o seu cartão.** O primeiro está em `<caminho do cartão>` <no passo 1, antes da escolha, esta linha fica: "O primeiro se escolhe no fim do Base Camp."; no passo 2, entra o caminho>. Cada conversa roda um workflow só; o cartão de cada um guarda onde ele parou, e eu posso abrir outro, até de outra frente, antes de fechar este. O outro abre numa conversa nova (pelo botão do painel, que pede a conversa e eu aprovo); se eu pedir um segundo workflow numa conversa que já rodou um, o sistema não roda, não pede nada sobre ele e me oferece a conversa nova (skill `campo-1`). Completo é quando ele roda do começo à entrega com um pedido só meu e eu aprovo a entrega.
-- **A primeira montanha:** no Campo 1, detalhar e aprender o workflow, passo a passo, rodando de ponta a ponta comigo; no Campo 2, os passos que se repetem viram skills (em `.claude/skills/`), e ele passa a sair pronto com um pedido meu; no Campo 3, se tem hora certa, ele chega sozinho. Toda skill nasce de um passo de um workflow.
-- **Tarefa que se repete sem cartão:** o CAIO percebe pelo registro e cria o workflow sozinho (na 3ª vez, ou na 2ª se for toda semana), me dizendo o pedido em meia linha; se eu não quiser, escrevo "descartar o workflow <nome>". O trabalho vem primeiro: nenhuma tarefa espera o workflow ser mapeado.
-- **Rotina não se perde:** toda rotina que produz uma entrega fica gravada na pasta (`frentes/<frente>/rotinas/`; <no leve: `rotinas/`>), com a conferência dentro, antes de a conversa acabar, e o cartão do workflow aponta para ela no passo dela. Na vez seguinte, roda a gravada.
+- **Pelo uso.** Quanto mais do meu trabalho passa por aqui, mais o sistema sabe. O trabalho vem primeiro: nenhuma tarefa espera o sistema ficar pronto.
+- **O que se repete fica anotado**, sem aviso e sem cobrança, no caderno do dia. Jeito fixo de fazer uma tarefa nasce depois: quando eu pedir ("transforma isso num jeito fixo de fazer") ou quando chegar uma sugestão para eu aceitar.
+- **Rotina não se perde:** toda rotina que produz uma entrega fica gravada na pasta (`frentes/<frente>/rotinas/`; <no leve: `rotinas/`>), com a conferência dentro, antes de a conversa acabar. Na vez seguinte, roda a gravada.
 - **O que eu aprovo vira arquivo:** texto em meu nome ou modelo aprovado vai para `frentes/<frente>/modelos/` <no leve: `modelos/`>.
 - **Nada fica no ar:** o que ficar sem resposta vai para as Pendências da frente antes de a conversa acabar.
 - **Toda tarefa tem linha de chegada:** antes de começar, diga o que é "pronto" (o quê, em que formato e onde fica). Se o meu pedido não disser, pergunte.
 
 <!--
-A seção temporária do passo 1. Vai logo abaixo do título e sai no Fim da montagem:
+A seção temporária do passo 1. Vai logo abaixo do título e sai no "confirmo" do passo 1:
 
 ## Montagem em andamento (esta seção sai no fim)
-- No começo de toda conversa, leia `base-camp.md`. Enquanto houver etapa pendente ou em andamento ali, use a skill `montagem-do-base-camp` para responder a qualquer mensagem, mesmo um "oi".
+- No começo de toda conversa, leia `base-camp.md`. Enquanto houver passo pendente ou em andamento ali, use a skill `montagem-do-base-camp` para responder a qualquer mensagem, mesmo um "oi".
 -->
